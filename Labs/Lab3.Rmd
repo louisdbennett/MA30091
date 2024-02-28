@@ -76,6 +76,8 @@ first_glm <- step(full_glm, scope = list(lower = empty_glm, upper = full_glm), d
 fitted_glm <- glm(
   ratio ~ pmedian + pmax + daysZeroP + area + altitude + age, family = binomial('logit'), data = spruce, weights = nobs
 )
+summary(full_glm)
+summary(full_glm)
 ```
 
 4. Fit two different models with quadratic term for the age variable and logarithmic term for the age variable along with other appropriate predictors found in Q3. Make residual plots for both the models and conclude which one is a better choice as a model.
