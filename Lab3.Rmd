@@ -1,0 +1,83 @@
+---
+title: "Spruce data modelling"
+author: "Sandipan Roy"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  html_document:
+      code_download: true
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Read the attached Spruce data description and answer the following questions
+
+## Exploratory Analysis- looking into the data
+```{r}
+library(ggplot2)
+library(GGally)
+library(dplyr)
+library(MASS)
+
+spruce<-read.csv("spruce1994.csv")
+dim(spruce)
+head(spruce)
+names(spruce)
+
+summary(spruce)
+```
+
+1. Are there any data related issues with the variable "soiltxt" and "soiltype"?
+
+```{r}
+spruce <- spruce %>% 
+  mutate(
+    across(c(relief, soiltxt, soiltype), stringr::str_trim),
+    soiltype = if_else(grepl('brown', soiltype), 'brown soil', soiltype),
+    area = case_match(
+      area,
+      'around Stuttgart/Neckarland' ~ 'Neckar',
+      'Baar/Blackforest' ~ 'Baar',
+      'Black Forest' ~ 'Black',
+      'Donau, Lake of Konstanz' ~ 'Donau',
+      'Oden Forest' ~ 'Oden',
+      'Rhine area' ~ 'Rhine',
+      'Swabian Alp' ~ 'Swabia',
+      .default = area
+    )
+  ) %>% 
+  dplyr::select(-X)
+```
+
+2. **(H)** Fit a linear model and a weighted linear model to the response variable "ratio" with only intercept present in the model. Which model is a better fit and why?
+
+```{r}
+lmod <- lm(ratio ~ 1, data = spruce)
+
+lmod1 <- lm(ratio ~ 1, data = spruce, weights = nobs)
+
+summary(lmod)
+summary(lmod1)
+```
+
+3. **(H)** Use an appropriate GLM using relevant predictors in the dataset and the response variable. Using appropriate statistical technique(s) decide on which predictor variables to stay in the model. (Hint: You may need to use context of the data along with appropriate variable selection procedure(s) in R to come to the final model)
+
+```{r}
+full_glm <- glm(ratio ~ ., binomial('logit'), data = spruce, weights = nobs)
+full_glm <- glm(ratio ~ ., gaussian, data = spruce, weights = nobs)
+empty_glm <- glm(ratio ~ 1, binomial('logit'), data = spruce, weights = nobs)
+
+first_glm <- step(full_glm, scope = list(lower = empty_glm, upper = full_glm), direction = 'backward', trace = 0, k = 2)
+
+fitted_glm <- glm(
+  ratio ~ pmedian + pmax + daysZeroP + area + altitude + age, family = binomial('logit'), data = spruce, weights = nobs
+)
+```
+
+4. Fit two different models with quadratic term for the age variable and logarithmic term for the age variable along with other appropriate predictors found in Q3. Make residual plots for both the models and conclude which one is a better choice as a model.
+
+5. **(H)** Interpret the coefficients of the predictors in the final model and mention which explanatory variable is the biggest contributor in that model? Write a non-technical summary of your findings.

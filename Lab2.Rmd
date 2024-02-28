@@ -1,0 +1,55 @@
+---
+title: "Coral_analysis"
+author: "Sandipan Roy"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  html_document:
+      code_download: true
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+# Initial Exploration
+We first read the data, look at the dimension and the first few rows in the dataset
+```{r}
+coral <- read.csv("coral.csv")
+dim(coral)
+head(coral)
+length(unique(coral$reef))
+```
+
+1. Make three different tables showing the number of observations available for different coral complexities, different years and different seasons respectively.
+
+```{r}
+xtabs(formula = ~ complex, data = coral)
+xtabs(formula = ~ year, data = coral)
+xtabs(formula = ~ season, data = coral)
+```
+
+2. Are the counts for the disease and the plastic skewed? Explain.
+```{r}
+ggplot() +
+  geom_density(data = coral, aes(x = plastic))
+```
+
+
+3. Find the disease rates for the different types of diseases. Interpret the result you obtained.
+
+4. Use an appropriate GLM (call the model mod0) to fit the counts of disease against the predictors plastic, complex and reef.
+
+5. Use the command drop1(mod0,test="Chisq"). Arrange the predictor variables in the order of strongest contributions. What do you observe about the reef effects?
+
+6. **(H)** Fit a new model with plastic, complex and country as predictors. Any practical benefit of including country?
+
+7. **(H)** What is the increase in the risk of disease for each extra piece of plastic waste? Which one among the different complexes would likely to have less disease as per the fitted model in question 6.
+
+8. **(H)** Find the prediction errors (training error, test error and the cross validation error) by creating a training dataset (~90%) to build model and then a test dataset (~10%) for measuring the performanc of the model. You may use the same predictor variables as in question 6 to build the model.
+
+9. Modify your model in question 6 with plastic and complex interaction included. Interpret the estimates of the coefficients in the new model.
+
