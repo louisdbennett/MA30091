@@ -1,0 +1,281 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+  11pt,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{hhline}
+\usepackage{calc}
+\usepackage{tabularx}
+\usepackage[para,online,flushleft]{threeparttable}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Analysis of Health Survey for England (HSE) 2019},
+  pdfauthor={Candidate Numbers Here},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Analysis of Health Survey for England (HSE) 2019}
+\author{Candidate Numbers Here}
+\date{March 01, 2024}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+This report provides an analysis of data related to health, age,
+socio-economic factors and lifestyle habits in adults (from the age of
+16) from the population in England, derived from the Health Survey for
+England 2019.
+\end{abstract}
+
+\newpage
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+This is a body of text. \emph{This is an italic body of text.}
+\href{https://google.com}{This is a clickable link!}.
+
+\hypertarget{some-yaml-stuff}{%
+\section{Some YAML Stuff}\label{some-yaml-stuff}}
+
+The lion's share of a R Markdown document will be raw text, though the
+front matter may be the most important part of the document. R Markdown
+uses \href{http://www.yaml.org/}{YAML} for its metadata and the fields
+differ from
+\href{http://svmiller.com/blog/2015/02/moving-from-beamer-to-r-markdown/}{what
+an author would use for a Beamer presentation}. I provide a sample YAML
+metadata largely taken from this exact document and explain it below.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\SpecialCharTok{{-}{-}{-}}
+\NormalTok{output}\SpecialCharTok{:} 
+\NormalTok{  pdf\_document}\SpecialCharTok{:}
+\NormalTok{    keep\_tex}\SpecialCharTok{:}\NormalTok{ true}
+\NormalTok{    fig\_caption}\SpecialCharTok{:}\NormalTok{ true}
+\NormalTok{    latex\_engine}\SpecialCharTok{:}\NormalTok{ pdflatex}
+\NormalTok{title}\SpecialCharTok{:} \StringTok{"A Pandoc Markdown Article Starter and Template"}
+\NormalTok{abstract}\SpecialCharTok{:} \StringTok{"This document provides an introduction to R Markdown, argues for its..."}
+\NormalTok{date}\SpecialCharTok{:} \StringTok{"\textasciigrave{}r format(Sys.time(), \textquotesingle{}\%B \%d, \%Y\textquotesingle{})\textasciigrave{}"}
+\NormalTok{geometry}\SpecialCharTok{:}\NormalTok{ margin}\OtherTok{=}\NormalTok{1in}
+\NormalTok{fontsize}\SpecialCharTok{:}\NormalTok{ 11pt}
+\CommentTok{\# spacing: double}
+\SpecialCharTok{{-}{-}{-}}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{output:} will tell R Markdown we want a PDF document rendered
+with LaTeX. Since we are adding a fair bit of custom options to this
+call, we specify \texttt{pdf\_document:} on the next line (with,
+importantly, a two-space indent). We specify additional output-level
+options underneath it, each are indented with four spaces. The line
+(\texttt{keep\_tex:\ true}) tells R Markdown to render a raw
+\texttt{.tex} file along with the PDF document. This is useful for both
+debugging and the publication stage. The next line
+\texttt{fig\_caption:\ true} tells R Markdown to make sure that whatever
+images are included in the document are treated as figures in which our
+caption in brackets in a Markdown call is treated as the caption in the
+figure. The next line (\texttt{latex\_engine:\ pdflatex}) tells R
+Markdown to use pdflatex and not some other option like
+\texttt{lualatex}. For this template, I'm pretty sure this is
+mandatory.{[}\^{}pdflatex{]}
+
+The next fields get to the heart of the document itself. \texttt{title:}
+is, intuitively, the title of the manuscript. Do note that fields like
+\texttt{title:} do not have to be in quotation marks, but must be in
+quotation marks if the title of the document includes a colon. That
+said, the only reason to use a colon in an article title is if it is
+followed by a subtitle, hence the optional field (\texttt{subtitle:}).
+Notice I ``comment out'' the subtitle in the above example with a pound
+sign since this particular document does not have a subtitle.
+
+\texttt{date} comes standard with R Markdown and you can use it to enter
+the date of the most recent compile.
+
+The next items are optional and cosmetic. \texttt{geometry:} is a
+standard option in LaTeX. I set the margins at one inch, and you
+probably should too. \texttt{fontsize:} sets, intuitively, the font
+size. The default is 10-point, but I prefer 11-point. \texttt{spacing:}
+is an optional field. If it is set as ``double'', the ensuing document
+is double-spaced. ``single'' is the only other valid entry for this
+field, though not including the entry in the YAML metadata amounts to
+singlespacing the document by default. Notice I have this ``commented
+out'' in the example code.
+
+\hypertarget{getting-started-with-markdown-syntax}{%
+\section{Getting Started with Markdown
+Syntax}\label{getting-started-with-markdown-syntax}}
+
+There are a lot of cheatsheets and reference guides for Markdown
+(e.g.~\href{https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet}{Adam
+Prichard},
+\href{http://assemble.io/docs/Cheatsheet-Markdown.html}{Assemble},
+\href{https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf}{Rstudio},
+\href{https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf}{Rstudio
+again},
+\href{http://scottboms.com/downloads/documentation/markdown_cheatsheet.pdf}{Scott
+Boms}, \href{https://daringfireball.net/projects/markdown/syntax}{Daring
+Fireball}, among, I'm sure, several others).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\FunctionTok{\# Introduction}
+
+\NormalTok{**Lorem ipsum** dolor *sit amet*. }
+
+\SpecialStringTok{{-} }\NormalTok{Single asterisks italicize text *like this*. }
+\SpecialStringTok{{-} }\NormalTok{Double asterisks embolden text **like this**.}
+
+\NormalTok{Start a new paragraph with a blank line separating paragraphs.}
+
+\SpecialStringTok{{-} }\NormalTok{This will start an unordered list environment, and this will be the first item.}
+\SpecialStringTok{{-} }\NormalTok{This will be a second item.}
+\SpecialStringTok{{-} }\NormalTok{A third item.}
+\SpecialStringTok{    {-} }\NormalTok{Four spaces and a dash create a sublist and this item in it.}
+\SpecialStringTok{{-} }\NormalTok{The fourth item.}
+    
+\SpecialStringTok{1. }\NormalTok{This starts a numerical list.}
+\SpecialStringTok{2. }\NormalTok{This is no. 2 in the numerical list.}
+    
+\FunctionTok{\# This Starts A New Section}
+\FunctionTok{\#\# This is a Subsection}
+\FunctionTok{\#\#\# This is a Subsubsection}
+\FunctionTok{\#\#\#\# This starts a Paragraph Block.}
+
+\AttributeTok{\textgreater{} This will create a block quote, if you want one.}
+
+\NormalTok{Want a table? This will create one.}
+
+\NormalTok{Table Header  | Second Header}
+\NormalTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} | {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{Table Cell    | Cell 2}
+\NormalTok{Cell 3        | Cell 4 }
+
+\NormalTok{Note that the separators *do not* have to be aligned.}
+
+\NormalTok{Want an image? This will do it.}
+
+\AlertTok{![caption for my image](path/to/image.jpg)}
+
+\InformationTok{\textasciigrave{}fig\_caption: yes\textasciigrave{}}\NormalTok{ will provide a caption. Put that in the YAML metadata.}
+
+\NormalTok{Almost forgot about creating a footnote.}\OtherTok{[\^{}1]}\NormalTok{ This will do it again.}\OtherTok{[\^{}2]}
+
+\OtherTok{[\^{}1]: }\NormalTok{The first footnote}
+\OtherTok{[\^{}2]: }\NormalTok{The second footnote}
+
+\NormalTok{Want to cite something? }
+
+\SpecialStringTok{{-} }\NormalTok{Find your biblatexkey in your bib file.}
+\SpecialStringTok{{-} }\NormalTok{Put an @ before it, like @smith1984, or whatever it is.}
+\SpecialStringTok{{-} }\NormalTok{@smith1984 creates an in{-}text citation (e.g. Smith (1984) says...)}
+\SpecialStringTok{{-} }\CommentTok{[}\OtherTok{@smith1984}\CommentTok{]}\NormalTok{ creates a parenthetical citation (Smith, 1984)}
+
+\NormalTok{That\textquotesingle{}ll also automatically create a reference list at the end of the document.}
+
+\CommentTok{[}\OtherTok{In{-}text link to Google}\CommentTok{](http://google.com)}\NormalTok{ as well.}
+\end{Highlighting}
+\end{Shaded}
+
+
+\end{document}

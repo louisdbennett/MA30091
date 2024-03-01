@@ -1,0 +1,144 @@
+---
+output: 
+  pdf_document:
+    keep_tex: true
+    fig_caption: true
+    latex_engine: pdflatex
+header-includes:
+  -  \usepackage{hyperref}
+  - \usepackage{array}   
+  - \usepackage{caption}
+  - \usepackage{graphicx}
+  - \usepackage{multirow}
+  - \usepackage{hhline}
+  - \usepackage{calc}
+  - \usepackage{tabularx}
+  - \usepackage[para,online,flushleft]{threeparttable} 
+title: "Analysis of Health Survey for England (HSE) 2019"
+author: Candidate Numbers Here
+abstract: "This report provides an analysis of data related to health, age, socio-economic factors and lifestyle habits in adults (from the age of 16) from the population in England, derived from the Health Survey for England 2019."
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+geometry: margin=1in
+fontsize: 11pt
+# spacing: double
+endnote: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(cache=TRUE,
+                      message=FALSE, warning=FALSE,
+                      fig.path='figs/',
+                      cache.path = '_cache/',
+                      fig.process = function(x) {
+                      x2 = sub('-\\d+([.][a-z]+)$', '\\1', x)
+                      if (file.rename(x, x2)) x2 else x
+                      })
+```
+
+\newpage
+
+
+
+# Introduction
+
+This is a body of text.  *This is an italic body of text.* [This is a clickable link!](https://google.com).
+
+# Some YAML Stuff
+
+The lion's share of a R Markdown document will be raw text, though the front matter may be the most important part of the document. R Markdown uses [YAML](http://www.yaml.org/) for its metadata and the fields differ from [what an author would use for a Beamer presentation](http://svmiller.com/blog/2015/02/moving-from-beamer-to-r-markdown/). I provide a sample YAML metadata largely taken from this exact document and explain it below.
+
+```{r eval=FALSE}
+---
+output: 
+  pdf_document:
+    keep_tex: true
+    fig_caption: true
+    latex_engine: pdflatex
+title: "A Pandoc Markdown Article Starter and Template"
+abstract: "This document provides an introduction to R Markdown, argues for its..."
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+geometry: margin=1in
+fontsize: 11pt
+# spacing: double
+---
+```
+
+`output:` will tell R Markdown we want a PDF document rendered with LaTeX. Since we are adding a fair bit of custom options to this call, we specify `pdf_document:` on the next line (with, importantly, a two-space indent). We specify additional output-level options underneath it, each are indented with four spaces. The line (`keep_tex: true`) tells R Markdown to render a raw `.tex` file along with the PDF document. This is useful for both debugging and the publication stage. The next line `fig_caption: true` tells R Markdown to make sure that whatever images are included in the document are treated as figures in which our caption in brackets in a Markdown call is treated as the caption in the figure. The next line (`latex_engine: pdflatex`) tells R Markdown to use pdflatex and not some other option like `lualatex`. For this template, I'm pretty sure this is mandatory.[^pdflatex]
+
+The next fields get to the heart of the document itself. `title:` is, intuitively, the title of the manuscript. Do note that fields like `title:` do not have to be in quotation marks, but must be in quotation marks if the title of the document includes a colon. That said, the only reason to use a colon in an article title is if it is followed by a subtitle, hence the optional field (`subtitle:`). Notice I "comment out" the subtitle in the above example with a pound sign since this particular document does not have a subtitle.
+
+`date` comes standard with R Markdown and you can use it to enter the date of the most recent compile.
+
+The next items are optional and cosmetic. `geometry:` is a standard option in LaTeX. I set the margins at one inch, and you probably should too. `fontsize:` sets, intuitively, the font size. The default is 10-point, but I prefer 11-point. `spacing:` is an optional field. If it is set as "double", the ensuing document is double-spaced. "single" is the only other valid entry for this field, though not including the entry in the YAML metadata amounts to singlespacing the document by default. Notice I have this "commented out" in the example code.
+
+# Getting Started with Markdown Syntax
+
+There are a lot of cheatsheets and reference guides for Markdown (e.g. [Adam Prichard](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet), [Assemble](http://assemble.io/docs/Cheatsheet-Markdown.html), [Rstudio](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf), [Rstudio again](https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf), [Scott Boms](http://scottboms.com/downloads/documentation/markdown_cheatsheet.pdf), [Daring Fireball](https://daringfireball.net/projects/markdown/syntax), among, I'm sure, several others).
+
+```markdown
+
+# Introduction
+
+**Lorem ipsum** dolor *sit amet*. 
+
+- Single asterisks italicize text *like this*. 
+- Double asterisks embolden text **like this**.
+
+Start a new paragraph with a blank line separating paragraphs.
+
+- This will start an unordered list environment, and this will be the first item.
+- This will be a second item.
+- A third item.
+    - Four spaces and a dash create a sublist and this item in it.
+- The fourth item.
+    
+1. This starts a numerical list.
+2. This is no. 2 in the numerical list.
+    
+# This Starts A New Section
+## This is a Subsection
+### This is a Subsubsection
+#### This starts a Paragraph Block.
+
+> This will create a block quote, if you want one.
+
+Want a table? This will create one.
+
+Table Header  | Second Header
+------------- | -------------
+Table Cell    | Cell 2
+Cell 3        | Cell 4 
+
+Note that the separators *do not* have to be aligned.
+
+Want an image? This will do it.
+
+![caption for my image](path/to/image.jpg)
+
+`fig_caption: yes` will provide a caption. Put that in the YAML metadata.
+
+Almost forgot about creating a footnote.[^1] This will do it again.[^2]
+
+[^1]: The first footnote
+[^2]: The second footnote
+
+Want to cite something? 
+
+- Find your biblatexkey in your bib file.
+- Put an @ before it, like @smith1984, or whatever it is.
+- @smith1984 creates an in-text citation (e.g. Smith (1984) says...)
+- [@smith1984] creates a parenthetical citation (Smith, 1984)
+
+That'll also automatically create a reference list at the end of the document.
+
+[In-text link to Google](http://google.com) as well.
+```
+
+<!--
+# References
+\setlength{\parindent}{-0.2in}
+\setlength{\leftskip}{0.2in}
+\setlength{\parskip}{8pt}
+\vspace*{-0.2in}
+\noindent
+-->
