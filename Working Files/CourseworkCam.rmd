@@ -142,3 +142,206 @@ That'll also automatically create a reference list at the end of the document.
 \vspace*{-0.2in}
 \noindent
 -->
+
+## Exploring the Data
+
+### Checking for Messy Data
+
+```{r LoadDataset}
+library(haven) # Required to present the summary of labelled data.
+load("~/MA30091/Coursework/MA30091/Datasets/hsesub.Rdata") # The dset is called subdat
+summary(subdat)
+```
+This tells us that all of our variables are coded as numeric. However, we may want to code some as factor variables instead based on the variable descriptions.
+
+- Sex: Should be coded as 
+
+Code  | Decode         | Count
+----- | -------------- | -----
+1     | Male           |
+2     | Female         |
+-1    | Not Applicable |
+-8    | Don't Know     |
+-9    | Refused        |
+
+- Age35g: Should be coded as
+
+Code  | Decode         | Count
+----- | -------------- | ------
+1     | 0-1yrs         |
+2     | 2-4yrs         |
+3     | 5-7yrs         |
+4     | 8-10yrs        |
+5     | 11-12yrs       |
+6     | 13-15yrs       |
+7     | 16-19yrs       |
+8     | 20-24yrs       |
+9     | 25-29yrs       |
+10    | 30-34yrs       |
+11    | 35-39yrs       |
+12    | 40-44yrs       |
+13    | 45-49yrs       |
+14    | 50-54yrs       |
+15    | 55-59yrs       |
+16    | 60-64yrs       |
+17    | 65-69yrs       |
+18    | 70-74yrs       |
+19    | 75-79yrs       |
+20    | 80-84yrs       |
+21    | 85-59yrs       |
+22    | 90+yrs         |
+-1    | Not Applicable |
+-8    | Don't Know     |
+-9    | Refused        |
+
+- ag16g10: Should be coded as
+
+Code  | Decode         | Count
+----- | -------------- | ------
+1     | 16-24yrs       |
+2     | 25-34yrs       |
+3     | 35-44yrs       |
+4     | 45-54yrs       |
+5     | 55-64yrs       |
+6     | 65-74yrs       |
+7     | 75+yrs         |
+-1    | Not Applicable |
+-8    | Don't Know     |
+-9    | Refused        |
+
+- topqual2: Should be coded as
+
+Code  | Decode                     | Count
+----- | -------------------------- | ------
+1     | NVQ4/NVQ5/Degree or equiv  |
+2     | Higher ed below degree     |
+3     | NVQ3/GCE A Level equiv     |
+4     | NVQ2/GCE O Level equiv     |
+5     | NVQ1/CSE other grade equiv |
+6     | Foreign/other              |
+7     | No qualification           |
+8     | FT Student                 |
+-1    | Not Applicable             |
+-8    | Don't Know                 |
+-9    | Refused                    |
+
+- qimd19: Should be coded as
+
+Code  | Decode         | Count
+----- | -------------- | ------
+1     | Most deprived  |
+5     | Least deprived |
+-1    | Not Applicable |
+-8    | Don't Know     |
+-9    | Refused        |
+
+Note: IMD2,IMD3 and IMD4 had no observations.
+
+- urban14b: Should be coded as
+
+Code  | Decode                                                | Count
+----- | ------------------------------------------------------| ------
+1     | Urban                                                 |
+2     | Town/ Fringe/ Village, hamlet and isolated dwellings  |
+-1    | Not Applicable                                        |
+-8    | Don't Know                                            |
+-9    | Refused                                               |
+
+- origin2: Should be coded as
+
+Code  | Decode                           | Count
+----- | -------------------------------- | ------
+1     | White                            |
+2     | Black                            |
+3     | Asian                            |
+4     | Mixed/multiple ethnic background |
+5     | Any other ethnic group           |
+-1    | Not Applicable                   |
+-8    | Don't Know                       |
+-9    | Refused                          |
+
+- cigsta3_19: Should be coded as
+
+Code  | Decode                           | Count
+----- | -------------------------------- | ------
+1     | Current cigarette smoker         |
+2     | Ex-regular cigarette smoker      |
+3     | Never regular cigarette smoker   |
+-1    | Not Applicable                   |
+-8    | Don't Know                       |
+-9    | Refused                          |
+
+- NDPNow_19: Should be coded as
+
+Code  | Decode                                | Count
+----- | ------------------------------------- | ------
+1     | E-cigarettes or vaping devices only   |
+2     | Other nicotine delivery products only |
+3     | Both                                  |
+4     | None                                  |
+-1    | Not Applicable                        |
+-8    | Don't Know                            |
+-9    | Refused                               |
+
+- drinkYN_19: Should be coded as
+
+Code  | Decode                                | Count
+----- | ------------------------------------- | ------
+1     | No                                    |
+2     | Yes                                   |
+-1    | Not Applicable                        |
+-8    | Don't Know                            |
+-9    | Refused                               |
+
+- dnoft_19: Should be coded as
+
+Code  | Decode                           | Count
+----- | -------------------------------- | ------
+1     | Almost every day                 |
+2     | Five or six days a week          |
+3     | Three or four days a week        |
+4     | Once or twice a week             |
+5     | Once or twice a month            |
+6     | Once every couple of months     |
+7     | Once or twice a year             |
+8     | Not at all in the last 12 months |
+-1    | Not Applicable                   |
+-8    | Don't Know                       |
+-9    | Refused                          |
+
+- GOR1: Should be coded as
+
+Code  | Decode                   | Count
+----- | ------------------------ | ------
+1     | North East               |
+2     | North West               |
+3     | Yorkshire and the Humber |
+4     | East Midlands            |
+5     | West Midlands            |
+6     | East of England          |
+7     | London                   |
+8     | South East               |
+9     | South West               |
+-1    | Not Applicable           |
+-8    | Don't Know               |
+-9    | Refused                  |
+
+```{r}
+subdat$Sex = factor(subdat$Sex)
+subdat$Age35g = factor(subdat$Age35g)
+subdat$ag16g10 = factor(subdat$ag16g10)
+subdat$topqual2 = factor(subdat$topqual2)
+subdat$qimd19 = factor(subdat$qimd19)
+subdat$urban14b = factor(subdat$urban14b)
+subdat$origin2 = factor(subdat$origin2)
+subdat$cigsta3_19 = factor(subdat$cigsta3_19)
+subdat$NDPNow_19 = factor(subdat$NDPNow_19)
+subdat$drinkYN_19 = factor(subdat$drinkYN_19)
+subdat$dnoft_19 = factor(subdat$dnoft_19)
+subdat$GOR1 = factor(subdat$GOR1)
+summary(subdat)
+```
+
+Note that the null flavors may not be used for modeling (and can just be treated as generic missing values), but they will bve useful for evaluating the study design. For example, lots of **Refused** for a variable could mean there is a bias in porivacy or that the question is too sensitive. Lots of **Don't know** for a variable could indicate some recall bias and that the question is poorly designed, whereas lots of **Not applicable** either comes from reduced generalisability (e.g. "Is patient currently pregnant?) or poorly measured variables (Like valid BMI results being sparse due to bad measurements or missing heights/weights).
+
+The variable d7many3_19 has nothing but missing values, so this variable can be dropped from analysis.

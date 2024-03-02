@@ -75,6 +75,16 @@
 \newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
 \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
 \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
 \usepackage{graphicx}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
@@ -115,7 +125,7 @@
 
 \title{Analysis of Health Survey for England (HSE) 2019}
 \author{Candidate Numbers Here}
-\date{March 01, 2024}
+\date{March 02, 2024}
 
 \begin{document}
 \maketitle
@@ -277,5 +287,412 @@ Fireball}, among, I'm sure, several others).
 \end{Highlighting}
 \end{Shaded}
 
+\hypertarget{exploring-the-data}{%
+\subsection{Exploring the Data}\label{exploring-the-data}}
+
+\hypertarget{checking-for-messy-data}{%
+\subsubsection{Checking for Messy Data}\label{checking-for-messy-data}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(haven) }\CommentTok{\# Required to present the summary of labelled data.}
+\FunctionTok{load}\NormalTok{(}\StringTok{"\textasciitilde{}/MA30091/Coursework/MA30091/Datasets/hsesub.Rdata"}\NormalTok{) }\CommentTok{\# The dset is called subdat}
+\FunctionTok{summary}\NormalTok{(subdat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     SerialA             Sex           ag16g10          Age35g     
+##  Min.   :2900001   Min.   :1.000   Min.   :1.000   Min.   : 1.00  
+##  1st Qu.:2903094   1st Qu.:1.000   1st Qu.:3.000   1st Qu.: 8.00  
+##  Median :2906238   Median :2.000   Median :4.000   Median :12.00  
+##  Mean   :2906229   Mean   :1.539   Mean   :4.128   Mean   :11.71  
+##  3rd Qu.:2909378   3rd Qu.:2.000   3rd Qu.:6.000   3rd Qu.:16.00  
+##  Max.   :2912465   Max.   :2.000   Max.   :7.000   Max.   :22.00  
+##                                    NA's   :2095                   
+##      wt_int          topqual2        marstatD         qimd19     
+##  Min.   :0.3155   Min.   :1.000   Min.   :1.000   Min.   :1.000  
+##  1st Qu.:0.7941   1st Qu.:1.000   1st Qu.:2.000   1st Qu.:2.000  
+##  Median :0.8989   Median :3.000   Median :2.000   Median :3.000  
+##  Mean   :1.0000   Mean   :3.664   Mean   :2.658   Mean   :3.044  
+##  3rd Qu.:1.0974   3rd Qu.:7.000   3rd Qu.:4.000   3rd Qu.:4.000  
+##  Max.   :6.4927   Max.   :8.000   Max.   :6.000   Max.   :5.000  
+##                   NA's   :2141    NA's   :2096                   
+##     urban14b        origin2        cigsta3_19      cigdyal_19    
+##  Min.   :1.000   Min.   :1.000   Min.   :1.000   Min.   : 0.000  
+##  1st Qu.:1.000   1st Qu.:1.000   1st Qu.:2.000   1st Qu.: 0.000  
+##  Median :1.000   Median :1.000   Median :3.000   Median : 0.000  
+##  Mean   :1.181   Mean   :1.343   Mean   :2.437   Mean   : 1.692  
+##  3rd Qu.:1.000   3rd Qu.:1.000   3rd Qu.:3.000   3rd Qu.: 0.000  
+##  Max.   :2.000   Max.   :5.000   Max.   :3.000   Max.   :60.000  
+##                  NA's   :33      NA's   :2151    NA's   :2152    
+##      BMIVal         NDPNow_19        dnoft_19       drinkYN_19   
+##  Min.   : 9.723   Min.   :1.000   Min.   :1.000   Min.   :1.000  
+##  1st Qu.:21.915   1st Qu.:4.000   1st Qu.:3.000   1st Qu.:2.000  
+##  Median :25.904   Median :4.000   Median :4.000   Median :2.000  
+##  Mean   :26.223   Mean   :3.862   Mean   :4.281   Mean   :1.808  
+##  3rd Qu.:29.953   3rd Qu.:4.000   3rd Qu.:5.000   3rd Qu.:2.000  
+##  Max.   :73.494   Max.   :4.000   Max.   :8.000   Max.   :2.000  
+##  NA's   :2224     NA's   :2148    NA's   :3594    NA's   :2146   
+##    d7many3_19       omsysval          GOR1      
+##  Min.   :0.000   Min.   : 75.0   Min.   :1.000  
+##  1st Qu.:0.000   1st Qu.:110.5   1st Qu.:3.000  
+##  Median :1.000   Median :121.0   Median :5.000  
+##  Mean   :1.595   Mean   :122.9   Mean   :5.163  
+##  3rd Qu.:3.000   3rd Qu.:133.5   3rd Qu.:8.000  
+##  Max.   :7.000   Max.   :209.5   Max.   :9.000  
+##  NA's   :2147    NA's   :5593
+\end{verbatim}
+
+This tells us that all of our variables are coded as numeric. However,
+we may want to code some as factor variables instead based on the
+variable descriptions.
+
+\begin{itemize}
+\tightlist
+\item
+  Sex: Should be coded as
+\end{itemize}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule()
+Code & Decode & Count \\
+\midrule()
+\endhead
+1 & Male & \\
+2 & Female & \\
+-1 & Not Applicable & \\
+-8 & Don't Know & \\
+-9 & Refused & \\
+\bottomrule()
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  Age35g: Should be coded as
+\end{itemize}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule()
+Code & Decode & Count \\
+\midrule()
+\endhead
+1 & 0-1yrs & \\
+2 & 2-4yrs & \\
+3 & 5-7yrs & \\
+4 & 8-10yrs & \\
+5 & 11-12yrs & \\
+6 & 13-15yrs & \\
+7 & 16-19yrs & \\
+8 & 20-24yrs & \\
+9 & 25-29yrs & \\
+10 & 30-34yrs & \\
+11 & 35-39yrs & \\
+12 & 40-44yrs & \\
+13 & 45-49yrs & \\
+14 & 50-54yrs & \\
+15 & 55-59yrs & \\
+16 & 60-64yrs & \\
+17 & 65-69yrs & \\
+18 & 70-74yrs & \\
+19 & 75-79yrs & \\
+20 & 80-84yrs & \\
+21 & 85-59yrs & \\
+22 & 90+yrs & \\
+-1 & Not Applicable & \\
+-8 & Don't Know & \\
+-9 & Refused & \\
+\bottomrule()
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  ag16g10: Should be coded as
+\end{itemize}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule()
+Code & Decode & Count \\
+\midrule()
+\endhead
+1 & 16-24yrs & \\
+2 & 25-34yrs & \\
+3 & 35-44yrs & \\
+4 & 45-54yrs & \\
+5 & 55-64yrs & \\
+6 & 65-74yrs & \\
+7 & 75+yrs & \\
+-1 & Not Applicable & \\
+-8 & Don't Know & \\
+-9 & Refused & \\
+\bottomrule()
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  topqual2: Should be coded as
+\end{itemize}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule()
+Code & Decode & Count \\
+\midrule()
+\endhead
+1 & NVQ4/NVQ5/Degree or equiv & \\
+2 & Higher ed below degree & \\
+3 & NVQ3/GCE A Level equiv & \\
+4 & NVQ2/GCE O Level equiv & \\
+5 & NVQ1/CSE other grade equiv & \\
+6 & Foreign/other & \\
+7 & No qualification & \\
+8 & FT Student & \\
+-1 & Not Applicable & \\
+-8 & Don't Know & \\
+-9 & Refused & \\
+\bottomrule()
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  qimd19: Should be coded as
+\end{itemize}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule()
+Code & Decode & Count \\
+\midrule()
+\endhead
+1 & Most deprived & \\
+5 & Least deprived & \\
+-1 & Not Applicable & \\
+-8 & Don't Know & \\
+-9 & Refused & \\
+\bottomrule()
+\end{longtable}
+
+Note: IMD2,IMD3 and IMD4 had no observations.
+
+\begin{itemize}
+\tightlist
+\item
+  urban14b: Should be coded as
+\end{itemize}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule()
+Code & Decode & Count \\
+\midrule()
+\endhead
+1 & Urban & \\
+2 & Town/ Fringe/ Village, hamlet and isolated dwellings & \\
+-1 & Not Applicable & \\
+-8 & Don't Know & \\
+-9 & Refused & \\
+\bottomrule()
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  origin2: Should be coded as
+\end{itemize}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule()
+Code & Decode & Count \\
+\midrule()
+\endhead
+1 & White & \\
+2 & Black & \\
+3 & Asian & \\
+4 & Mixed/multiple ethnic background & \\
+5 & Any other ethnic group & \\
+-1 & Not Applicable & \\
+-8 & Don't Know & \\
+-9 & Refused & \\
+\bottomrule()
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  cigsta3\_19: Should be coded as
+\end{itemize}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule()
+Code & Decode & Count \\
+\midrule()
+\endhead
+1 & Current cigarette smoker & \\
+2 & Ex-regular cigarette smoker & \\
+3 & Never regular cigarette smoker & \\
+-1 & Not Applicable & \\
+-8 & Don't Know & \\
+-9 & Refused & \\
+\bottomrule()
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  NDPNow\_19: Should be coded as
+\end{itemize}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule()
+Code & Decode & Count \\
+\midrule()
+\endhead
+1 & E-cigarettes or vaping devices only & \\
+2 & Other nicotine delivery products only & \\
+3 & Both & \\
+4 & None & \\
+-1 & Not Applicable & \\
+-8 & Don't Know & \\
+-9 & Refused & \\
+\bottomrule()
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  drinkYN\_19: Should be coded as
+\end{itemize}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule()
+Code & Decode & Count \\
+\midrule()
+\endhead
+1 & No & \\
+2 & Yes & \\
+-1 & Not Applicable & \\
+-8 & Don't Know & \\
+-9 & Refused & \\
+\bottomrule()
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  dnoft\_19: Should be coded as
+\end{itemize}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule()
+Code & Decode & Count \\
+\midrule()
+\endhead
+1 & Almost every day & \\
+2 & Five or six days a week & \\
+3 & Three or four days a week & \\
+4 & Once or twice a week & \\
+5 & Once or twice a month & \\
+6 & Once every couple of months & \\
+7 & Once or twice a year & \\
+8 & Not at all in the last 12 months & \\
+-1 & Not Applicable & \\
+-8 & Don't Know & \\
+-9 & Refused & \\
+\bottomrule()
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  GOR1: Should be coded as
+\end{itemize}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule()
+Code & Decode & Count \\
+\midrule()
+\endhead
+1 & North East & \\
+2 & North West & \\
+3 & Yorkshire and the Humber & \\
+4 & East Midlands & \\
+5 & West Midlands & \\
+6 & East of England & \\
+7 & London & \\
+8 & South East & \\
+9 & South West & \\
+-1 & Not Applicable & \\
+-8 & Don't Know & \\
+-9 & Refused & \\
+\bottomrule()
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{subdat}\SpecialCharTok{$}\NormalTok{Sex }\OtherTok{=} \FunctionTok{factor}\NormalTok{(subdat}\SpecialCharTok{$}\NormalTok{Sex)}
+\NormalTok{subdat}\SpecialCharTok{$}\NormalTok{Age35g }\OtherTok{=} \FunctionTok{factor}\NormalTok{(subdat}\SpecialCharTok{$}\NormalTok{Age35g)}
+\NormalTok{subdat}\SpecialCharTok{$}\NormalTok{ag16g10 }\OtherTok{=} \FunctionTok{factor}\NormalTok{(subdat}\SpecialCharTok{$}\NormalTok{ag16g10)}
+\NormalTok{subdat}\SpecialCharTok{$}\NormalTok{topqual2 }\OtherTok{=} \FunctionTok{factor}\NormalTok{(subdat}\SpecialCharTok{$}\NormalTok{topqual2)}
+\NormalTok{subdat}\SpecialCharTok{$}\NormalTok{qimd19 }\OtherTok{=} \FunctionTok{factor}\NormalTok{(subdat}\SpecialCharTok{$}\NormalTok{qimd19)}
+\NormalTok{subdat}\SpecialCharTok{$}\NormalTok{urban14b }\OtherTok{=} \FunctionTok{factor}\NormalTok{(subdat}\SpecialCharTok{$}\NormalTok{urban14b)}
+\NormalTok{subdat}\SpecialCharTok{$}\NormalTok{origin2 }\OtherTok{=} \FunctionTok{factor}\NormalTok{(subdat}\SpecialCharTok{$}\NormalTok{origin2)}
+\NormalTok{subdat}\SpecialCharTok{$}\NormalTok{cigsta3\_19 }\OtherTok{=} \FunctionTok{factor}\NormalTok{(subdat}\SpecialCharTok{$}\NormalTok{cigsta3\_19)}
+\NormalTok{subdat}\SpecialCharTok{$}\NormalTok{NDPNow\_19 }\OtherTok{=} \FunctionTok{factor}\NormalTok{(subdat}\SpecialCharTok{$}\NormalTok{NDPNow\_19)}
+\NormalTok{subdat}\SpecialCharTok{$}\NormalTok{drinkYN\_19 }\OtherTok{=} \FunctionTok{factor}\NormalTok{(subdat}\SpecialCharTok{$}\NormalTok{drinkYN\_19)}
+\NormalTok{subdat}\SpecialCharTok{$}\NormalTok{dnoft\_19 }\OtherTok{=} \FunctionTok{factor}\NormalTok{(subdat}\SpecialCharTok{$}\NormalTok{dnoft\_19)}
+\NormalTok{subdat}\SpecialCharTok{$}\NormalTok{GOR1 }\OtherTok{=} \FunctionTok{factor}\NormalTok{(subdat}\SpecialCharTok{$}\NormalTok{GOR1)}
+\FunctionTok{summary}\NormalTok{(subdat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     SerialA        Sex         ag16g10         Age35g         wt_int      
+##  Min.   :2900001   1:4745   4      :1416   14     : 735   Min.   :0.3155  
+##  1st Qu.:2903094   2:5554   3      :1397   11     : 725   1st Qu.:0.7941  
+##  Median :2906238            5      :1349   15     : 693   Median :0.8989  
+##  Mean   :2906229            6      :1242   13     : 681   Mean   :1.0000  
+##  3rd Qu.:2909378            2      :1083   12     : 672   3rd Qu.:1.0974  
+##  Max.   :2912465            (Other):1717   16     : 656   Max.   :6.4927  
+##                             NA's   :2095   (Other):6137                   
+##     topqual2       marstatD     qimd19   urban14b origin2     cigsta3_19 
+##  1      :2320   Min.   :1.000   1:2074   1:8433   1   :8561   1   :1254  
+##  7      :1616   1st Qu.:2.000   2:1942   2:1866   2   : 345   2   :2076  
+##  4      :1432   Median :2.000   3:1965            3   :1007   3   :4818  
+##  3      :1106   Mean   :2.658   4:2091            4   : 250   NA's:2151  
+##  2      : 873   3rd Qu.:4.000   5:2227            5   : 103              
+##  (Other): 811   Max.   :6.000                     NA's:  33              
+##  NA's   :2141   NA's   :2096                                             
+##    cigdyal_19         BMIVal       NDPNow_19      dnoft_19    drinkYN_19 
+##  Min.   : 0.000   Min.   : 9.723   1   : 317   4      :1978   1   :1567  
+##  1st Qu.: 0.000   1st Qu.:21.915   2   :  78   5      :1191   2   :6586  
+##  Median : 0.000   Median :25.904   3   :  17   3      :1106   NA's:2146  
+##  Mean   : 1.692   Mean   :26.223   4   :7739   6      : 748              
+##  3rd Qu.: 0.000   3rd Qu.:29.953   NA's:2148   7      : 705              
+##  Max.   :60.000   Max.   :73.494               (Other): 977              
+##  NA's   :2152     NA's   :2224                 NA's   :3594              
+##    d7many3_19       omsysval          GOR1     
+##  Min.   :0.000   Min.   : 75.0   8      :1620  
+##  1st Qu.:0.000   1st Qu.:110.5   2      :1379  
+##  Median :1.000   Median :121.0   7      :1284  
+##  Mean   :1.595   Mean   :122.9   6      :1179  
+##  3rd Qu.:3.000   3rd Qu.:133.5   3      :1138  
+##  Max.   :7.000   Max.   :209.5   5      : 972  
+##  NA's   :2147    NA's   :5593    (Other):2727
+\end{verbatim}
+
+Note that the null flavors may not be used for modeling (and can just be
+treated as generic missing values), but they will bve useful for
+evaluating the study design. For example, lots of \textbf{Refused} for a
+variable could mean there is a bias in porivacy or that the question is
+too sensitive. Lots of \textbf{Don't know} for a variable could indicate
+some recall bias and that the question is poorly designed, whereas lots
+of \textbf{Not applicable} either comes from reduced generalisability
+(e.g.~``Is patient currently pregnant?) or poorly measured variables
+(Like valid BMI results being sparse due to bad measurements or missing
+heights/weights).
+
+The variable d7many3\_19 has nothing but missing values, so this
+variable can be dropped from analysis.
 
 \end{document}
