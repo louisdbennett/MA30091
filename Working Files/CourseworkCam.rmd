@@ -37,11 +37,9 @@ knitr::opts_chunk$set(cache=TRUE,
 
 \newpage
 
-
-
 # Introduction
 
-This is a body of text.  *This is an italic body of text.* [This is a clickable link!](https://google.com).
+This is a body of text. *This is an italic body of text.* [This is a clickable link!](https://google.com).
 
 # Some YAML Stuff
 
@@ -63,7 +61,7 @@ fontsize: 11pt
 ---
 ```
 
-`output:` will tell R Markdown we want a PDF document rendered with LaTeX. Since we are adding a fair bit of custom options to this call, we specify `pdf_document:` on the next line (with, importantly, a two-space indent). We specify additional output-level options underneath it, each are indented with four spaces. The line (`keep_tex: true`) tells R Markdown to render a raw `.tex` file along with the PDF document. This is useful for both debugging and the publication stage. The next line `fig_caption: true` tells R Markdown to make sure that whatever images are included in the document are treated as figures in which our caption in brackets in a Markdown call is treated as the caption in the figure. The next line (`latex_engine: pdflatex`) tells R Markdown to use pdflatex and not some other option like `lualatex`. For this template, I'm pretty sure this is mandatory.[^pdflatex]
+`output:` will tell R Markdown we want a PDF document rendered with LaTeX. Since we are adding a fair bit of custom options to this call, we specify `pdf_document:` on the next line (with, importantly, a two-space indent). We specify additional output-level options underneath it, each are indented with four spaces. The line (`keep_tex: true`) tells R Markdown to render a raw `.tex` file along with the PDF document. This is useful for both debugging and the publication stage. The next line `fig_caption: true` tells R Markdown to make sure that whatever images are included in the document are treated as figures in which our caption in brackets in a Markdown call is treated as the caption in the figure. The next line (`latex_engine: pdflatex`) tells R Markdown to use pdflatex and not some other option like `lualatex`. For this template, I'm pretty sure this is mandatory.[\^pdflatex]
 
 The next fields get to the heart of the document itself. `title:` is, intuitively, the title of the manuscript. Do note that fields like `title:` do not have to be in quotation marks, but must be in quotation marks if the title of the document includes a colon. That said, the only reason to use a colon in an article title is if it is followed by a subtitle, hence the optional field (`subtitle:`). Notice I "comment out" the subtitle in the above example with a pound sign since this particular document does not have a subtitle.
 
@@ -75,8 +73,7 @@ The next items are optional and cosmetic. `geometry:` is a standard option in La
 
 There are a lot of cheatsheets and reference guides for Markdown (e.g. [Adam Prichard](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet), [Assemble](http://assemble.io/docs/Cheatsheet-Markdown.html), [Rstudio](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf), [Rstudio again](https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf), [Scott Boms](http://scottboms.com/downloads/documentation/markdown_cheatsheet.pdf), [Daring Fireball](https://daringfireball.net/projects/markdown/syntax), among, I'm sure, several others).
 
-```markdown
-
+``` {.markdown}
 # Introduction
 
 **Lorem ipsum** dolor *sit amet*. 
@@ -134,6 +131,7 @@ That'll also automatically create a reference list at the end of the document.
 [In-text link to Google](http://google.com) as well.
 ```
 
+```{=html}
 <!--
 # References
 \setlength{\parindent}{-0.2in}
@@ -142,205 +140,335 @@ That'll also automatically create a reference list at the end of the document.
 \vspace*{-0.2in}
 \noindent
 -->
-
-## Exploring the Data
-
-### Checking for Messy Data
-
-```{r LoadDataset}
-library(haven) # Required to present the summary of labelled data.
-load("~/MA30091/Coursework/MA30091/Datasets/hsesub.Rdata") # The dset is called subdat
-summary(subdat)
 ```
+# Checking for Potential Data Issues
+
+## Handling of Missing Values
+
+The approach for handling missing values is as follows:
+
+1.  If an entire row of descriptive variables is empty, the entire record can be deleted.
+2.  If key variables are missing, the entire record can be deleted. Key variables include **serialA**, **sex**, **Age35g10 OR ag16g10**, **cigdyal_19 OR cigsta3_19 OR NDPNow_19**.
+3.  If a variable value is completely implausible (not just an outlier), it should be coded as missing, unless the true value is obvious.
+4.  If all variable values are outside the study population, the whole variable can be removed.
+5.  If all variable values are empty, the whole variable can be removed.
+6.  Missing values (codes, text) should all be recoded to the standard R value of 'NA'.
+
+I perform these checks on our full dataset.
+
+Firstly, we note that the study population is *adults from the population of England*, meaning that any records with an age group not containing values of 16 years or higher must be excluded (if the age group is missing for both variables, we assume they are under 16).
+
+```{r MissingNo}
+library(haven) # Required to present the summary of labelled data.
+library(dplyr) # Required to use the pipe operator %>%.
+load("~/MA30091/Coursework/MA30091/Datasets/hsesub.Rdata") # The dset is called subdat.
+# I have checked, and the two age category variables match up.
+subdat = data.frame(subdat)
+sd16plus <- subdat %>%
+  filter(ag16g10 >= 1 & Age35g >= 7 & !(is.na(Age35g)& is.na(ag16g10)))
+# As we are only dealing with adults, the ag16g10 variable is now the same as Age35g, except that it has lower resolution. As such, we can remove ag16g10.
+sd16plusA = sd16plus[,-3]
+summary(sd16plusA)
+```
+
+### The Missing Adult
+
+The original brief tells us there are 8205 adults sampled, however our dataset only contains 8204. In fact, the original dataset should contain 10300 observations, so we know that this is a data error. Perhaps this patient did not have any data collected on them, or withdrew.
+
+It is also worth mentioning that the below subset of 7144 adults are only those who have at least one key physical measurement taken. We proceed with the full dataset, but save this subset for later.
+
+```{r NurseVis}
+sdPhys <- sd16plusA %>%
+  filter(!(is.na(omsysval) & is.na(BMIVal)))
+summary(sdPhys)
+```
+
+## Duplicate Entries
+
+```{r}
+# Firstly, we need to check that no ID variables are duplicated.
+anyDuplicated(sd16plusA$SerialA)
+# There are none.
+
+# Now, we check whether we have any exact copies in all other variables (not including ID or any variables that could have been recorded as an accidental second visit like quantified questionnaire data or lab data).
+ 
+dupesFront = duplicated(sd16plusA[,-c(1, 12, 17)])
+dupesBack =  duplicated(sd16plusA[,-c(1, 12, 17)], fromLast = TRUE)
+which(dupesFront == 1 | dupesBack == 1) # This will output the indices of where duplicate observations occur *including the first occurrence*.
+dupes2 = sd16plusA[which(dupesFront == 1 | dupesBack == 1),-1]
+dupesFin <- dupes2[order(dupes2$wt_int),]
+dupesFin
+```
+
+From this, we observe that there are 39 pairs of observations that are equal in every variables except serialID, and the two lab variables. These are:
+
+6727~7359
+1250~4727 (Exact)
+3062~3063
+4752~4753
+2813~3492
+369~7305
+4236~4639
+1992~7287
+1248~1249
+3022~3023
+7496~7497
+7510~7516
+1279~1280 (Exact) ~ 1281 (1 lab diff)
+6314~6316
+5268~5269
+512~1334
+2056~2057
+1191~1192
+3174~3175 (Exact)
+
+## Factor Variables
+
 This tells us that all of our variables are coded as numeric. However, we may want to code some as factor variables instead based on the variable descriptions.
 
-- Sex: Should be coded as 
+-   Sex: Should be coded as
 
-Code  | Decode         | Count
------ | -------------- | -----
-1     | Male           |
-2     | Female         |
--1    | Not Applicable |
--8    | Don't Know     |
--9    | Refused        |
+| Code | Decode         | Count |
+|------|----------------|-------|
+| 1    | Male           |       |
+| 2    | Female         |       |
+| -1   | Not Applicable |       |
+| -8   | Don't Know     |       |
+| -9   | Refused        |       |
 
-- Age35g: Should be coded as
+-   Age35g: Should be coded as
 
-Code  | Decode         | Count
------ | -------------- | ------
-1     | 0-1yrs         |
-2     | 2-4yrs         |
-3     | 5-7yrs         |
-4     | 8-10yrs        |
-5     | 11-12yrs       |
-6     | 13-15yrs       |
-7     | 16-19yrs       |
-8     | 20-24yrs       |
-9     | 25-29yrs       |
-10    | 30-34yrs       |
-11    | 35-39yrs       |
-12    | 40-44yrs       |
-13    | 45-49yrs       |
-14    | 50-54yrs       |
-15    | 55-59yrs       |
-16    | 60-64yrs       |
-17    | 65-69yrs       |
-18    | 70-74yrs       |
-19    | 75-79yrs       |
-20    | 80-84yrs       |
-21    | 85-59yrs       |
-22    | 90+yrs         |
--1    | Not Applicable |
--8    | Don't Know     |
--9    | Refused        |
+| Code | Decode         | Count |
+|------|----------------|-------|
+| 1    | 0-1yrs         |       |
+| 2    | 2-4yrs         |       |
+| 3    | 5-7yrs         |       |
+| 4    | 8-10yrs        |       |
+| 5    | 11-12yrs       |       |
+| 6    | 13-15yrs       |       |
+| 7    | 16-19yrs       |       |
+| 8    | 20-24yrs       |       |
+| 9    | 25-29yrs       |       |
+| 10   | 30-34yrs       |       |
+| 11   | 35-39yrs       |       |
+| 12   | 40-44yrs       |       |
+| 13   | 45-49yrs       |       |
+| 14   | 50-54yrs       |       |
+| 15   | 55-59yrs       |       |
+| 16   | 60-64yrs       |       |
+| 17   | 65-69yrs       |       |
+| 18   | 70-74yrs       |       |
+| 19   | 75-79yrs       |       |
+| 20   | 80-84yrs       |       |
+| 21   | 85-59yrs       |       |
+| 22   | 90+yrs         |       |
+| -1   | Not Applicable |       |
+| -8   | Don't Know     |       |
+| -9   | Refused        |       |
 
-- ag16g10: Should be coded as
+-   ag16g10: Should be coded as
 
-Code  | Decode         | Count
------ | -------------- | ------
-1     | 16-24yrs       |
-2     | 25-34yrs       |
-3     | 35-44yrs       |
-4     | 45-54yrs       |
-5     | 55-64yrs       |
-6     | 65-74yrs       |
-7     | 75+yrs         |
--1    | Not Applicable |
--8    | Don't Know     |
--9    | Refused        |
+| Code | Decode         | Count |
+|------|----------------|-------|
+| 1    | 16-24yrs       |       |
+| 2    | 25-34yrs       |       |
+| 3    | 35-44yrs       |       |
+| 4    | 45-54yrs       |       |
+| 5    | 55-64yrs       |       |
+| 6    | 65-74yrs       |       |
+| 7    | 75+yrs         |       |
+| -1   | Not Applicable |       |
+| -8   | Don't Know     |       |
+| -9   | Refused        |       |
 
-- topqual2: Should be coded as
+-   topqual2: Should be coded as
 
-Code  | Decode                     | Count
------ | -------------------------- | ------
-1     | NVQ4/NVQ5/Degree or equiv  |
-2     | Higher ed below degree     |
-3     | NVQ3/GCE A Level equiv     |
-4     | NVQ2/GCE O Level equiv     |
-5     | NVQ1/CSE other grade equiv |
-6     | Foreign/other              |
-7     | No qualification           |
-8     | FT Student                 |
--1    | Not Applicable             |
--8    | Don't Know                 |
--9    | Refused                    |
+| Code | Decode                     | Count |
+|------|----------------------------|-------|
+| 1    | NVQ4/NVQ5/Degree or equiv  |       |
+| 2    | Higher ed below degree     |       |
+| 3    | NVQ3/GCE A Level equiv     |       |
+| 4    | NVQ2/GCE O Level equiv     |       |
+| 5    | NVQ1/CSE other grade equiv |       |
+| 6    | Foreign/other              |       |
+| 7    | No qualification           |       |
+| 8    | FT Student                 |       |
+| -1   | Not Applicable             |       |
+| -8   | Don't Know                 |       |
+| -9   | Refused                    |       |
 
-- qimd19: Should be coded as
+-   qimd19: Should be coded as
 
-Code  | Decode         | Count
------ | -------------- | ------
-1     | Most deprived  |
-5     | Least deprived |
--1    | Not Applicable |
--8    | Don't Know     |
--9    | Refused        |
+| Code | Decode         | Count |
+|------|----------------|-------|
+| 1    | Most deprived  |       |
+| 5    | Least deprived |       |
+| -1   | Not Applicable |       |
+| -8   | Don't Know     |       |
+| -9   | Refused        |       |
 
 Note: IMD2,IMD3 and IMD4 had no observations.
 
-- urban14b: Should be coded as
+-   urban14b: Should be coded as
 
-Code  | Decode                                                | Count
------ | ------------------------------------------------------| ------
-1     | Urban                                                 |
-2     | Town/ Fringe/ Village, hamlet and isolated dwellings  |
--1    | Not Applicable                                        |
--8    | Don't Know                                            |
--9    | Refused                                               |
+| Code | Decode                                               | Count |
+|------|------------------------------------------------------|-------|
+| 1    | Urban                                                |       |
+| 2    | Town/ Fringe/ Village, hamlet and isolated dwellings |       |
+| -1   | Not Applicable                                       |       |
+| -8   | Don't Know                                           |       |
+| -9   | Refused                                              |       |
 
-- origin2: Should be coded as
+-   origin2: Should be coded as
 
-Code  | Decode                           | Count
------ | -------------------------------- | ------
-1     | White                            |
-2     | Black                            |
-3     | Asian                            |
-4     | Mixed/multiple ethnic background |
-5     | Any other ethnic group           |
--1    | Not Applicable                   |
--8    | Don't Know                       |
--9    | Refused                          |
+| Code | Decode                           | Count |
+|------|----------------------------------|-------|
+| 1    | White                            |       |
+| 2    | Black                            |       |
+| 3    | Asian                            |       |
+| 4    | Mixed/multiple ethnic background |       |
+| 5    | Any other ethnic group           |       |
+| -1   | Not Applicable                   |       |
+| -8   | Don't Know                       |       |
+| -9   | Refused                          |       |
 
-- cigsta3_19: Should be coded as
+-   cigsta3_19: Should be coded as
 
-Code  | Decode                           | Count
------ | -------------------------------- | ------
-1     | Current cigarette smoker         |
-2     | Ex-regular cigarette smoker      |
-3     | Never regular cigarette smoker   |
--1    | Not Applicable                   |
--8    | Don't Know                       |
--9    | Refused                          |
+| Code | Decode                         | Count |
+|------|--------------------------------|-------|
+| 1    | Current cigarette smoker       |       |
+| 2    | Ex-regular cigarette smoker    |       |
+| 3    | Never regular cigarette smoker |       |
+| -1   | Not Applicable                 |       |
+| -8   | Don't Know                     |       |
+| -9   | Refused                        |       |
 
-- NDPNow_19: Should be coded as
+-   NDPNow_19: Should be coded as
 
-Code  | Decode                                | Count
------ | ------------------------------------- | ------
-1     | E-cigarettes or vaping devices only   |
-2     | Other nicotine delivery products only |
-3     | Both                                  |
-4     | None                                  |
--1    | Not Applicable                        |
--8    | Don't Know                            |
--9    | Refused                               |
+| Code | Decode                                | Count |
+|------|---------------------------------------|-------|
+| 1    | E-cigarettes or vaping devices only   |       |
+| 2    | Other nicotine delivery products only |       |
+| 3    | Both                                  |       |
+| 4    | None                                  |       |
+| -1   | Not Applicable                        |       |
+| -8   | Don't Know                            |       |
+| -9   | Refused                               |       |
 
-- drinkYN_19: Should be coded as
+-   drinkYN_19: Should be coded as
 
-Code  | Decode                                | Count
------ | ------------------------------------- | ------
-1     | No                                    |
-2     | Yes                                   |
--1    | Not Applicable                        |
--8    | Don't Know                            |
--9    | Refused                               |
+| Code | Decode         | Count |
+|------|----------------|-------|
+| 1    | No             |       |
+| 2    | Yes            |       |
+| -1   | Not Applicable |       |
+| -8   | Don't Know     |       |
+| -9   | Refused        |       |
 
-- dnoft_19: Should be coded as
+-   dnoft_19: Should be coded as
 
-Code  | Decode                           | Count
------ | -------------------------------- | ------
-1     | Almost every day                 |
-2     | Five or six days a week          |
-3     | Three or four days a week        |
-4     | Once or twice a week             |
-5     | Once or twice a month            |
-6     | Once every couple of months     |
-7     | Once or twice a year             |
-8     | Not at all in the last 12 months |
--1    | Not Applicable                   |
--8    | Don't Know                       |
--9    | Refused                          |
+| Code | Decode                           | Count |
+|------|----------------------------------|-------|
+| 1    | Almost every day                 |       |
+| 2    | Five or six days a week          |       |
+| 3    | Three or four days a week        |       |
+| 4    | Once or twice a week             |       |
+| 5    | Once or twice a month            |       |
+| 6    | Once every couple of months      |       |
+| 7    | Once or twice a year             |       |
+| 8    | Not at all in the last 12 months |       |
+| -1   | Not Applicable                   |       |
+| -8   | Don't Know                       |       |
+| -9   | Refused                          |       |
 
-- GOR1: Should be coded as
+-   GOR1: Should be coded as
 
-Code  | Decode                   | Count
------ | ------------------------ | ------
-1     | North East               |
-2     | North West               |
-3     | Yorkshire and the Humber |
-4     | East Midlands            |
-5     | West Midlands            |
-6     | East of England          |
-7     | London                   |
-8     | South East               |
-9     | South West               |
--1    | Not Applicable           |
--8    | Don't Know               |
--9    | Refused                  |
+| Code | Decode                   | Count |
+|------|--------------------------|-------|
+| 1    | North East               |       |
+| 2    | North West               |       |
+| 3    | Yorkshire and the Humber |       |
+| 4    | East Midlands            |       |
+| 5    | West Midlands            |       |
+| 6    | East of England          |       |
+| 7    | London                   |       |
+| 8    | South East               |       |
+| 9    | South West               |       |
+| -1   | Not Applicable           |       |
+| -8   | Don't Know               |       |
+| -9   | Refused                  |       |
 
 ```{r}
-subdat$Sex = factor(subdat$Sex)
-subdat$Age35g = factor(subdat$Age35g)
-subdat$ag16g10 = factor(subdat$ag16g10)
-subdat$topqual2 = factor(subdat$topqual2)
-subdat$qimd19 = factor(subdat$qimd19)
-subdat$urban14b = factor(subdat$urban14b)
-subdat$origin2 = factor(subdat$origin2)
-subdat$cigsta3_19 = factor(subdat$cigsta3_19)
-subdat$NDPNow_19 = factor(subdat$NDPNow_19)
-subdat$drinkYN_19 = factor(subdat$drinkYN_19)
-subdat$dnoft_19 = factor(subdat$dnoft_19)
-subdat$GOR1 = factor(subdat$GOR1)
-summary(subdat)
+sd16plusA$Sex = factor(sd16plusA$Sex)
+sd16plusA$Age35g = factor(sd16plusA$Age35g)
+sd16plusA$topqual2 = factor(sd16plusA$topqual2)
+sd16plusA$qimd19 = factor(sd16plusA$qimd19)
+sd16plusA$urban14b = factor(sd16plusA$urban14b)
+sd16plusA$origin2 = factor(sd16plusA$origin2)
+sd16plusA$cigsta3_19 = factor(sd16plusA$cigsta3_19)
+sd16plusA$NDPNow_19 = factor(sd16plusA$NDPNow_19)
+sd16plusA$drinkYN_19 = factor(sd16plusA$drinkYN_19)
+sd16plusA$dnoft_19 = factor(sd16plusA$dnoft_19)
+sd16plusA$GOR1 = factor(sd16plusA$GOR1)
+sd16plusA$marstatD = factor(sd16plusA$marstatD)
+summary(sd16plusA)
 ```
 
 Note that the null flavors may not be used for modeling (and can just be treated as generic missing values), but they will bve useful for evaluating the study design. For example, lots of **Refused** for a variable could mean there is a bias in porivacy or that the question is too sensitive. Lots of **Don't know** for a variable could indicate some recall bias and that the question is poorly designed, whereas lots of **Not applicable** either comes from reduced generalisability (e.g. "Is patient currently pregnant?) or poorly measured variables (Like valid BMI results being sparse due to bad measurements or missing heights/weights).
+
+Note, omsysval has a unique null flavour (-7 = Refused, attempted but not obtained, not attempted).
+
+## Checking the missing values
+
+We can see that we have many missing values, but this will only be an issue for certain variables. The missingness *in the over 16 subset* is summarised in the below table:
+
+| Variable   | Missing Values | % Missing |
+|------------|----------------|-----------|
+| omsysval   | 4039           | 49.23%    |
+| BMIVal     | 1522           | 18.55%    |
+| dnoft_19   | 1499           | 18.27%    |
+| cigdyal_19 | 57             | 0.695%    |
+| cigsta3_19 | 56             | 0.683%    |
+| NDPNow_19  | 53             | 0.646%    |
+| d7many3_19 | 52             | 0.634%    |
+| drinkYN_19 | 51             | 0.622%    |
+| topqual2   | 46             | 0.561%    |
+| origin2    | 29             | 0.353%    |
+| marstatD   | 1              | 0.012%    |
+
+The lab-values have a lot of missingness, but we still have sufficient data in the "lab results present" subset, so this should not be an issue, and certainly won't be a problem for analysis based on questionnaire results. The only demographic variable with missingness is topqual2, origin2 and marstatD. This could be an issue, and would affect 51 observations (0.622% of data). However, given that ethnic origin, marital status and education qualifications are considered sensitive data, we would not expect these to always be populated and they aren't required for identifiability (as we still have serial numbers for these observations). dnoft_19 has significant missingness, and this could be as a result of recall bias, due to it being a rather personal question *and* being retrospective.
+
+```{r}
+sdNoDemo <- sd16plusA %>%
+  filter((is.na(topqual2) | is.na(origin2) | is.na(marstatD)))
+summary(sdNoDemo)
+```
+
+## Checking Outliers
+
+Note: cigdyal_19 codes 97 as "Smokes roll ups and doesn't know how many smokes", but this should not be taken as a numerical value. In any case, there are no occurrences of this in the over 16 subset.
+
+We need to check the numerical measured variables of BMIVal and omsysval.
+
+## Visit-based variables
+
+These are not applicable for this study, as only one visit was performed (which is the baseline, hereafter referred to as *"The Nurse Visit"*).
+
+## Variable Labels
+
+This is less important, but I check to ensure labels are consistent, descriptive, and limited to 40 characters.
+
+The "(D)" at the start of the labels indicates that a variable was derived, and is not a direct input from the respondent (e.g. age bands).
+
+```{r}
+library(Hmisc)
+
+label(sd16plusA[["Age35g"]]) <- "(D) Age, 5 year bands at 16+"
+label(sd16plusA[["wt_int"]]) <- "HSE2019 Weighting for analysing core interviewees"
+label(sd16plusA[["marstatD"]]) <- "(D) Marital status incl. cohabitees"
+label(sd16plusA[["qimd19"]]) <- "(D) 2019 IMD Quintile - least to most deprived"
+label(sd16plusA[["urban14b"]]) <- "(D) Rurality of dwelling unit (urban or rural)"
+label(sd16plusA[["urban14b"]]) <- "(D) Current use of E-cigarettes or vaping devices and/or NDPs"
+label(sd16plusA)
+```
 
