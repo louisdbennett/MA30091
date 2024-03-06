@@ -1,0 +1,451 @@
+---
+title: "CourseworkMarcis"
+author: "Marcis"
+date: "04/03/2024"
+output: pdf_document
+---
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(haven)
+
+load("Datasets/hsesub.Rdata")
+```
+
+```{r}
+#Task 1: Provide estimates and confidence intervals of the prevalence of smoking, e-cig smoking and alcohol consumption in the population.
+
+#Initial task: Provide simple mean + SD with weighing (for active smoking, active vaping, active drinking)
+
+#For graph:
+
+#Mean across age groups for smoking, drinking (often), vaping (By gender) (% which do smoking, e-cig, frequent alcohol)
+
+#Mean across levels of deprivation
+
+#Distribution of those who do smoke cigarettes (i.e. remove all 0)
+
+```
+
+```{r}
+#Creating subset of data that I will use
+dataM = subdat %>%
+  mutate(age = as.factor(ag16g10),
+         gender = as.factor(Sex),
+         current_smoker = as.factor(cigsta3_19),
+         current_e_cig_user = as.factor(NDPNow_19),
+         level_of_deprivation = as.factor(qimd19),
+         frequency_of_alcohol_consumption = as.factor(dnoft_19),
+         weights = as.numeric(wt_int),
+         nr_cigarettes = as.numeric(cigdyal_19)) %>% select(-c(1:19))
+
+dataM = na.omit(dataM)
+
+```
+
+```{r}
+#I will refactorize the variable to make them more understandable and group frequency of alcohol consumption into more managble buckets
+
+dataM = dataM %>%
+  mutate(
+    # Refactorizing gender
+    gender = factor(gender, levels = c("1", "2"), labels = c("male", "female")),
+    
+    # Refactorizing current_smoker
+    current_smoker = factor(current_smoker, levels = c("1", "2", "3"), labels = c("active", "quit", "never")), 
+    
+    # Refactorizing current_e_cig_user
+    current_e_cig_user = factor(current_e_cig_user, levels = c("1", "2", "3", "4"), labels = c("vapes", "Other", "Both","none")),
+    
+    # Refactorizing frequency_of_alcohol_consumption
+    frequency_of_alcohol_consumption = factor(case_when(
+      frequency_of_alcohol_consumption %in% c("1", "2", "3") ~ "frequent",
+      frequency_of_alcohol_consumption %in% c("4","5") ~ "occasional",
+      frequency_of_alcohol_consumption %in% c("6", "7", "8") ~ "rare"
+    ), levels = c("frequent", "occasional", "rare"))
+  )
+```
+
+```{r}
+
+# Calculate weighted means and C.I. using what Louie sent
+dataM_summary = dataM %>%
+  summarise(
+    # Proportion of active smokers
+    prop_active_smoker = weighted.mean(current_smoker == "active", weights, na.rm = TRUE),
+    # Proportion of active e-cig users (vapes, Other, Both)
+    prop_active_e_cig = weighted.mean(current_e_cig_user %in% c("vapes","Other", "Both"), weights, na.rm = TRUE),
+    # Proportion of frequent alcohol consumers
+    prop_frequent_drinker = weighted.mean(frequency_of_alcohol_consumption == "frequent", weights, na.rm = TRUE),
+    # Total sum of weights
+    total_weights = sum(weights, na.rm = TRUE)
+  ) %>%
+  mutate(
+    # Standard Error (SE) for each proportion
+    se_active_smoker = sqrt(prop_active_smoker * (1 - prop_active_smoker) / total_weights),
+    se_active_e_cig = sqrt(prop_active_e_cig * (1 - prop_active_e_cig) / total_weights),
+    se_frequent_drinker = sqrt(prop_frequent_drinker * (1 - prop_frequent_drinker) / total_weights),
+    # 95% Confidence Interval (CI) for each proportion
+    ci_lower_active_smoker = prop_active_smoker - qnorm(0.975) * se_active_smoker,
+    ci_upper_active_smoker = prop_active_smoker + qnorm(0.975) * se_active_smoker,
+    ci_lower_active_e_cig = prop_active_e_cig - qnorm(0.975) * se_active_e_cig,
+    ci_upper_active_e_cig = prop_active_e_cig + qnorm(0.975) * se_active_e_cig,
+    ci_lower_frequent_drinker = prop_frequent_drinker - qnorm(0.975) * se_frequent_drinker,
+    ci_upper_frequent_drinker = prop_frequent_drinker + qnorm(0.975) * se_frequent_drinker
+  )
+
+dataM_summary
+
+dataM_table = tibble(
+  Category = c("Active Smoking", "Active Vaping", "Frequent Drinking"),
+  Mean = c(dataM_summary$prop_active_smoker, dataM_summary$prop_active_e_cig, dataM_summary$prop_frequent_drinker),
+  `Lower CI` = c(dataM_summary$ci_lower_active_smoker, dataM_summary$ci_lower_active_e_cig, dataM_summary$ci_lower_frequent_drinker),
+  `Upper CI` = c(dataM_summary$ci_upper_active_smoker, dataM_summary$ci_upper_active_e_cig, dataM_summary$ci_upper_frequent_drinker)
+)
+
+# View the compact table
+print(dataM_table)
+```
+
+```{r}
+#After doing some research online regarding how survey weights are used, a common suggestion was to use this package which takes into a account the design effect when creating C.I.. As you can see the mean stays the same, but CI widens very slightly. I am not 100% sure how you guys wants to procede, but just showcasing how for one variable it would work.
+
+
+library(survey)
+
+# Create a survey design object
+svy_design <- svydesign(ids = ~1, data = dataM, weights = ~weights)
+
+# Calculate weighted proportion for active smokers
+svy_active_smokers <- svymean(~I(current_smoker == "active"), design = svy_design)
+
+# Get confidence interval for the proportion
+ci_active_smokers <- confint(svy_active_smokers, level = 0.95)
+
+print(svy_active_smokers)
+print(ci_active_smokers)
+```
+
+```{r}
+#Graph for smoking status by age and gender:
+
+# Adjusting the data preparation with age group decoding
+data_prepared <- dataM %>%
+  mutate(
+    age_group = factor(age, 
+                       levels = 1:7, 
+                       labels = c("16-24yrs", "25-34yrs", "35-44yrs", "45-54yrs", "55-64yrs", "65-74yrs", "75+yrs")),
+    gender_combined = "Population"
+  ) %>%
+  bind_rows(mutate(dataM, gender_combined = "Population")) %>%
+  count(age_group, gender = coalesce(gender, gender_combined), current_smoker) %>%
+  group_by(age_group, gender) %>%
+  mutate(proportion = n / sum(n)) %>%
+  ungroup()
+
+#Can remove this part, then last bar will be the average
+data_prepared = na.omit(data_prepared)
+
+# Plot
+ggplot(data_prepared, aes(x = age_group, y = proportion, fill = current_smoker)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~gender, scales = "free_x") +
+  scale_fill_brewer(palette = "Pastel1") +
+  labs(x = "Age Group", y = "Proportion", title = "Smoking Status Proportions by Age Group and Gender") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+```{r}
+#Graph for drinking status by age and gender:
+
+# Adjusting the data preparation with age group decoding
+data_prepared_alc = dataM %>%
+  mutate(
+    age_group = factor(age, 
+                       levels = 1:7, 
+                       labels = c("16-24yrs", "25-34yrs", "35-44yrs", "45-54yrs", "55-64yrs", "65-74yrs", "75+yrs")),
+    gender_combined = "Population"
+  ) %>%
+  bind_rows(mutate(dataM, gender_combined = "Population")) %>%
+  count(age_group, gender = coalesce(gender, gender_combined), frequency_of_alcohol_consumption) %>%
+  group_by(age_group, gender) %>%
+  mutate(proportion = n / sum(n)) %>%
+  ungroup()
+
+#Can remove this part, then last bar will be the average
+data_prepared_alc = na.omit(data_prepared_alc)
+
+# Plot
+ggplot(data_prepared_alc, aes(x = age_group, y = proportion, fill = frequency_of_alcohol_consumption)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~gender, scales = "free_x") +
+  scale_fill_brewer(palette = "Pastel1") +
+  labs(x = "Age Group", y = "Proportion", title = "Drinking Status Proportions by Age Group and Gender") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+```{r}
+#Graph for vaping status by age and gender, its very low, dont think there is a point to this graph
+
+# Adjusting the data preparation with age group decoding
+data_prepared_e = dataM %>%
+  mutate(
+    age_group = factor(age, 
+                       levels = 1:7, 
+                       labels = c("16-24yrs", "25-34yrs", "35-44yrs", "45-54yrs", "55-64yrs", "65-74yrs", "75+yrs")),
+    gender_combined = "Population"
+  ) %>%
+  bind_rows(mutate(dataM, gender_combined = "Population")) %>%
+  count(age_group, gender = coalesce(gender, gender_combined), current_e_cig_user) %>%
+  group_by(age_group, gender) %>%
+  mutate(proportion = n / sum(n)) %>%
+  ungroup()
+
+#Can remove this part, then last bar will be the average
+data_prepared_e = na.omit(data_prepared_e)
+
+# Plot
+ggplot(data_prepared_e, aes(x = age_group, y = proportion, fill = current_e_cig_user)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~gender, scales = "free_x") +
+  scale_fill_brewer(palette = "Pastel1") +
+  labs(x = "Age Group", y = "Proportion", title = "Vaping and other nicotine device Status Proportions by Age Group and Gender") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+#Graphs across levels of deprivation
+
+# Prepare data for drinking status
+data_drinking <- dataM %>%
+  count(level_of_deprivation, frequency_of_alcohol_consumption) %>%
+  group_by(level_of_deprivation) %>%
+  mutate(proportion = n / sum(n)) %>%
+  ungroup()
+
+data_drinking$frequency_of_alcohol_consumption = factor(data_drinking$frequency_of_alcohol_consumption,
+                                                         levels = c("rare", "occasional", "frequent"))
+
+# Prepare data for smoking status
+data_smoking <- dataM %>%
+  count(level_of_deprivation, current_smoker) %>%
+  group_by(level_of_deprivation) %>%
+  mutate(proportion = n / sum(n)) %>%
+  ungroup()
+
+data_smoking$current_smoker = factor(data_smoking$current_smoker,
+                                       levels = c("never", "quit", "active"))
+
+```
+
+```{r}
+ggplot(data_drinking, aes(x = level_of_deprivation, y = proportion, fill = frequency_of_alcohol_consumption)) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_fill_brewer(palette = "Pastel3", name = "Drinking Status") +
+  labs(x = "Level of Deprivation", y = "Proportion", title = "Drinking Status Proportions by Level of Deprivation") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+ggplot(data_smoking, aes(x = level_of_deprivation, y = proportion, fill = current_smoker)) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_fill_brewer(name = "Smoking Status") +
+  labs(x = "Level of Deprivation", y = "Proportion", title = "Smoking Status Proportions by Level of Deprivation") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+#Graph for distribution of cigarettes per week
+
+# Filtering to include only those who smoke
+smokers_data = dataM %>% 
+  filter(current_smoker == "active")
+
+# Plotting the histogram
+ggplot(smokers_data, aes(x = nr_cigarettes)) +
+  geom_histogram(binwidth = 3, fill = "skyblue", color = "black") +
+  labs(title = "Distribution of Daily Cigarette Consumption Among Smokers",
+       x = "Cigarettes per Day",
+       y = "Count of Smokers") +
+   scale_x_continuous(breaks = seq(min(smokers_data$nr_cigarettes, na.rm = TRUE), 
+                                  max(smokers_data$nr_cigarettes, na.rm = TRUE), by = 3),
+                     labels = seq(min(smokers_data$nr_cigarettes, na.rm = TRUE), 
+                                  max(smokers_data$nr_cigarettes, na.rm = TRUE), by = 3)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+```{r}
+#Might be better as a density plot?
+
+ggplot(smokers_data, aes(x = nr_cigarettes)) +
+  geom_density(fill = "skyblue", alpha = 0.5) +
+  labs(title = "Density Distribution of Daily Cigarette Consumption Among Smokers",
+       x = "Cigarettes per Day",
+       y = "Density") +
+    scale_x_continuous(breaks = seq(min(smokers_data$nr_cigarettes, na.rm = TRUE), 
+                                  max(smokers_data$nr_cigarettes, na.rm = TRUE), by = 3),
+                     labels = seq(min(smokers_data$nr_cigarettes, na.rm = TRUE), 
+                                  max(smokers_data$nr_cigarettes, na.rm = TRUE), by = 3)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+# Calculate the average for active smokers only, across age groups
+average_cigarettes_by_age <- dataM %>%
+  filter(current_smoker == "active") %>%
+  group_by(age) %>%
+  summarise(average_cigarettes = mean(nr_cigarettes, na.rm = TRUE)) %>%
+  mutate(age_group = factor(age, levels = 1:7, labels = c("16-24yrs", "25-34yrs", "35-44yrs", "45-54yrs", "55-64yrs", "65-74yrs", "75+yrs")))
+
+# View the calculated averages
+print(average_cigarettes_by_age)
+```
+
+```{r}
+# Plotting the average cigarettes smoked per week by age group
+ggplot(average_cigarettes_by_age, aes(x = age_group, y = average_cigarettes)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.9, fill = "skyblue") +
+  labs(title = "Average Number of Cigarettes Smoked per Week by Age Group",
+       x = "Age Group",
+       y = "Average Cigarettes per Week") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+```{r}
+#MEANINGS FOR MARRIED
+#Value = 1.0	Label = Single
+#	Value = 2.0	Label = Married/ in a registered same-sex civil partnership
+	#Value = 3.0	Label = Separated/ separated, but still legally in a same-sex civil partnership
+	#Value = 4.0	Label = Divorced/ same-sex civil partnership which is now legally dissolved
+#	Value = 5.0	Label = Widowed/ surviving partner from a same-sex civil partnership
+	#Value = 6.0	Label = Cohabitees
+
+```
+
+```{r}
+#FOR QUESTION 2: 2. Using an appropriate model describe to what extent is smoking associated with socioeconomic status and age.
+
+#Potential variables of interest: age, marital status, level of deprivation, rurality, ethnicity, number of cigarettes a day, 
+
+
+#Creating the dataset (note, I factorize current smoker into yes/no, and martial status into yes/no. Moreover, I take age as a continuous variable with the values being the average of each bucket)
+dataR = subdat %>%
+  mutate(
+    age_group = factor(ag16g10),
+    age = as.numeric(Age35g),
+    current_smoker = factor(ifelse(cigsta3_19 == 1, 1, 0), levels = c(0, 1)),
+    marital_status = factor(ifelse(marstatD == 2, "Married", "Not Married"), levels = c("Not Married", "Married")),
+    level_of_deprivation = as.numeric(qimd19, ordered = TRUE),
+    rural = factor(urban14b, levels = 1:2, labels = c("Urban","Rural")),
+    ethnicity = factor(origin2, levels = 1:5, labels = c("White", "Black","Asian","Mixed","Other")),
+    nr_cigarettes_weekly = as.numeric(cigdyal_19*7),
+    educ = factor(ifelse(topqual2 == 1 | topqual2 == 2, "higher educ", "basic educ"),
+               levels = c("basic educ", "higher educ"))
+  )
+
+dataR = dataR %>% select(-c(1:19)) %>% na.omit() %>% select(-1)
+dataR$age = (dataR$age - 7)*5 + 17
+dataR
+
+```
+
+```{r}
+glm1 = glm(current_smoker ~ age + marital_status + level_of_deprivation + rural + ethnicity + educ, family = binomial(logit), data = dataR)
+
+summary(glm1)
+
+```
+
+```{r}
+drop_test = drop1(glm1)
+drop_test
+
+#We see that we should not drop any variables as lowest AIC is full model
+```
+
+```{r}
+#Let us now check for potential interactions
+
+# Adding an interaction between age and marital status as an example
+glm2 = glm(current_smoker ~ age*marital_status + level_of_deprivation + rural + ethnicity + educ, 
+            family = binomial(logit), data = dataR)
+
+glm3 = glm(current_smoker ~ age + marital_status + level_of_deprivation*rural + ethnicity + educ, 
+            family = binomial(logit), data = dataR)
+
+glm4 = glm(current_smoker ~ age*marital_status + level_of_deprivation*rural + ethnicity + educ, 
+            family = binomial(logit), data = dataR)
+
+# Use ANOVA to compare the original model without interactions (glm1) and the new model (glm2)
+anova(glm1, glm2, test = "Chisq")
+
+anova(glm1, glm3, test = "Chisq")
+
+anova(glm1, glm4, test = "Chisq")
+#Final one is signficant at 10%
+
+#Overall looks like no interaction is necessary
+
+```
+
+```{r}
+#Some plots to see how well the model fits
+
+# Calculate residuals and fitted values
+residuals = residuals(glm1, type = "deviance")
+fitted_values = fitted(glm1)
+
+```
+
+```{r}
+ggplot(calibration_data, aes(x = Predicted, fill = factor(Actual))) +
+  geom_histogram(alpha = 0.5, position = "identity", bins = 30) +
+  scale_fill_manual(values = c("0" = "blue", "1" = "green"), name = "Actual Outcome") +
+  labs(title = "Distribution of Predicted Probabilities", x = "Predicted Probability", y = "Frequency")
+
+```
+
+```{r}
+install.packages("pROC")
+library(pROC)
+
+# Compute ROC curve and AUC
+roc_result <- roc(actual_outcomes, predicted_probabilities)
+
+# Plot ROC curve
+plot(roc_result, main = "ROC Curve")
+abline(a = 0, b = 1, col = "red", lwd = 2, lty = 2)  # Diagonal reference line
+
+# Print AUC
+print(auc(roc_result))
+
+#This is a reasonably good value (not great)
+```
+
+```{r}
+glm_weekly1 = glm(nr_cigarettes_weekly ~ age + marital_status + level_of_deprivation + rural + ethnicity + educ, family = poisson(), data = dataR)
+
+summary(glm_weekly1)
+```
+
+```{r}
+plot(glm_weekly1, 1)
+plot(glm_weekly1, 2)
+plot(glm_weekly1, 3)
+
+
+#Think best way to do it would be to remove non-smokers and model how much you smoke if you smoke under socioeconomic variables
+```
+
