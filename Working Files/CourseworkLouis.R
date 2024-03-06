@@ -92,30 +92,50 @@ sum(dat_vec) / length(dat_vec)
 
 ## Question two model
 
-# Cleaning data
+# Cleaning data poisson assumption
 
 relevant_factors <- c('Sex', 'topqual2', 'marstatD', 'urban14b', 'origin2', 'GOR1', 'Age35g', 'qimd19')
 
 subdat_clean <- subdat %>% 
   filter(!ag16g10 %in% c(1:3), !is.na(cigdyal_19)) %>% 
   mutate(
-    across(all_of(relevant_factors), as.factor), cigweek_19 = 7 * cigdyal_19
+    across(all_of(relevant_factors), as.factor), cigweek_19 = log(7 * cigdyal_19 + 0.000001)
   ) %>% 
   select(
     cigweek_19, all_of(relevant_factors)
   )
 
-full_model <- glm(formula = cigweek_19 ~ Age35g:qimd19 + Age35g:Sex + ., family = poisson, data = subdat_clean)
-null_model <- glm(formula = cigweek_19 ~ 1, family = poisson, data = subdat_clean)
+full_model <- glm(formula = cigweek_19 ~ Age35g:qimd19 + Age35g:Sex + ., family = gaussian, data = subdat_clean)
+null_model <- glm(formula = cigweek_19 ~ 1, family = gaussian, data = subdat_clean)
 
 fitted_model <- step(full_model, scope = list(lower = null_model, upper = full_model), direction = 'backward', trace = 0)
 
 summary(fitted_model)
 
-formula <- cigweek_19 ~ Sex + topqual2 + marstatD + qimd19 + urban14b + origin2 + GOR1 + Age35g
+formula <- cigweek_19 ~ Sex + topqual2 + marstatD + qimd19 + origin2 + Age35g
 
 mod <- glm(formula = formula, family = gaussian, data = subdat_clean)
 
 summary(mod)
 
 plot(mod, 2)
+
+# Try with binomial model
+
+subdat_clean <- subdat %>% 
+  filter(!ag16g10 %in% c(1:3), !is.na(cigsta3_19)) %>% 
+  mutate(
+    across(all_of(relevant_factors), as.factor), smokes = as.numeric(cigsta3_19 == 1)
+  ) %>% 
+  select(
+    smokes, all_of(relevant_factors)
+  )
+
+full_model <- glm(formula = smokes ~ Age35g:qimd19 + Age35g:Sex + ., family = binomial, data = subdat_clean)
+null_model <- glm(formula = smokes ~ 1, family = binomial, data = subdat_clean)
+
+fitted_model <- step(full_model, scope = list(lower = null_model, upper = full_model), direction = 'backward', trace = 0)
+
+summary(fitted_model)
+
+plot(fitted_model, 2)
