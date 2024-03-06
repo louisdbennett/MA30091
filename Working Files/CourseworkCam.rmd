@@ -344,4 +344,3 @@ summary(subdat)
 
 Note that the null flavors may not be used for modeling (and can just be treated as generic missing values), but they will bve useful for evaluating the study design. For example, lots of **Refused** for a variable could mean there is a bias in porivacy or that the question is too sensitive. Lots of **Don't know** for a variable could indicate some recall bias and that the question is poorly designed, whereas lots of **Not applicable** either comes from reduced generalisability (e.g. "Is patient currently pregnant?) or poorly measured variables (Like valid BMI results being sparse due to bad measurements or missing heights/weights).
 
-The variable d7many3_19 has nothing but missing values, so this variable can be dropped from analysis.
