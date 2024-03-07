@@ -1,0 +1,282 @@
+---
+output: 
+  pdf_document:
+    keep_tex: true
+    fig_caption: true
+    latex_engine: pdflatex
+header-includes:
+  - \usepackage{hyperref}
+  - \usepackage{array}   
+  - \usepackage{caption}
+  - \usepackage{graphicx}
+  - \usepackage{multirow}
+  - \usepackage{hhline}
+  - \usepackage{calc}
+  - \usepackage{tabularx}
+  - \usepackage[para,online,flushleft]{threeparttable} 
+geometry: margin=1in
+fontsize: 11pt
+endnote: no
+title: "Analysis of Health Survey for England (HSE) 2019"
+author: Candidate Numbers Here
+abstract: "This report provides an analysis of data related to health, age, socio-economic factors and lifestyle habits in adults (from the age of 16) from the population in England, derived from the Health Survey for England 2019."
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+---
+
+```{r setup, include=F}
+knitr::opts_chunk$set(include = F, echo = F, message = F, warning = F)
+```
+
+
+\newpage
+# Introduction
+
+```{r initial data filtering and splitting}
+library(dplyr)
+library(haven)
+library(ggplot2)
+
+load("Datasets/hsesub.Rdata")
+
+fct_variables <- c(
+  'Sex', 'Age35g', 'ag16g10', 'topqual2', 'urban14b', 'origin2', 'marstatD', 'GOR1', 'cigsta3_19', 'NDPNow_19', 'drinkYN_19', 'dnoft_19'
+)
+
+# filter to over 16s, relabel all factors
+sd16plus <- subdat %>% 
+  filter(Age35g >= 7 & !is.na(Age35g)) %>%
+  mutate(
+    across(
+      all_of(fct_variables), 
+      ~ factor(as.factor(.x), levels = attr(subdat[[cur_column()]], 'labels'), labels = names(attr(subdat[[cur_column()]], 'labels')))
+    ), 
+    across(!all_of(fct_variables), as.numeric),
+    
+    # Grouping variables
+    marstatD = as.factor(
+      case_when(
+        grepl('Married', marstatD) ~ 'Married', 
+        !is.na(marstatD) ~ 'Not Married',
+        T ~ NA
+      )
+    ),
+    topqual2 = as.factor(
+      case_when(
+        grepl('Degree or equiv|degree|FT Student', topqual2) ~ 'Higher Education', 
+        grepl('A Level equiv', topqual2) ~ 'A-Levels',
+        grepl('O Level equiv|CSE other grade equiv', topqual2) ~ 'O-Levels',
+        T ~ topqual2
+      )
+    ),
+    dnoft_19 = as.factor(
+      case_when(
+        dnoft_19 %in% c('Almost every day', 'Five or six days a week', 'Three or four days a week') ~ "Frequent",
+        dnoft_19 %in% c('Once or twice a week', 'Once or twice a month') ~ "Occasional",
+        dnoft_19 %in% c('Once every couple of months', 'Once or twice a year', 'Not at all in the last 12 months') ~ "Rarely",
+        T ~ NA
+      )
+    ),
+    urban14b = as.factor(
+      case_when(
+        grepl('Town', urban14b) ~ 'Not Urban', 
+        T ~ urban14b
+      )
+    ),
+    NDPNow_19 = as.factor(
+      case_when(
+        grepl('Both|E-cigarettes', NDPNow_19) ~ 'Smokes E-cigarettes',
+        grepl('None|Other', NDPNow_19) ~ 'Doesn\'t smoke E-cigarettes',
+        T ~ NA
+      )
+    )
+  )
+```
+
+# Question One
+
+We start by investigating the data
+
+```{r proportion bar plot function}
+create_proportion_bar_plot <- function(group_variable, facet_variable, plotting_variable, labels = list()) {
+  data <- sd16plus %>% 
+    filter(
+      !if_any(all_of(plotting_variable), is.na)
+    ) %>% 
+    group_by(
+      across(all_of(c(group_variable, facet_variable, plotting_variable)))
+    ) %>% 
+    summarise(n = n(), .groups = 'drop_last') %>% 
+    mutate(proportion = n / sum(n))
+  
+  ggplot(data, aes(x = !!sym(group_variable), y = proportion, fill = !!sym(plotting_variable))) +
+    geom_bar(stat = "identity", position = "dodge") +
+    facet_wrap(as.formula(paste("~", facet_variable)), scales = "free_x") +
+    scale_fill_brewer(palette = "Pastel1") +
+    labs(x = labels$x, y = labels$y) +
+    scale_y_continuous(labels = scales::percent) +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      legend.title = element_blank(),
+      legend.position = 'bottom',
+      strip.text = element_text(face = 'bold', size = 12)
+    )
+}
+```
+
+```{r output smoking by age plot, include = T, fig.width=10, fig.height=4, fig.cap="Smoking status proportions by age group and gender"}
+create_proportion_bar_plot('ag16g10', 'Sex', 'cigsta3_19', labels = list(x = 'Age Group', y = 'Proportion'))
+```
+
+```{r output drinking by age plot, include = T, fig.width=10, fig.height=4, fig.cap="Drinking Status Proportions by age group and gender"}
+create_proportion_bar_plot('ag16g10', 'Sex', 'dnoft_19', labels = list(x = 'Age Group', y = 'Proportion'))
+```
+
+```{r output e-cigs by age plot, include = T, fig.width=10, fig.height=4, fig.cap="E-cigarette Usage Status Proportions by age group and gender"}
+create_proportion_bar_plot('ag16g10', 'Sex', 'NDPNow_19', labels = list(x = 'Age Group', y = 'Proportion'))
+```
+
+```{r}
+create_stacked_bar_plot <- function(group_variable, plotting_variable, labels = list()) {
+  data <- sd16plus %>% 
+    filter(
+      !if_any(all_of(plotting_variable), is.na)
+    ) %>% 
+    group_by(
+      across(all_of(c(group_variable, plotting_variable)))
+    ) %>% 
+    summarise(n = n(), .groups = 'drop_last') %>% 
+    mutate(proportion = n / sum(n))
+  
+  ggplot(data, aes(x = !!sym(group_variable), y = proportion, fill = !!sym(plotting_variable))) +
+    geom_bar(stat = "identity", position = "stack") +
+    scale_y_continuous(labels = scales::percent) +
+    scale_fill_brewer(palette = "Pastel3", name = labels$legend.title) +
+    labs(x = labels$x, y = labels$y) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+}
+```
+
+```{r output deprivation plot, include = T, fig.width=8, fig.height=4, fig.cap="Drinking Status Proportions by Level of Deprivation"}
+create_stacked_bar_plot('qimd19', 'cigsta3_19', labels = list(x = 'Level of Deprivation', y = 'Proportion', legend.title = 'Drinking Status'))
+```
+
+Assuming a binomial...
+
+```{r confidence interval calculation}
+# function to calculate the confidence intervals
+calculate_binomial_ci <- function(dat_vec, weights = rep(1, length.out = length(dat_vec)), alpha = 0.05) {
+  dat_vec <- as.numeric(dat_vec)
+  
+  n <- length(dat_vec)
+  
+  p_hat <- sum(dat_vec * weights) / sum(weights)
+  
+  var_est <- p_hat * (1 - p_hat) / sum(weights)
+  
+  ci <- p_hat + c(-1, 1) * qnorm(1 - alpha / 2) * sqrt(var_est)
+  
+  list(n = n, p_hat = p_hat, alpha = alpha, ci = ci)
+}
+
+# Initial calculations of prevelance across the three categories
+# here we use full dataset, not split into test and train
+drinking_na <- is.na(sd16plus$drinkYN_19)
+overall_drinking <- calculate_binomial_ci(sd16plus$drinkYN_19[!drinking_na] == 'Yes', sd16plus$wt_int[!drinking_na])
+
+smoking_na <- is.na(sd16plus$cigsta3_19)
+overall_smoking <- calculate_binomial_ci(sd16plus$cigsta3_19[!smoking_na] == 'Current cigarette smoker', sd16plus$wt_int[!smoking_na])
+
+ecig_na <- is.na(sd16plus$NDPNow_19)
+overall_ecigs <- calculate_binomial_ci(sd16plus$NDPNow_19[!ecig_na] == 'Smokes E-cigarettes', sd16plus$wt_int[!ecig_na])
+
+# Creating table output
+prevelance_table <- tibble(
+  Category = c('Drinking', 'Smoking', 'Smoking E-cigarettes'),
+  Estimate = c(overall_drinking$p_hat, overall_smoking$p_hat, overall_ecigs$p_hat),
+  LowerCI = c(overall_drinking$ci[1], overall_smoking$ci[1], overall_ecigs$ci[1]),
+  UpperCI = c(overall_drinking$ci[2], overall_smoking$ci[2], overall_ecigs$ci[2])
+) %>% 
+  mutate(
+    CI = glue::glue('({100 * signif(LowerCI, digits = 3)}%, {100 * signif(UpperCI, digits = 3)}%)'),
+    Estimate = paste0(100 * signif(Estimate, digits = 3), '%')
+  ) %>% 
+  select(-c(LowerCI, UpperCI))
+```
+
+```{r output estimates table, include = T}
+knitr::kable(
+  prevelance_table, 
+  col.names = c('Category', 'Estimate', 'C.I.'), 
+  caption = "Estimates and 95% Confidence Intervals for % of Population"
+)
+```
+
+```{r calculations by age groups}
+age_groups_drinking <- sd16plus %>% 
+  filter(!is.na(drinkYN_19)) %>% 
+  # Change grouping here to calculate CIs for different variables
+  group_by(urban14b, ag16g10) %>% 
+  summarise(
+    drinkYN_19 = list(drinkYN_19 == 'Yes'), wt_int = list(wt_int), .groups = 'drop'
+  ) %>% 
+  mutate(
+    summary = purrr::map2(drinkYN_19, wt_int, calculate_binomial_ci),
+    p_hat = purrr::map_dbl(summary, \(x) x$p_hat),
+    lower = purrr::map_dbl(summary, \(x) x$ci[1]),
+    upper = purrr::map_dbl(summary, \(x) x$ci[2])
+  ) %>% 
+  select(-c(drinkYN_19, wt_int, summary))
+
+prevelance_plot <- ggplot(data = age_groups_drinking, aes(x = ag16g10, y = p_hat, ymin = lower, ymax = upper)) +
+  geom_bar(stat = 'identity', fill = 'skyblue') +
+  geom_errorbar(width = 0.5) +
+  facet_wrap(~ urban14b) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x = "Age Group", y = "% Drinkers", title = "") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1), 
+    strip.text = element_text(face = 'bold', size = 12)
+  )
+```
+
+```{r output prevelance plot, include = T, fig.width=10, fig.height=5, fig.cap="Estimation of the prevelance of drinkers by city type and age group"}
+prevelance_plot
+```
+
+# Question Two
+
+```{r splitting dataset into test and train}
+# split data into test/train
+train16plus <- sd16plus %>% sample_frac(0.8) 
+test16plus <- sd16plus %>% anti_join(train16plus, by = c('SerialA'))
+```
+
+Explanation of why we split into test/train dataset.
+
+This leaves us with `r NROW(train16plus)` observations in our training dataset.
+
+```{r summary of data set}
+variable_na_table <- train16plus %>% 
+  select(-SerialA) %>% 
+  summarise(
+    across(everything(), ~ sum(is.na(.x)))
+  ) %>% 
+  tidyr::pivot_longer(
+    cols = everything(), names_to = 'Variable', values_to = 'SumNA'
+  ) %>% 
+  # Can filter out variables with 0 NAs for table?
+  filter(SumNA != 0) %>% 
+  mutate(PercNA = paste0(100 * signif(SumNA / NROW(train16plus), digits = 3), '%')) %>% 
+  arrange(desc(SumNA))
+```
+
+```{r output NA table, include = T}
+knitr::kable(
+  variable_na_table, 
+  col.names = c('Variable', 'Missing Values', '% Missing'), 
+  caption = "Missing values in the training dataset"
+)
+```
