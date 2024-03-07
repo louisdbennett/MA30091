@@ -109,7 +109,7 @@ sd16plus <- subdat %>%
 
 # Question One
 
-We start by investigating the data
+We start by investigating the data...
 
 ```{r proportion bar plot function}
 create_proportion_bar_plot <- function(group_variable, facet_variable, plotting_variable, labels = list()) {
@@ -142,15 +142,16 @@ create_proportion_bar_plot <- function(group_variable, facet_variable, plotting_
 ```{r output smoking by age plot, include = T, fig.width=10, fig.height=4, fig.cap="Smoking status proportions by age group and gender"}
 create_proportion_bar_plot('ag16g10', 'Sex', 'cigsta3_19', labels = list(x = 'Age Group', y = 'Proportion'))
 ```
-
+<!-- these slashes are needed to insert breaks after plots -->
+\
 ```{r output drinking by age plot, include = T, fig.width=10, fig.height=4, fig.cap="Drinking Status Proportions by age group and gender"}
 create_proportion_bar_plot('ag16g10', 'Sex', 'dnoft_19', labels = list(x = 'Age Group', y = 'Proportion'))
 ```
-
+\
 ```{r output e-cigs by age plot, include = T, fig.width=10, fig.height=4, fig.cap="E-cigarette Usage Status Proportions by age group and gender"}
 create_proportion_bar_plot('ag16g10', 'Sex', 'NDPNow_19', labels = list(x = 'Age Group', y = 'Proportion'))
 ```
-
+\
 ```{r}
 create_stacked_bar_plot <- function(group_variable, plotting_variable, labels = list()) {
   data <- sd16plus %>% 
@@ -176,8 +177,14 @@ create_stacked_bar_plot <- function(group_variable, plotting_variable, labels = 
 ```{r output deprivation plot, include = T, fig.width=8, fig.height=4, fig.cap="Drinking Status Proportions by Level of Deprivation"}
 create_stacked_bar_plot('qimd19', 'cigsta3_19', labels = list(x = 'Level of Deprivation', y = 'Proportion', legend.title = 'Drinking Status'))
 ```
+\
+To calculate the prevalence of each habit we assume each of the $n$ observations, $x_1,…,x_n$ , to be independent, identically distributed (iid) random variables (RVs) where $x_i \sim Bern(p)\, \forall i=1,…,n$ and $p$ denotes the probability of an observation having the relevant habit. 
+We use the household weights to calculate a weighted MLE of $p$. That is, letting $w_i$ denote the weight of the $i^{th}$ observation, we alter the standard likelihood to be
+$$L(p|\textbf{x}) = \prod_{i = 1}^{n} (p^{x_i}(1-p)^{1-x_i})^{w_i}$$
+From this, we can calculate our weighted MLE
+$$\widehat{p} = \frac{\sum_{i=1}^{n} x_iw_i}{\sum_{i=1}^{n} w_i}$$
 
-Assuming a binomial...
+We also can see that this MLE has variance given by $var(\widehat{p})=\frac{p(1-p)}{\sum_{i=1}^{n}w_i}$, which we can estimate using $\widehat{p}$ and use the large sample Normal approximation of the MLE to estimate our 95% confidence intervals.
 
 ```{r confidence interval calculation}
 # function to calculate the confidence intervals
@@ -303,13 +310,19 @@ knitr::kable(
 Creating first model on train data
 
 ```{r}
-full_binom_model <- glm(
-  current_smoker ~ ag16g10 + marstatD + qimd19 + urban14b + origin2 + topqual2, 
+full_binom_model1 <- glm(
+  current_smoker ~ ag16g10 + marstatD + qimd19 + urban14b + origin2 + topqual2 + GOR1, 
   family = binomial(logit),
   data = filter(train16plus, !is.na(current_smoker))
 )
 
-summary(full_binom_model)
+full_binom_model2 <- glm(
+  current_smoker ~ Age35g + marstatD + qimd19 + urban14b + origin2 + topqual2, 
+  family = binomial(logit),
+  data = filter(train16plus, !is.na(current_smoker))
+)
+
+summary(full_binom_model1)
 ```
 
 # References

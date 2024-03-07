@@ -158,33 +158,30 @@ pressure levels throughout the UK population.
 
 \section{Question One}\label{question-one}
 
-We start by investigating the data
+We start by investigating the data\ldots{}
 
-\begin{figure}
-\centering
 \includegraphics{Coursework_files/figure-latex/output smoking by age plot-1.pdf}
-\caption{Smoking status proportions by age group and gender}
-\end{figure}
+\\
+\includegraphics{Coursework_files/figure-latex/output drinking by age plot-1.pdf}\\
+\includegraphics{Coursework_files/figure-latex/output e-cigs by age plot-1.pdf}\\
 
-\begin{figure}
-\centering
-\includegraphics{Coursework_files/figure-latex/output drinking by age plot-1.pdf}
-\caption{Drinking Status Proportions by age group and gender}
-\end{figure}
+\includegraphics{Coursework_files/figure-latex/output deprivation plot-1.pdf}\\
+To calculate the prevalence of each habit we assume each of the \(n\)
+observations, \(x_1,…,x_n\) , to be independent, identically distributed
+(iid) random variables (RVs) where
+\(x_i \sim Bern(p)\, \forall i=1,…,n\) and \(p\) denotes the probability
+of an observation having the relevant habit. We use the household
+weights to calculate a weighted MLE of \(p\). That is, letting \(w_i\)
+denote the weight of the \(i^{th}\) observation, we alter the standard
+likelihood to be
+\[L(p|\textbf{x}) = \prod_{i = 1}^{n} (p^{x_i}(1-p)^{1-x_i})^{w_i}\]
+From this, we can calculate our weighted MLE
+\[\widehat{p} = \frac{\sum_{i=1}^{n} x_iw_i}{\sum_{i=1}^{n} w_i}\]
 
-\begin{figure}
-\centering
-\includegraphics{Coursework_files/figure-latex/output e-cigs by age plot-1.pdf}
-\caption{E-cigarette Usage Status Proportions by age group and gender}
-\end{figure}
-
-\begin{figure}
-\centering
-\includegraphics{Coursework_files/figure-latex/output deprivation plot-1.pdf}
-\caption{Drinking Status Proportions by Level of Deprivation}
-\end{figure}
-
-Assuming a binomial\ldots{}
+We also can see that this MLE has variance given by
+\(var(\widehat{p})=\frac{p(1-p)}{\sum_{i=1}^{n}w_i}\), which we can
+estimate using \(\widehat{p}\) and use the large sample Normal
+approximation of the MLE to estimate our 95\% confidence intervals.
 
 \begin{longtable}[]{@{}lll@{}}
 \caption{Estimates and 95\% Confidence Intervals for \% of
@@ -228,16 +225,16 @@ Variable & Missing Values & \% Missing \\
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-omsysval & 3217 & 49\% \\
-BMIVal & 1203 & 18.3\% \\
-dnoft\_19 & 1187 & 18.1\% \\
-cigdyal\_19 & 45 & 0.686\% \\
-cigsta3\_19 & 44 & 0.67\% \\
+omsysval & 3190 & 48.6\% \\
+BMIVal & 1212 & 18.5\% \\
+dnoft\_19 & 1189 & 18.1\% \\
+cigdyal\_19 & 44 & 0.67\% \\
+cigsta3\_19 & 43 & 0.655\% \\
 NDPNow\_19 & 43 & 0.655\% \\
-d7many3\_19 & 40 & 0.609\% \\
-drinkYN\_19 & 39 & 0.594\% \\
-topqual2 & 38 & 0.579\% \\
-origin2 & 24 & 0.366\% \\
+d7many3\_19 & 42 & 0.64\% \\
+drinkYN\_19 & 41 & 0.625\% \\
+topqual2 & 33 & 0.503\% \\
+origin2 & 22 & 0.335\% \\
 marstatD & 1 & 0.0152\% \\
 \end{longtable}
 
