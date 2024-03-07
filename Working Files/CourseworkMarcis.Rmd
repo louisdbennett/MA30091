@@ -10,7 +10,7 @@ output: pdf_document
 library(dplyr)
 library(ggplot2)
 library(haven)
-
+library(broom)
 ```
 
 ```{r}
@@ -347,6 +347,7 @@ dataR = subdat %>%
     age_group = factor(ag16g10),
     ID = factor(SerialA),
     age = as.numeric(Age35g),
+    gender = factor(Sex, levels = c("1", "2"), labels = c("male", "female")),
     current_smoker = factor(ifelse(cigsta3_19 == 1, 1, 0), levels = c(0, 1)),
     marital_status = factor(ifelse(marstatD == 2, "Married", "Not Married"), levels = c("Not Married", "Married")),
     level_of_deprivation = as.numeric(qimd19, ordered = TRUE),
@@ -366,7 +367,7 @@ dataR
 ```{r}
 #Testing most obvious model
 
-glm1 = glm(current_smoker ~ age + marital_status + level_of_deprivation + rural + ethnicity + educ, family = binomial(logit), data = dataR)
+glm1 = glm(current_smoker ~ age + marital_status + level_of_deprivation + rural + ethnicity + educ + gender, family = binomial(logit), data = dataR)
 
 summary(glm1)
 
@@ -383,13 +384,13 @@ drop_test
 #Let us now check for potential interactions
 
 # Adding an interaction between age and marital status as an example
-glm2i = glm(current_smoker ~ age*marital_status + level_of_deprivation + rural + ethnicity + educ, 
+glm2i = glm(current_smoker ~ age*marital_status + level_of_deprivation + rural + ethnicity + educ + gender, 
             family = binomial(logit), data = dataR)
 
-glm3i = glm(current_smoker ~ age + marital_status + level_of_deprivation*rural + ethnicity + educ, 
+glm3i = glm(current_smoker ~ age + marital_status + level_of_deprivation*rural + ethnicity + educ + gender, 
             family = binomial(logit), data = dataR)
 
-glm4i = glm(current_smoker ~ age*marital_status + level_of_deprivation*rural + ethnicity + educ, 
+glm4i = glm(current_smoker ~ age*marital_status + level_of_deprivation*rural + ethnicity + educ + gender, 
             family = binomial(logit), data = dataR)
 
 # Use ANOVA to compare the original model without interactions (glm1) and the new model (glm2)
@@ -407,32 +408,19 @@ anova(glm1, glm4i, test = "Chisq")
 ```{r}
 #Some plots to see how well the model fits
 
-# Calculate residuals and fitted values
-residuals = residuals(glm1, type = "deviance")
-fitted_values = fitted(glm1)
-
-```
-
-```{r}
 predicted_probabilities <- predict(glm1, type = "response")
 actual_outcomes <- dataR$current_smoker  # Adjust according to your data
 
-# Create a data frame for ggplot
+# Create a data frame
 calibration_data <- data.frame(Predicted = predicted_probabilities, Actual = actual_outcomes)
 
-#Binning predicted probabilities for plotting
-calibration_data$PredictedBin <- cut(calibration_data$Predicted, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE)
+calibration_data$Actual <- as.numeric(as.character(calibration_data$Actual))
 
-# Calculating mean actual outcome per bin
-calibration_summary <- aggregate(Actual ~ PredictedBin, data = calibration_data, mean)
-
-# Plotting
-ggplot(calibration_summary, aes(x = as.numeric(as.character(PredictedBin)), y = Actual)) +
-  geom_line() +
-  geom_point() +
-  labs(title = "Calibration Curve", x = "Mean Predicted Probability", y = "Mean Actual Outcome") +
+ggplot(calibration_data, aes(x = Predicted, y = Actual)) +
+  stat_summary_bin(fun = "mean", bins = 10, geom = "point") +  # Bin and plot mean Actual per bin
+  stat_summary_bin(fun = "mean", bins = 10, geom = "line", aes(group = 1)) +  # Connect points with lines
+  labs(title = "Calibration Curve", x = "Predicted Probability", y = "Mean Actual Outcome") +
   geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "red")
-
 ```
 
 ```{r}
@@ -467,12 +455,12 @@ testData = dataR %>% anti_join(trainData, by = c('ID'))
 
 # Define the model formulas
 model_formulas = list(
-  glm1 = current_smoker ~ age + marital_status + level_of_deprivation + rural + ethnicity + educ,
-  glm2 = current_smoker ~ age + marital_status + I(log(level_of_deprivation)) + rural + ethnicity + educ,
-  glm3 = current_smoker ~ age * marital_status + level_of_deprivation + rural + ethnicity + educ,
-  glm4 = current_smoker ~ age * marital_status + I(log(level_of_deprivation)) + rural + ethnicity + educ,
-  glm5 = current_smoker ~ age * marital_status + I(log(level_of_deprivation))*rural + ethnicity + educ,
-  glm6 = current_smoker ~ age * marital_status + level_of_deprivation*rural + ethnicity + educ
+  glm1 = current_smoker ~ age + marital_status + level_of_deprivation + rural + ethnicity + educ + gender,
+  glm2 = current_smoker ~ age + marital_status + I(log(level_of_deprivation)) + rural + ethnicity + educ + gender,
+  glm3 = current_smoker ~ age * marital_status + level_of_deprivation + rural + ethnicity + educ + gender,
+  glm4 = current_smoker ~ age * marital_status + I(log(level_of_deprivation)) + rural + ethnicity + educ + gender,
+  glm5 = current_smoker ~ age * marital_status + I(log(level_of_deprivation))*rural + ethnicity + educ + gender,
+  glm6 = current_smoker ~ age * marital_status + level_of_deprivation*rural + ethnicity + educ + gender
 )
 
 # Initialize a summary table
@@ -503,7 +491,7 @@ summary_table
 ```
 
 ```{r}
-#Think either model 1 or model 3 would be best; For the forest plot I will do model 1
+#Think either model 1 or model 6 would be best; For the forest plot I will do model 1
 
 
 ### Forest plot
@@ -535,7 +523,7 @@ ggplot(tidied_model, aes(y = term, x = estimate, xmin = conf.low, xmax = conf.hi
 dataR_smokers = dataR %>% subset(nr_cigarettes_weekly > 0)
 
 
-glm_weekly1 = glm(nr_cigarettes_weekly ~ age + marital_status + level_of_deprivation + rural + ethnicity + educ, family = Gamma(), data = dataR_smokers)
+glm_weekly1 = glm(nr_cigarettes_weekly ~ age + marital_status + level_of_deprivation + rural + ethnicity + educ + gender, family = Gamma(), data = dataR_smokers)
 
 
 summary(glm_weekly1)
@@ -565,9 +553,92 @@ drop_test_weekly
 
 
 ```{r}
+
+
 #QUESTION 3: Using an appropriate model comment on the lifestyle habits that are associated with systolic bloodpressure and how are they associated? (Hint: Note that the appropriate model may not only involve lifestyle habits as predictors)
 
+dataS = subdat %>%
+  mutate(
+    age_group = factor(ag16g10),
+    ID = factor(SerialA),
+    age = as.numeric(Age35g),
+    current_smoker = factor(ifelse(cigsta3_19 == 1, 1, 0), levels = c(0, 1)),
+    marital_status_ = factor(ifelse(marstatD == 2, "Married", "Not Married"), levels = c("Not Married", "Married")),
+    level_of_deprivation = as.numeric(qimd19, ordered = TRUE),
+    rural = factor(urban14b, levels = 1:2, labels = c("Urban","Rural")),
+    ethnicity = factor(origin2, levels = 1:5, labels = c("White", "Black","Asian","Mixed","Other")),
+    nr_cigarettes_weekly = as.numeric(cigdyal_19*7),
+    educ_ = factor(ifelse(topqual2 == 1 | topqual2 == 2, "higher", "basic"),
+               levels = c("basic", "higher")),
+    systolic = as.numeric(omsysval, ordered = TRUE),
+    BMI = as.numeric(BMIVal),
+    gender_ = factor(Sex, levels = c("1", "2"), labels = c("male", "female")),
+    current_e_cig_user = factor(NDPNow_19, levels = c("1", "2", "3", "4"), labels = c("vapes", "Other", "Both","none")),
+        drinks_ = factor(case_when(
+      dnoft_19 %in% c("1", "2", "3") ~ "frequent",
+      dnoft_19 %in% c("4","5") ~ "occasional",
+      dnoft_19 %in% c("6", "7", "8") ~ "rare"
+    ), levels = c("frequent", "occasional", "rare"))
+  )
 
+dataS = dataS %>% select(-c(1:19)) %>% na.omit() %>% select(-1)
+dataS$age = (dataS$age - 7)*5 + 17
+dataS
+```
+
+```{r}
+#First a full linear model
+
+
+lm_full = lm(systolic ~ current_smoker + nr_cigarettes_weekly + age + marital_status_ + level_of_deprivation + 
+    rural + ethnicity + educ_ + BMI + gender_ + current_e_cig_user + drinks_, dataS)
+
+summary(lm_full)
+```
+
+```{r}
+step_lmSys = step(lm_full, direction = "both")
+```
+```{r}
+lmS1 = lm(systolic ~ current_smoker + nr_cigarettes_weekly*age + marital_status_ + level_of_deprivation + 
+    rural + ethnicity + educ_ + BMI + gender_ + current_e_cig_user + drinks_, dataS)
+
+lmS2 = lm(systolic ~ current_smoker*age + nr_cigarettes_weekly + marital_status_ + level_of_deprivation + 
+    rural + ethnicity + educ_ + BMI + gender_ + current_e_cig_user + drinks_, dataS)
+
+lmS3 = lm(systolic ~ current_smoker*drinks_ + nr_cigarettes_weekly + age + marital_status_ + level_of_deprivation + 
+    rural + ethnicity + educ_ + BMI + gender_ + current_e_cig_user, dataS)
+
+
+anova(lm_full, lmS1)
+anova(lm_full, lmS2)
+anova(lm_full, lmS3)
+
+#We see that current_smoker*age is an important interaction
+```
+
+```{r}
+#It appears our best base model is:
+
+lm_best = lm(systolic ~ age*current_smoker + marital_status_ + rural + ethnicity + educ_ + 
+    BMI + gender_ + drinks_, dataS)
+summary(lm_best)
 
 ```
+
+```{r}
+par(mfrow = c(2, 2))  # Set up the plotting area to display 4 key plots
+plot(lm_best)
+
+
+#We see from QQ plot that a transformation may be useful. I suspect one on the drinks per week could make sense as it is distinctly a non linear growth.
+
+
+#Can see in final graph there are some very high leverage outliers which might be worth investigating
+```
+```{r}
+#Overall can notice the positive interaction effect between age and smoking; Moreover, as we would expect (note our baseline is frequent drinkers) the less you drink the lower the blood pressure.
+```
+
+
 
