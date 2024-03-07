@@ -37,7 +37,7 @@
   \KOMAoptions{parskip=half}}
 \makeatother
 \usepackage{xcolor}
-\usepackage[margin=1in]{geometry}
+\usepackage[margin=0.5in]{geometry}
 \usepackage{longtable,booktabs,array}
 \usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
@@ -65,6 +65,39 @@
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break#1\hfill\break}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
 \usepackage{hyperref}
 \usepackage{array}
 \usepackage{caption}
@@ -99,9 +132,29 @@ socio-economic factors and lifestyle habits in adults (from the age of
 England 2019.
 \end{abstract}
 
+\pagenumbering{gobble}
+
 \newpage
 
 \section{Introduction}\label{introduction}
+
+In the UK, smoking, vaping, and alcohol consumption are widespread,
+particularly among youngsters. It is crucial to be aware of the
+consequences and dangers of these habits, and the complications they can
+cause in later-life. The Office for National Statistics (ONS), regarded
+as the foremost statistical institute in the UK, is the ``go-to'' for
+insights into public health trends. According to their estimations,
+approximately 14.1\% of the adult population aged 18 and above were
+identified as cigarette smokers (\citeproc{ref-1ONS}{ONS 2019a}).
+Furthermore, their data revealed there were 7,565 deaths attributed to
+alcohol-specific causes in 2019 (\citeproc{ref-2ONS}{ONS 2019b}). These
+statistics alone warrant a need for an understanding of health-related
+behaviours and the outcome. Therefore, the aim of our study is to
+investigate not only the prevalence but also the severity of these
+habits, exploring different socioeconomic factors that may potentially
+contribute to each. Additionally, we will investigate the greater
+implications of these bad habits and how they relate to systolic blood
+pressure levels throughout the UK population.
 
 \section{Question One}\label{question-one}
 
@@ -154,8 +207,7 @@ Smoking E-cigarettes & 4.28\% & (3.84\%, 4.72\%) \\
 \begin{figure}
 \centering
 \includegraphics{Coursework_files/figure-latex/output prevelance plot-1.pdf}
-\caption{Estimation of the prevelance of drinkers by city type and age
-group}
+\caption{Estimation of the prevelance of smokers by deprivation}
 \end{figure}
 
 \section{Question Two}\label{question-two}
@@ -176,17 +228,34 @@ Variable & Missing Values & \% Missing \\
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-omsysval & 3216 & 49\% \\
-dnoft\_19 & 1220 & 18.6\% \\
-BMIVal & 1207 & 18.4\% \\
-cigdyal\_19 & 49 & 0.747\% \\
-cigsta3\_19 & 47 & 0.716\% \\
-NDPNow\_19 & 44 & 0.67\% \\
-d7many3\_19 & 43 & 0.655\% \\
-drinkYN\_19 & 42 & 0.64\% \\
-topqual2 & 36 & 0.549\% \\
+omsysval & 3217 & 49\% \\
+BMIVal & 1203 & 18.3\% \\
+dnoft\_19 & 1187 & 18.1\% \\
+cigdyal\_19 & 45 & 0.686\% \\
+cigsta3\_19 & 44 & 0.67\% \\
+NDPNow\_19 & 43 & 0.655\% \\
+d7many3\_19 & 40 & 0.609\% \\
+drinkYN\_19 & 39 & 0.594\% \\
+topqual2 & 38 & 0.579\% \\
 origin2 & 24 & 0.366\% \\
 marstatD & 1 & 0.0152\% \\
 \end{longtable}
+
+Creating first model on train data
+
+\section*{References}\label{references}
+\addcontentsline{toc}{section}{References}
+
+\phantomsection\label{refs}
+\begin{CSLReferences}{1}{0}
+\bibitem[\citeproctext]{ref-1ONS}
+ONS. 2019a. {``{Adult smoking habits in the UK: 2019}.''}
+\url{https://shorturl.at/qQW27}.
+
+\bibitem[\citeproctext]{ref-2ONS}
+---------. 2019b. {``{Alcohol-specific deaths in the UK: registered in
+2019}.''} \url{https://shorturl.at/gqxY1}.
+
+\end{CSLReferences}
 
 \end{document}

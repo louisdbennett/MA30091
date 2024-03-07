@@ -14,14 +14,21 @@ header-includes:
   - \usepackage{calc}
   - \usepackage{tabularx}
   - \usepackage[para,online,flushleft]{threeparttable} 
-geometry: margin=1in
+geometry: margin=0.5in
+pagenumbers: no
 fontsize: 11pt
 endnote: no
 title: "Analysis of Health Survey for England (HSE) 2019"
 author: Candidate Numbers Here
 abstract: "This report provides an analysis of data related to health, age, socio-economic factors and lifestyle habits in adults (from the age of 16) from the population in England, derived from the Health Survey for England 2019."
 date: "`r format(Sys.time(), '%B %d, %Y')`"
+bibliography: bibliography.bib
+nocite: '@*'
+link-citations: true
 ---
+
+<!-- Remove page numbers -->
+\pagenumbering{gobble}
 
 ```{r setup, include=F}
 knitr::opts_chunk$set(include = F, echo = F, message = F, warning = F)
@@ -30,6 +37,10 @@ knitr::opts_chunk$set(include = F, echo = F, message = F, warning = F)
 
 \newpage
 # Introduction
+
+In the UK, smoking, vaping, and alcohol consumption are widespread, particularly among youngsters. It is crucial to be aware of the consequences and dangers of these habits, and the complications they can cause in later-life.
+The Office for National Statistics (ONS), regarded as the foremost statistical institute in the UK, is the “go-to” for insights into public health trends. According to their estimations, approximately 14.1% of the adult population aged 18 and above were identified as cigarette smokers [@1ONS]. Furthermore, their data revealed there were 7,565 deaths attributed to alcohol-specific causes in 2019 [@2ONS].
+These statistics alone warrant a need for an understanding of health-related behaviours and the outcome. Therefore, the aim of our study is to investigate not only the prevalence but also the severity of these habits, exploring different socioeconomic factors that may potentially contribute to each. Additionally, we will investigate the greater implications of these bad habits and how they relate to systolic blood pressure levels throughout the UK population.
 
 ```{r initial data filtering and splitting}
 library(dplyr)
@@ -88,7 +99,11 @@ sd16plus <- subdat %>%
         grepl('None|Other', NDPNow_19) ~ 'Doesn\'t smoke E-cigarettes',
         T ~ NA
       )
-    )
+    ),
+    
+    # Define new variables
+    
+    current_smoker = as.numeric(cigsta3_19 == "Current cigarette smoker")
   )
 ```
 
@@ -214,36 +229,40 @@ knitr::kable(
 ```
 
 ```{r calculations by age groups}
-age_groups_drinking <- sd16plus %>% 
-  filter(!is.na(drinkYN_19)) %>% 
-  # Change grouping here to calculate CIs for different variables
-  group_by(urban14b, ag16g10) %>% 
-  summarise(
-    drinkYN_19 = list(drinkYN_19 == 'Yes'), wt_int = list(wt_int), .groups = 'drop'
-  ) %>% 
-  mutate(
-    summary = purrr::map2(drinkYN_19, wt_int, calculate_binomial_ci),
-    p_hat = purrr::map_dbl(summary, \(x) x$p_hat),
-    lower = purrr::map_dbl(summary, \(x) x$ci[1]),
-    upper = purrr::map_dbl(summary, \(x) x$ci[2])
-  ) %>% 
-  select(-c(drinkYN_19, wt_int, summary))
-
-prevelance_plot <- ggplot(data = age_groups_drinking, aes(x = ag16g10, y = p_hat, ymin = lower, ymax = upper)) +
-  geom_bar(stat = 'identity', fill = 'skyblue') +
-  geom_errorbar(width = 0.5) +
-  facet_wrap(~ urban14b) +
-  scale_y_continuous(labels = scales::percent) +
-  labs(x = "Age Group", y = "% Drinkers", title = "") +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1), 
-    strip.text = element_text(face = 'bold', size = 12)
-  )
+create_confidence_int_plot <- function(group_variable, facet_variable, plotting_variable, required_levels, labels = list()) {
+  data <- sd16plus %>% 
+    filter(!if_any(all_of(plotting_variable), is.na)) %>% 
+    group_by(
+      across(all_of(c(group_variable, facet_variable)))
+    ) %>% 
+    summarise(
+      across(all_of(plotting_variable), ~ list(.x %in% required_levels), .names = 'dat_vec'),
+      wt_int = list(wt_int), .groups = 'drop'
+    ) %>% 
+    mutate(
+      summary = purrr::map2(dat_vec, wt_int, calculate_binomial_ci),
+      p_hat = purrr::map_dbl(summary, \(x) x$p_hat),
+      lower = purrr::map_dbl(summary, \(x) x$ci[1]),
+      upper = purrr::map_dbl(summary, \(x) x$ci[2])
+    ) %>% 
+    select(-c(dat_vec, wt_int, summary))
+  
+  ggplot(data = data, aes(x = !!sym(group_variable), y = p_hat, ymin = lower, ymax = upper)) +
+    geom_point(size = 3) +
+    geom_errorbar(width = 0.5) +
+    facet_wrap(as.formula(paste('~ ', facet_variable))) +
+    scale_y_continuous(labels = scales::percent) +
+    labs(x = labels$x, y = labels$y) +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1), 
+      strip.text = element_text(face = 'bold', size = 12)
+    )
+}
 ```
 
-```{r output prevelance plot, include = T, fig.width=10, fig.height=5, fig.cap="Estimation of the prevelance of drinkers by city type and age group"}
-prevelance_plot
+```{r output prevelance plot, include = T, fig.width=10, fig.height=5, fig.cap="Estimation of the prevelance of smokers by deprivation"}
+create_confidence_int_plot('qimd19', 'Sex', 'cigsta3_19', required_levels = c('Current cigarette smoker'), list(x = 'Deprivation', y = '% Smokers'))
 ```
 
 # Question Two
@@ -260,7 +279,7 @@ This leaves us with `r NROW(train16plus)` observations in our training dataset.
 
 ```{r summary of data set}
 variable_na_table <- train16plus %>% 
-  select(-SerialA) %>% 
+  select(-c(SerialA, current_smoker)) %>% 
   summarise(
     across(everything(), ~ sum(is.na(.x)))
   ) %>% 
@@ -268,7 +287,7 @@ variable_na_table <- train16plus %>%
     cols = everything(), names_to = 'Variable', values_to = 'SumNA'
   ) %>% 
   # Can filter out variables with 0 NAs for table?
-  filter(SumNA != 0) %>% 
+  filter(SumNA != 0) %>%
   mutate(PercNA = paste0(100 * signif(SumNA / NROW(train16plus), digits = 3), '%')) %>% 
   arrange(desc(SumNA))
 ```
@@ -280,3 +299,17 @@ knitr::kable(
   caption = "Missing values in the training dataset"
 )
 ```
+
+Creating first model on train data
+
+```{r}
+full_binom_model <- glm(
+  current_smoker ~ ag16g10 + marstatD + qimd19 + urban14b + origin2 + topqual2, 
+  family = binomial(logit),
+  data = filter(train16plus, !is.na(current_smoker))
+)
+
+summary(full_binom_model)
+```
+
+# References
