@@ -42,6 +42,8 @@ dataM = subdat %>%
 
 dataM = na.omit(dataM)
 
+attr(subdat$qimd19, "labels")
+
 ```
 
 
@@ -460,7 +462,8 @@ model_formulas = list(
   glm3 = current_smoker ~ age * marital_status + level_of_deprivation + rural + ethnicity + educ + gender,
   glm4 = current_smoker ~ age * marital_status + I(log(level_of_deprivation)) + rural + ethnicity + educ + gender,
   glm5 = current_smoker ~ age * marital_status + I(log(level_of_deprivation))*rural + ethnicity + educ + gender,
-  glm6 = current_smoker ~ age * marital_status + level_of_deprivation*rural + ethnicity + educ + gender
+  glm6 = current_smoker ~ age * marital_status + level_of_deprivation*rural + ethnicity + educ + gender,
+  glm7 = current_smoker ~ I(age^2) * marital_status + level_of_deprivation*rural + ethnicity + educ + gender
 )
 
 # Initialize a summary table
@@ -530,13 +533,9 @@ summary(glm_weekly1)
 ```
 
 ```{r}
+par(mfrow = c(2, 2))  # Set up the plotting area to display 4 key plots
+plot(glm_weekly1)
 
-
-plot(glm_weekly1,2)
-
-#QQ-Plot looks acceptible
-
-plot(glm_weekly1,3)
 
 #Residuals seem to be centered around 0 reasonably well, no clear patterns.
 
@@ -609,10 +608,13 @@ lmS2 = lm(systolic ~ current_smoker*age + nr_cigarettes_weekly + marital_status_
 lmS3 = lm(systolic ~ current_smoker*drinks_ + nr_cigarettes_weekly + age + marital_status_ + level_of_deprivation + 
     rural + ethnicity + educ_ + BMI + gender_ + current_e_cig_user, dataS)
 
+lmS4 = lm(systolic ~ current_smoker*I(age^2) + nr_cigarettes_weekly + marital_status_ + level_of_deprivation + 
+    rural + ethnicity + educ_ + BMI + gender_ + current_e_cig_user + drinks_, dataS)
 
 anova(lm_full, lmS1)
 anova(lm_full, lmS2)
 anova(lm_full, lmS3)
+anova(lm_full, lmS4)
 
 #We see that current_smoker*age is an important interaction
 ```
