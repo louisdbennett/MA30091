@@ -11,7 +11,6 @@ library(dplyr)
 library(ggplot2)
 library(haven)
 
-load("Datasets/hsesub.Rdata")
 ```
 
 ```{r}
@@ -45,6 +44,7 @@ dataM = na.omit(dataM)
 
 ```
 
+
 ```{r}
 #I will refactorize the variable to make them more understandable and group frequency of alcohol consumption into more managble buckets
 
@@ -67,6 +67,7 @@ dataM = dataM %>%
     ), levels = c("frequent", "occasional", "rare"))
   )
 ```
+
 
 ```{r}
 
@@ -110,7 +111,7 @@ print(dataM_table)
 ```
 
 ```{r}
-#After doing some research online regarding how survey weights are used, a common suggestion was to use this package which takes into a account the design effect when creating C.I.. As you can see the mean stays the same, but CI widens very slightly. I am not 100% sure how you guys wants to procede, but just showcasing how for one variable it would work.
+#After doing some research online regarding how survey weights are used, a common suggestion was to use this package which takes into a account the design effect when creating C.I. As you can see the mean stays the same, but CI widens very slightly. I am not 100% sure how you guys wants to procede, but just showcasing how for one variable it would work.
 
 
 library(survey)
@@ -337,13 +338,14 @@ ggplot(average_cigarettes_by_age, aes(x = age_group, y = average_cigarettes)) +
 ```{r}
 #FOR QUESTION 2: 2. Using an appropriate model describe to what extent is smoking associated with socioeconomic status and age.
 
-#Potential variables of interest: age, marital status, level of deprivation, rurality, ethnicity, number of cigarettes a day, 
+#Potential variables of interest: age, marital status, level of deprivation, rurality, ethnicity, number of cigarettes a day.
 
 
-#Creating the dataset (note, I factorize current smoker into yes/no, and martial status into yes/no. Moreover, I take age as a continuous variable with the values being the average of each bucket)
+#Creating the dataset. Note, I factorize current smoker into yes/no, and martial status into yes/no. Moreover, I take age as a continuous variable with the values being the average of each bucket, and I take level of deprivation as a continuous variable as well.
 dataR = subdat %>%
   mutate(
     age_group = factor(ag16g10),
+    ID = factor(SerialA),
     age = as.numeric(Age35g),
     current_smoker = factor(ifelse(cigsta3_19 == 1, 1, 0), levels = c(0, 1)),
     marital_status = factor(ifelse(marstatD == 2, "Married", "Not Married"), levels = c("Not Married", "Married")),
@@ -362,6 +364,8 @@ dataR
 ```
 
 ```{r}
+#Testing most obvious model
+
 glm1 = glm(current_smoker ~ age + marital_status + level_of_deprivation + rural + ethnicity + educ, family = binomial(logit), data = dataR)
 
 summary(glm1)
@@ -379,21 +383,21 @@ drop_test
 #Let us now check for potential interactions
 
 # Adding an interaction between age and marital status as an example
-glm2 = glm(current_smoker ~ age*marital_status + level_of_deprivation + rural + ethnicity + educ, 
+glm2i = glm(current_smoker ~ age*marital_status + level_of_deprivation + rural + ethnicity + educ, 
             family = binomial(logit), data = dataR)
 
-glm3 = glm(current_smoker ~ age + marital_status + level_of_deprivation*rural + ethnicity + educ, 
+glm3i = glm(current_smoker ~ age + marital_status + level_of_deprivation*rural + ethnicity + educ, 
             family = binomial(logit), data = dataR)
 
-glm4 = glm(current_smoker ~ age*marital_status + level_of_deprivation*rural + ethnicity + educ, 
+glm4i = glm(current_smoker ~ age*marital_status + level_of_deprivation*rural + ethnicity + educ, 
             family = binomial(logit), data = dataR)
 
 # Use ANOVA to compare the original model without interactions (glm1) and the new model (glm2)
-anova(glm1, glm2, test = "Chisq")
+anova(glm1, glm2i, test = "Chisq")
 
-anova(glm1, glm3, test = "Chisq")
+anova(glm1, glm3i, test = "Chisq")
 
-anova(glm1, glm4, test = "Chisq")
+anova(glm1, glm4i, test = "Chisq")
 #Final one is signficant at 10%
 
 #Overall looks like no interaction is necessary
@@ -410,23 +414,35 @@ fitted_values = fitted(glm1)
 ```
 
 ```{r}
-ggplot(calibration_data, aes(x = Predicted, fill = factor(Actual))) +
-  geom_histogram(alpha = 0.5, position = "identity", bins = 30) +
-  scale_fill_manual(values = c("0" = "blue", "1" = "green"), name = "Actual Outcome") +
-  labs(title = "Distribution of Predicted Probabilities", x = "Predicted Probability", y = "Frequency")
+predicted_probabilities <- predict(glm1, type = "response")
+actual_outcomes <- dataR$current_smoker  # Adjust according to your data
+
+# Create a data frame for ggplot
+calibration_data <- data.frame(Predicted = predicted_probabilities, Actual = actual_outcomes)
+
+#Binning predicted probabilities for plotting
+calibration_data$PredictedBin <- cut(calibration_data$Predicted, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE)
+
+# Calculating mean actual outcome per bin
+calibration_summary <- aggregate(Actual ~ PredictedBin, data = calibration_data, mean)
+
+# Plotting
+ggplot(calibration_summary, aes(x = as.numeric(as.character(PredictedBin)), y = Actual)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Calibration Curve", x = "Mean Predicted Probability", y = "Mean Actual Outcome") +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "red")
 
 ```
 
 ```{r}
-install.packages("pROC")
 library(pROC)
 
 # Compute ROC curve and AUC
-roc_result <- roc(actual_outcomes, predicted_probabilities)
+roc_result = roc(actual_outcomes, predicted_probabilities)
 
 # Plot ROC curve
 plot(roc_result, main = "ROC Curve")
-abline(a = 0, b = 1, col = "red", lwd = 2, lty = 2)  # Diagonal reference line
 
 # Print AUC
 print(auc(roc_result))
@@ -434,18 +450,124 @@ print(auc(roc_result))
 #This is a reasonably good value (not great)
 ```
 
+
 ```{r}
-glm_weekly1 = glm(nr_cigarettes_weekly ~ age + marital_status + level_of_deprivation + rural + ethnicity + educ, family = poisson(), data = dataR)
+library(broom)
+
+#This loop creates the table for model, type, AIC, AUC and Test accuracy. If you want to test any other model simply insert it into the model_formulas list and run the block. 
+
+#Also note, since quasibinomial only affects the variances, fitting it for these summary stats would not be relevant
+
+# split data into test/train
+set.seed(30091) # Setting seed for reproducibility
+trainData = dataR %>% sample_frac(0.8) 
+testData = dataR %>% anti_join(trainData, by = c('ID'))
+
+
+
+# Define the model formulas
+model_formulas = list(
+  glm1 = current_smoker ~ age + marital_status + level_of_deprivation + rural + ethnicity + educ,
+  glm2 = current_smoker ~ age + marital_status + I(log(level_of_deprivation)) + rural + ethnicity + educ,
+  glm3 = current_smoker ~ age * marital_status + level_of_deprivation + rural + ethnicity + educ,
+  glm4 = current_smoker ~ age * marital_status + I(log(level_of_deprivation)) + rural + ethnicity + educ,
+  glm5 = current_smoker ~ age * marital_status + I(log(level_of_deprivation))*rural + ethnicity + educ,
+  glm6 = current_smoker ~ age * marital_status + level_of_deprivation*rural + ethnicity + educ
+)
+
+# Initialize a summary table
+summary_table = data.frame(Model = character(), Type = character(), AIC = numeric(), AUC = numeric(), TestAccuracy = numeric(), stringsAsFactors = FALSE)
+
+# Loop through the models and fit them
+for (i in seq_along(model_formulas)) {
+  
+  # Fit the binomial GLM
+  glm_binomial <- glm(model_formulas[[i]], data = trainData, family = binomial(link = "logit"))
+  
+  # Compute AIC for the binomial GLM
+  binomial_aic <- AIC(glm_binomial)
+  
+  # Predict on test set and calculate AUC
+  predictions_binomial <- predict(glm_binomial, newdata = testData, type = "response")
+  auc_binomial <- roc(testData$current_smoker, predictions_binomial)$auc
+  
+  # Compute test accuracy
+  accuracy_binomial <- mean(round(predictions_binomial) == testData$current_smoker)
+  
+  # Add binomial GLM results to summary table
+  summary_table <- rbind(summary_table, data.frame(Model = paste("glm", i, sep = ""), Type = "Binomial", AIC = binomial_aic, AUC = auc_binomial, TestAccuracy = accuracy_binomial))
+  
+}
+
+summary_table
+```
+
+```{r}
+#Think either model 1 or model 3 would be best; For the forest plot I will do model 1
+
+
+### Forest plot
+library(broom)
+
+
+final_model = glm(glm1, data = dataR, family = binomial(link = "logit"))
+
+
+# Tidy the model to get a data frame for coefficients
+tidied_model = tidy(final_model, conf.int = TRUE, exponentiate = TRUE)
+
+# Forest plot for the odds ratios and their confidence intervals
+ggplot(tidied_model, aes(y = term, x = estimate, xmin = conf.low, xmax = conf.high)) +
+  geom_point() +
+  geom_errorbarh(height = 0.2) +
+  labs(x = "Odds Ratio", y = "Predictor", title = "Forest Plot of Odds Ratios with 95% CI") +
+  theme_minimal()
+
+#Note that since the baseline mean is around 27%, and our intercept gives odds of 38.6%, most coefficients will decrease the baseline odds. We can distinctly see that level of deprivation is the only one the will increase the odds. This aligns with out initial plot which showed a clear trend where as people are better off they smoke more (possibly explained by the very expensive nature of cigarettes in the UK). Alcohol follows the opposite trend.
+
+#Also, notice how age has a negligible influence on probability of smoking.
+```
+
+
+```{r}
+#Think best way to do it would be to remove non-smokers and model how much you smoke if you smoke under socioeconomic variables
+
+dataR_smokers = dataR %>% subset(nr_cigarettes_weekly > 0)
+
+
+glm_weekly1 = glm(nr_cigarettes_weekly ~ age + marital_status + level_of_deprivation + rural + ethnicity + educ, family = Gamma(), data = dataR_smokers)
+
 
 summary(glm_weekly1)
 ```
 
 ```{r}
-plot(glm_weekly1, 1)
-plot(glm_weekly1, 2)
-plot(glm_weekly1, 3)
 
 
-#Think best way to do it would be to remove non-smokers and model how much you smoke if you smoke under socioeconomic variables
+plot(glm_weekly1,2)
+
+#QQ-Plot looks acceptible
+
+plot(glm_weekly1,3)
+
+#Residuals seem to be centered around 0 reasonably well, no clear patterns.
+
+
+#Overall, Gamma distribution seems to fit well; next lets check if any variable should be dropped
+```
+```{r}
+drop_test_weekly = drop1(glm_weekly1)
+drop_test_weekly
+
+#Does not appear to be significant improvement in dropping any variables, we will use this model.
+
+```
+
+
+```{r}
+#QUESTION 3: Using an appropriate model comment on the lifestyle habits that are associated with systolic bloodpressure and how are they associated? (Hint: Note that the appropriate model may not only involve lifestyle habits as predictors)
+
+
+
 ```
 
