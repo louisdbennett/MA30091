@@ -11,6 +11,8 @@ library(dplyr)
 library(ggplot2)
 library(haven)
 library(broom)
+
+load("~/MA30091/Coursework/MA30091/Datasets/hsesub.Rdata")
 ```
 
 ```{r}
@@ -107,7 +109,7 @@ dataM_table = tibble(
 )
 
 # View the compact table
-print(dataM_table)
+# print(dataM_table)
 ```
 
 ```{r}

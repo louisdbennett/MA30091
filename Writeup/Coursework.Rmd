@@ -4,8 +4,6 @@ output:
     keep_tex: true
     fig_caption: true
     latex_engine: pdflatex
-    includes:
-      in_header: columns.tex
 header-includes:
   - \usepackage{hyperref}
   - \usepackage{array}   
@@ -49,7 +47,7 @@ library(pROC)
 library(caret)
 library(patchwork)
 
-load("Datasets/hsesub.Rdata")
+load("~/MA30091/Coursework/MA30091/Datasets/hsesub.Rdata")
 
 fct_variables <- c(
   'Sex', 'Age35g', 'ag16g10', 'topqual2', 'urban14b', 'origin2', 'marstatD', 'GOR1', 'cigsta3_19', 'NDPNow_19', 'drinkYN_19', 'dnoft_19'
@@ -87,7 +85,7 @@ sd16plus <- subdat %>%
         dnoft_19 %in% c('Almost every day', 'Five or six days a week', 'Three or four days a week') ~ "Frequent",
         dnoft_19 %in% c('Once or twice a week', 'Once or twice a month') ~ "Occasional",
         dnoft_19 %in% c('Once every couple of months', 'Once or twice a year', 'Not at all in the last 12 months') ~ "Rarely",
-        T ~ NA
+        T ~ NA_character_
       )
     ),
     urban14b = as.factor(
