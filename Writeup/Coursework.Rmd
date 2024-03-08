@@ -63,14 +63,15 @@ sd16plus <- subdat %>%
       all_of(fct_variables), 
       ~ factor(as.factor(.x), levels = attr(subdat[[cur_column()]], 'labels'), labels = names(attr(subdat[[cur_column()]], 'labels')))
     ), 
-    across(!all_of(fct_variables), as.numeric),
-    
+    across(!all_of(fct_variables), as.numeric)
+  ) %>% 
+  mutate(
     # Grouping variables
     marstatD = as.factor(
       case_when(
         grepl('Married', marstatD) ~ 'Married', 
         !is.na(marstatD) ~ 'Not Married',
-        T ~ NA
+        T ~ NA_character_
       )
     ),
     topqual2 = as.factor(
@@ -78,7 +79,7 @@ sd16plus <- subdat %>%
         grepl('Degree or equiv|degree|FT Student', topqual2) ~ 'Higher Education', 
         grepl('A Level equiv', topqual2) ~ 'A-Levels',
         grepl('O Level equiv|CSE other grade equiv', topqual2) ~ 'O-Levels',
-        T ~ topqual2
+        T ~ as.character(topqual2)
       )
     ),
     dnoft_19 = as.factor(
@@ -92,14 +93,14 @@ sd16plus <- subdat %>%
     urban14b = as.factor(
       case_when(
         grepl('Town', urban14b) ~ 'Not Urban', 
-        T ~ urban14b
+        T ~ as.character(urban14b)
       )
     ),
     NDPNow_19 = as.factor(
       case_when(
         grepl('Both|E-cigarettes', NDPNow_19) ~ 'Smokes E-cigarettes',
         grepl('None|Other', NDPNow_19) ~ 'Doesn\'t smoke E-cigarettes',
-        T ~ NA
+        T ~ NA_character_
       )
     ),
     
