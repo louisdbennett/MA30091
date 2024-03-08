@@ -4,6 +4,8 @@ output:
     keep_tex: true
     fig_caption: true
     latex_engine: pdflatex
+    includes:
+      in_header: columns.tex
 header-includes:
   - \usepackage{hyperref}
   - \usepackage{array}   
@@ -14,6 +16,8 @@ header-includes:
   - \usepackage{calc}
   - \usepackage{tabularx}
   - \usepackage[para,online,flushleft]{threeparttable} 
+  - \DeclareMathOperator{\logit}{logit}
+  - \DeclareMathOperator{\var}{var}
 geometry: margin=0.5in
 pagenumbers: no
 fontsize: 11pt
@@ -34,18 +38,16 @@ link-citations: true
 knitr::opts_chunk$set(include = F, echo = F, message = F, warning = F)
 ```
 
-
-\newpage
-# Introduction
-
-In the UK, smoking, vaping, and alcohol consumption are widespread, particularly among youngsters. It is crucial to be aware of the consequences and dangers of these habits, and the complications they can cause in later-life.
-The Office for National Statistics (ONS), regarded as the foremost statistical institute in the UK, is the “go-to” for insights into public health trends. According to their estimations, approximately 14.1% of the adult population aged 18 and above were identified as cigarette smokers [@1ONS]. Furthermore, their data revealed there were 7,565 deaths attributed to alcohol-specific causes in 2019 [@2ONS].
-These statistics alone warrant a need for an understanding of health-related behaviours and the outcome. Therefore, the aim of our study is to investigate not only the prevalence but also the severity of these habits, exploring different socioeconomic factors that may potentially contribute to each. Additionally, we will investigate the greater implications of these bad habits and how they relate to systolic blood pressure levels throughout the UK population.
+<!-- Put all code at start and only call plots when we need them in line -->
 
 ```{r initial data filtering and splitting}
 library(dplyr)
 library(haven)
 library(ggplot2)
+library(broom)
+library(pROC)
+library(caret)
+library(patchwork)
 
 load("Datasets/hsesub.Rdata")
 
@@ -103,13 +105,14 @@ sd16plus <- subdat %>%
     
     # Define new variables
     
-    current_smoker = as.numeric(cigsta3_19 == "Current cigarette smoker")
+    current_smoker = as.numeric(cigsta3_19 == "Current cigarette smoker"),
+    age_estim = if_else(
+      Age35g != "90+",
+      purrr::map2_dbl(as.numeric(gsub("-.*", "", Age35g)), as.numeric(gsub(".*-", "", Age35g)), \(x, y) mean(c(x, y))),
+      92.5
+    )
   )
 ```
-
-# Question One
-
-We start by investigating the data...
 
 ```{r proportion bar plot function}
 create_proportion_bar_plot <- function(group_variable, facet_variable, plotting_variable, labels = list()) {
@@ -126,33 +129,24 @@ create_proportion_bar_plot <- function(group_variable, facet_variable, plotting_
   ggplot(data, aes(x = !!sym(group_variable), y = proportion, fill = !!sym(plotting_variable))) +
     geom_bar(stat = "identity", position = "dodge") +
     facet_wrap(as.formula(paste("~", facet_variable)), scales = "free_x") +
-    scale_fill_brewer(palette = "Pastel1") +
+    scale_fill_brewer(palette = "Pastel1", name = labels$legend.title) +
     labs(x = labels$x, y = labels$y) +
     scale_y_continuous(labels = scales::percent) +
+    guides(
+      fill = guide_legend(title.position = 'top', title.hjust = 0.5, title.theme = element_text(face = 'bold'))
+    ) +
     theme_minimal() +
     theme(
       axis.text.x = element_text(angle = 45, hjust = 1),
-      legend.title = element_blank(),
       legend.position = 'bottom',
-      strip.text = element_text(face = 'bold', size = 12)
+      strip.text = element_text(face = 'bold', size = 12),
+      legend.text = element_text(size = 6), 
+      legend.key.size = unit(0.4, 'cm')
     )
 }
 ```
 
-```{r output smoking by age plot, include = T, fig.width=10, fig.height=4, fig.cap="Smoking status proportions by age group and gender"}
-create_proportion_bar_plot('ag16g10', 'Sex', 'cigsta3_19', labels = list(x = 'Age Group', y = 'Proportion'))
-```
-<!-- these slashes are needed to insert breaks after plots -->
-\
-```{r output drinking by age plot, include = T, fig.width=10, fig.height=4, fig.cap="Drinking Status Proportions by age group and gender"}
-create_proportion_bar_plot('ag16g10', 'Sex', 'dnoft_19', labels = list(x = 'Age Group', y = 'Proportion'))
-```
-\
-```{r output e-cigs by age plot, include = T, fig.width=10, fig.height=4, fig.cap="E-cigarette Usage Status Proportions by age group and gender"}
-create_proportion_bar_plot('ag16g10', 'Sex', 'NDPNow_19', labels = list(x = 'Age Group', y = 'Proportion'))
-```
-\
-```{r}
+```{r stacked bar plot function}
 create_stacked_bar_plot <- function(group_variable, plotting_variable, labels = list()) {
   data <- sd16plus %>% 
     filter(
@@ -166,25 +160,21 @@ create_stacked_bar_plot <- function(group_variable, plotting_variable, labels = 
   
   ggplot(data, aes(x = !!sym(group_variable), y = proportion, fill = !!sym(plotting_variable))) +
     geom_bar(stat = "identity", position = "stack") +
-    scale_y_continuous(labels = scales::percent) +
     scale_fill_brewer(palette = "Pastel3", name = labels$legend.title) +
+    scale_y_continuous(labels = scales::percent) +
+    guides(
+      fill = guide_legend(title.position = 'top', title.hjust = 0.5, title.theme = element_text(face = 'bold'))
+    ) +
     labs(x = labels$x, y = labels$y) +
     theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1), 
+      legend.position = 'bottom', 
+      legend.text = element_text(size = 6), 
+      legend.key.size = unit(0.4, 'cm')
+    )
 }
 ```
-
-```{r output deprivation plot, include = T, fig.width=8, fig.height=4, fig.cap="Drinking Status Proportions by Level of Deprivation"}
-create_stacked_bar_plot('qimd19', 'cigsta3_19', labels = list(x = 'Level of Deprivation', y = 'Proportion', legend.title = 'Drinking Status'))
-```
-\
-To calculate the prevalence of each habit we assume each of the $n$ observations, $x_1,…,x_n$ , to be independent, identically distributed (iid) random variables (RVs) where $x_i \sim Bern(p)\, \forall i=1,…,n$ and $p$ denotes the probability of an observation having the relevant habit. 
-We use the household weights to calculate a weighted MLE of $p$. That is, letting $w_i$ denote the weight of the $i^{th}$ observation, we alter the standard likelihood to be
-$$L(p|\textbf{x}) = \prod_{i = 1}^{n} (p^{x_i}(1-p)^{1-x_i})^{w_i}$$
-From this, we can calculate our weighted MLE
-$$\widehat{p} = \frac{\sum_{i=1}^{n} x_iw_i}{\sum_{i=1}^{n} w_i}$$
-
-We also can see that this MLE has variance given by $var(\widehat{p})=\frac{p(1-p)}{\sum_{i=1}^{n}w_i}$, which we can estimate using $\widehat{p}$ and use the large sample Normal approximation of the MLE to estimate our 95% confidence intervals.
 
 ```{r confidence interval calculation}
 # function to calculate the confidence intervals
@@ -227,14 +217,6 @@ prevelance_table <- tibble(
   select(-c(LowerCI, UpperCI))
 ```
 
-```{r output estimates table, include = T}
-knitr::kable(
-  prevelance_table, 
-  col.names = c('Category', 'Estimate', 'C.I.'), 
-  caption = "Estimates and 95% Confidence Intervals for % of Population"
-)
-```
-
 ```{r calculations by age groups}
 create_confidence_int_plot <- function(group_variable, facet_variable, plotting_variable, required_levels, labels = list()) {
   data <- sd16plus %>% 
@@ -268,25 +250,15 @@ create_confidence_int_plot <- function(group_variable, facet_variable, plotting_
 }
 ```
 
-```{r output prevelance plot, include = T, fig.width=10, fig.height=5, fig.cap="Estimation of the prevelance of smokers by deprivation"}
-create_confidence_int_plot('qimd19', 'Sex', 'cigsta3_19', required_levels = c('Current cigarette smoker'), list(x = 'Deprivation', y = '% Smokers'))
-```
-
-# Question Two
-
 ```{r splitting dataset into test and train}
 # split data into test/train
 train16plus <- sd16plus %>% sample_frac(0.8) 
 test16plus <- sd16plus %>% anti_join(train16plus, by = c('SerialA'))
 ```
 
-Explanation of why we split into test/train dataset.
-
-This leaves us with `r NROW(train16plus)` observations in our training dataset.
-
 ```{r summary of data set}
 variable_na_table <- train16plus %>% 
-  select(-c(SerialA, current_smoker)) %>% 
+  select(-c(SerialA, current_smoker, age_estim)) %>% 
   summarise(
     across(everything(), ~ sum(is.na(.x)))
   ) %>% 
@@ -299,6 +271,155 @@ variable_na_table <- train16plus %>%
   arrange(desc(SumNA))
 ```
 
+```{r fitting q2 model}
+get_binom_model_diagnostics <- function(formula) {
+  fit <- glm(formula, data = train16plus, family = binomial)
+  
+  aic <- AIC(fit)
+  
+  # predicting train values
+  pred_train <- predict(fit, newdata = train16plus, type = 'response')
+  
+  train_rmse <- sqrt(mean((train16plus$current_smoker - pred_train) ^ 2, na.rm = T))
+  
+  # predicting test values
+  pred_test <- predict(fit, newdata = test16plus, type = 'response')
+  
+  auc <- as.numeric(auc(response = test16plus$current_smoker, predictor = pred_test))
+  
+  test_rmse <- sqrt(mean((test16plus$current_smoker - pred_test) ^ 2, na.rm = T))
+  
+  accuracy <- mean(round(pred_test) == test16plus$current_smoker, na.rm = T)
+  
+  tibble(
+    model = list(fit), link = 'logit', family = 'binomial', aic = aic, auc = auc, train_rmse = train_rmse, test_rmse = test_rmse, accuracy = accuracy
+  )
+}
+
+# Define the model formulas
+binom_model_formulas <- list(
+  glm1 = current_smoker ~ age_estim + I(age_estim ^ 2) + marstatD + qimd19 + urban14b + origin2 + topqual2 + Sex + qimd19:urban14b,
+  glm2 = current_smoker ~ age_estim + I(age_estim ^ 2) + marstatD + qimd19 + urban14b + origin2 + topqual2 + Sex,
+  glm3 = current_smoker ~ age_estim + marstatD + qimd19 + urban14b + origin2 + topqual2 + Sex,
+  glm4 = current_smoker ~ Age35g + marstatD + qimd19 + urban14b + origin2 + topqual2 + Sex,
+  glm5 = current_smoker ~ ag16g10 + marstatD + qimd19 + urban14b + origin2 + topqual2 + Sex
+)
+
+# loop over formulas
+model_diagnostics <- lapply(binom_model_formulas, get_binom_model_diagnostics) %>% bind_rows()
+
+# selected model
+q2_model <- model_diagnostics$model[[which.min(model_diagnostics$aic)]]
+```
+
+```{r create q2 model selector table}
+model_specs <- c(
+  "$\\logit(\\mu_i) \\sim a_i + a_i^2 + m_i + q_i + u_i + o_i + t_i + s_i + q_i:u_i$",
+  "$\\logit(\\mu_i) \\sim a_i + a_i^2 + m_i + q_i + u_i + o_i + t_i + s_i$",
+  "$\\logit(\\mu_i) \\sim a_i + m_i + q_i + u_i + o_i + t_i + s_i$",
+  "$\\logit(\\mu_i) \\sim a_i^{(5)} + m_i + q_i + u_i + o_i + t_i + s_i$",
+  "$\\logit(\\mu_i) \\sim a_i^{(10)} + m_i + q_i + u_i + o_i + t_i + s_i$"
+)
+
+model_table_output <- model_diagnostics %>% 
+  select(aic, auc, train_rmse, test_rmse, accuracy) %>% 
+  mutate(
+    formula = model_specs, 
+    aic = round(aic, digits = 1),
+    across(c(auc:accuracy), ~ round(.x, digits = 3)),
+    .before = 1
+  )
+```
+
+```{r calibration chart function}
+create_binom_model_calibration_chart <- function(fit) {
+  pred <- predict(fit, test16plus, type = 'response')
+  
+  actual <- test16plus$current_smoker
+  
+  ggplot(mapping = aes(x = pred, y = actual)) +
+    stat_summary_bin(fun = "mean", bins = 10, geom = "point") +  # Bin and plot mean actual per bin
+    stat_summary_bin(fun = "mean", bins = 10, geom = "line", aes(group = 1)) +  # Connect points with lines
+    labs(x = "Predicted Probability", y = "Mean Actual Outcome") +
+    geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "red") +
+    theme_minimal()
+}
+```
+
+<!-- Start of write-up -->
+
+\newpage
+## Summary (Non-Technical)
+
+## Introduction
+
+In the UK, smoking, vaping, and alcohol consumption are widespread, particularly among youngsters. It is crucial to be aware of the consequences and dangers of these habits, and the complications they can cause in later-life.
+The Office for National Statistics (ONS), regarded as the foremost statistical institute in the UK, is the “go-to” for insights into public health trends. According to their estimations, approximately 14.1% of the adult population aged 18 and above were identified as cigarette smokers [@1ONS]. Furthermore, their data revealed there were 7,565 deaths attributed to alcohol-specific causes in 2019 [@2ONS].
+These statistics alone warrant a need for an understanding of health-related behaviours and the outcome. Therefore, the aim of our study is to investigate not only the prevalence but also the severity of these habits, exploring different socioeconomic factors that may potentially contribute to each. Additionally, we will investigate the greater implications of these bad habits and how they relate to systolic blood pressure levels throughout the UK population.
+
+## Exploratory Analysis
+
+**We start by investigating the data**
+
+```{r output smoking and drinking by age plot, include = T, fig.width=12, fig.height=4, fig.cap="Smoking and drinking status proportions by age group and gender"}
+p1 <- create_proportion_bar_plot('ag16g10', 'Sex', 'cigsta3_19', labels = list(x = 'Age Group', y = 'Proportion', legend.title = 'Smoking Status'))
+p2 <- create_proportion_bar_plot('ag16g10', 'Sex', 'dnoft_19', labels = list(x = 'Age Group', y = 'Proportion', legend.title = 'Drinking Status'))
+
+p1 + p2
+```
+<!-- these slashes are needed to insert breaks after plots -->
+\
+
+```{r output deprivation plot, include = T, fig.width=10, fig.height=3, fig.cap="Drinking, smoking and E-cig status proportions by level of deprivation"}
+p1 <- create_stacked_bar_plot('qimd19', 'cigsta3_19', labels = list(x = 'Level of Deprivation', y = 'Proportion', legend.title = 'Drinking Status'))
+p2 <- create_stacked_bar_plot('qimd19', 'dnoft_19', labels = list(x = 'Level of Deprivation', y = 'Proportion', legend.title = 'Smoking Status'))
+p3 <- create_stacked_bar_plot('qimd19', 'NDPNow_19', labels = list(x = 'Level of Deprivation', y = 'Proportion', legend.title = 'E-cig Status'))
+
+p1 + p2 + p3
+```
+\
+
+## Methology
+
+**Define all variables used in analysis**
+
+## Analysis
+
+### What is the prevelance of drinking, smoking and E-cig usage?
+
+To calculate the prevalence of each habit we assume each of the $n$ observations, $x_1,…,x_n$ , to be independent, identically distributed (iid) random variables (RVs) where $x_i \sim Bern(p)\, \forall i=1,…,n$ and $p$ denotes the probability of an observation having the relevant habit. 
+We use the household weights to calculate a weighted Maximum Likelihood Estimate (MLE) of $p$. That is, letting $w_i$ denote the weight of the $i^{th}$ observation, we alter the standard likelihood function of a Bernoulli distribution as below:
+$$L(p|\textbf{x}) = \prod_{i = 1}^{n} (p^{x_i}(1-p)^{1-x_i})^{w_i}$$
+From this, we calculate our weighted MLE as:
+$$\widehat{p} = \frac{\sum_{i=1}^{n} x_iw_i}{\sum_{i=1}^{n} w_i}$$
+
+It can also be shown that this MLE has variance given by $\var(\widehat{p})=\frac{p(1-p)}{\sum_{i=1}^{n}w_i}$, which we can estimate using $\widehat{p}$ and use large sample properties of the MLE to get a normal approximation and estimate 95% confidence intervals for each habit, which are shown in the table below.
+
+```{r output estimates table, include = T}
+knitr::kable(
+  prevelance_table, 
+  col.names = c('Habit', 'Estimate', 'C.I.'), 
+  caption = "Estimates and 95% Confidence Intervals for % of Population"
+)
+```
+
+**Interpretation of table/results - e-cig is much lower, drinking very common etc**
+
+**We can also...**
+
+```{r output prevelance plot, include = T, fig.width=12, fig.height=4, fig.cap="Estimation of the prevelance of smokers by deprivation"}
+create_confidence_int_plot('qimd19', 'Sex', 'cigsta3_19', required_levels = c('Current cigarette smoker'), list(x = 'Deprivation', y = '% Smokers'))
+```
+\
+
+<!-- Are we doing the same for Gamma distribution with number of cigarettes here? -->
+
+### How is smoking associated with socioeconomic factors and age?
+
+**Explanation of why we split into test/train dataset.**
+
+This leaves us with `r NROW(train16plus)` observations in our training dataset. The number of missing observations for each are shown:
+
 ```{r output NA table, include = T}
 knitr::kable(
   variable_na_table, 
@@ -307,22 +428,35 @@ knitr::kable(
 )
 ```
 
-Creating first model on train data
+**Explanation of first model - binomial with logit link**
 
-```{r}
-full_binom_model1 <- glm(
-  current_smoker ~ ag16g10 + marstatD + qimd19 + urban14b + origin2 + topqual2 + GOR1, 
-  family = binomial(logit),
-  data = filter(train16plus, !is.na(current_smoker))
+```{r output model selection table, include = T}
+knitr::kable(
+  model_table_output,
+  col.names = c('Linear Predictor', 'Train AIC', 'Test AUC', "Train RMSE", "Test RMSE", 'Test Accuracy'), 
+  caption = "Comparison of selected model evaluations",
+  escape = FALSE
 )
-
-full_binom_model2 <- glm(
-  current_smoker ~ Age35g + marstatD + qimd19 + urban14b + origin2 + topqual2, 
-  family = binomial(logit),
-  data = filter(train16plus, !is.na(current_smoker))
-)
-
-summary(full_binom_model1)
 ```
 
+**Explain why we selected the model we did - lowest AIC**
+
+**Some model diagnostics**
+
+```{r output calibration chart, include = T, fig.width=10, fig.height=4, fig.cap="Calibration chart for binomial model"}
+create_binom_model_calibration_chart(q2_model)
+```
+
+
+**Interpretation of model coefficients etc**
+
+**Limitations of model**
+
+### Which lifestyle habits are associated with systolic blood pressure?
+
+**Question Three**
+
+## Results/Conclusion
+
+\newpage
 # References

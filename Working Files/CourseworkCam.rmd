@@ -450,6 +450,59 @@ Note: cigdyal_19 codes 97 as "Smokes roll ups and doesn't know how many smokes",
 
 We need to check the numerical measured variables of BMIVal and omsysval.
 
+```{r Outliers}
+summary(sd16plusA$BMIVal)
+library(ggplot2)
+par(cex.lab=2.5)
+par(cex.axis=2.5) 
+
+# Basic combined violin and box plot
+sd16plusA$incl <- haven::as_factor(rep(1,8204))
+ggplot(sd16plusA, aes(x = incl, y = omsysval)) +
+  geom_violin(scale = "width", trim = FALSE, alpha = 0.5, color = "black", fill = "blue") +
+  geom_boxplot(width = 0.2, fill = "white", alpha = 1, outlier.shape = 3, outlier.colour = "red", outlier.alpha = 1, outlier.size = 4) +
+  ylab("Omron Valid Mean Systolic Blood Pressure (mmHg)") +
+  ggtitle("Distribution of Omron Valid Mean Systolic Blood Pressure") +
+  theme_bw() +
+  coord_flip() +
+  geom_hline(yintercept = c(130, 140, 180), colour = c("yellow", "orange", "red"), size = 0.5) +
+  geom_text(aes(x = 1.5, y = 128, label = "Stage I"), color = "black", angle = 90, size = 4) +
+  geom_text(aes(x = 1.5, y = 138, label = "Stage II"), color = "black", angle = 90, size = 4) +
+  geom_text(aes(x = 1.5, y = 178, label = "Crisis"), color = "black", angle = 90, size = 4) +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  ) +
+  scale_y_continuous(breaks = round(seq(75, 210, by = 10),1))
+  
+```
+
+```{r Outliers2}
+par(cex.lab=2.5)
+par(cex.axis=2.5)
+
+# Basic combined violin and box plot
+sd16plusA$incl <- haven::as_factor(rep(1,8204))
+ggplot(sd16plusA, aes(x = incl, y = BMIVal)) +
+  geom_violin(scale = "width", trim = FALSE, alpha = 0.5, color = "black", fill = "blue") +
+  geom_boxplot(width = 0.2, fill = "white", alpha = 1, outlier.shape = 3, outlier.colour = "red", outlier.alpha = 1, outlier.size = 4) +
+  ylab("Body Mass Index (kg/m^2)") +
+  ggtitle("Distribution of BMI") +
+  theme_bw() +
+  coord_flip() +
+  geom_hline(yintercept = c(18.5, 25, 30), colour = c("orange", "orange", "red"), size = 0.5) +
+  geom_text(aes(x = 1.5, y = 18.4, label = "Underweight"), color = "black", angle = 90, size = 4) +
+  geom_text(aes(x = 1.5, y = 24.9, label = "Overweight"), color = "black", angle = 90, size = 4) +
+  geom_text(aes(x = 1.5, y = 29.9, label = "Obese"), color = "black", angle = 90, size = 4) +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  ) +
+  scale_y_continuous(breaks = round(seq(14, 74, by = 5),1))
+```
+
 ## Visit-based variables
 
 These are not applicable for this study, as only one visit was performed (which is the baseline, hereafter referred to as *"The Nurse Visit"*).
