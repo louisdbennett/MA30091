@@ -501,5 +501,7 @@ create_binom_model_calibration_chart(q2_model)
 
 ## Results/Conclusion
 
+@Main
+
 \newpage
 # References

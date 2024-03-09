@@ -254,13 +254,6 @@ dnoft\_19 & 1 & Almost every day & Frequently \\
 \bottomrule()
 \end{longtable}
 
-dnoft\_19 \%in\% c(`Almost every day', `Five or six days a week', `Three
-or four days a week') \textasciitilde{} ``Frequent'', dnoft\_19 \%in\%
-c(`Once or twice a week', `Once or twice a month') \textasciitilde{}
-``Occasional'', dnoft\_19 \%in\% c(`Once every couple of months', `Once
-or twice a year', `Not at all in the last 12 months') \textasciitilde{}
-``Rarely'',
-
 \textbf{We can also\ldots{}}
 
 \includegraphics{Coursework_files/figure-latex/output prevelance plot-1.pdf}\\
@@ -284,16 +277,16 @@ Variable & Missing Values & \% Missing \\
 Variable & Missing Values & \% Missing \\
 \midrule()
 \endhead
-omsysval & 3250 & 49.5\% \\
-BMIVal & 1212 & 18.5\% \\
-dnoft\_19 & 1164 & 17.7\% \\
-cigdyal\_19 & 48 & 0.731\% \\
-cigsta3\_19 & 46 & 0.701\% \\
-NDPNow\_19 & 42 & 0.64\% \\
-d7many3\_19 & 41 & 0.625\% \\
-drinkYN\_19 & 40 & 0.609\% \\
-topqual2 & 35 & 0.533\% \\
-origin2 & 23 & 0.35\% \\
+omsysval & 3235 & 49.3\% \\
+BMIVal & 1201 & 18.3\% \\
+dnoft\_19 & 1180 & 18\% \\
+cigdyal\_19 & 39 & 0.594\% \\
+cigsta3\_19 & 38 & 0.579\% \\
+d7many3\_19 & 37 & 0.564\% \\
+drinkYN\_19 & 36 & 0.549\% \\
+NDPNow\_19 & 35 & 0.533\% \\
+topqual2 & 28 & 0.427\% \\
+origin2 & 19 & 0.29\% \\
 marstatD & 1 & 0.0152\% \\
 \bottomrule()
 \end{longtable}
@@ -341,15 +334,15 @@ Test Accuracy
 \midrule()
 \endhead
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i + a_i^2 + m_i + q_i + u_i + o_i + t_i + s_i + q_i:u_i\)
-& 4883.3 & 0.745 & 0.337 & 0.342 & 0.845 \\
+& 4959.9 & 0.751 & 0.341 & 0.329 & 0.858 \\
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i + a_i^2 + m_i + q_i + u_i + o_i + t_i + s_i\)
-& 4883.5 & 0.745 & 0.337 & 0.342 & 0.843 \\
+& 4961.4 & 0.752 & 0.341 & 0.329 & 0.859 \\
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i + m_i + q_i + u_i + o_i + t_i + s_i\)
-& 4951.9 & 0.742 & 0.340 & 0.342 & 0.844 \\
+& 5021.8 & 0.739 & 0.343 & 0.330 & 0.857 \\
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i^{(5)} + m_i + q_i + u_i + o_i + t_i + s_i\)
-& 4893.0 & 0.742 & 0.337 & 0.342 & 0.845 \\
+& 4970.9 & 0.750 & 0.340 & 0.329 & 0.859 \\
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i^{(10)} + m_i + q_i + u_i + o_i + t_i + s_i\)
-& 4909.0 & 0.745 & 0.338 & 0.342 & 0.843 \\
+& 4987.5 & 0.752 & 0.341 & 0.329 & 0.858 \\
 \bottomrule()
 \end{longtable}
 
@@ -376,6 +369,8 @@ pressure?}\label{which-lifestyle-habits-are-associated-with-systolic-blood-press
 \hypertarget{resultsconclusion}{%
 \subsection{Results/Conclusion}\label{resultsconclusion}}
 
+NatCen Social Research and Health (\protect\hyperlink{ref-Main}{2019})
+
 \newpage
 
 \hypertarget{references}{%
@@ -384,6 +379,11 @@ pressure?}\label{which-lifestyle-habits-are-associated-with-systolic-blood-press
 
 \hypertarget{refs}{}
 \begin{CSLReferences}{1}{0}
+\leavevmode\vadjust pre{\hypertarget{ref-Main}{}}%
+NatCen Social Research, Department of Epidemiology, University College
+London, and Public Health. 2019. {``{Health Survey for England}.''}
+\url{http://doi.org/10.5255/UKDA-SN-8860-1}.
+
 \leavevmode\vadjust pre{\hypertarget{ref-1ONS}{}}%
 ONS. 2019a. {``{Adult smoking habits in the UK: 2019}.''}
 \url{https://shorturl.at/qQW27}.
