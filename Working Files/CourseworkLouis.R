@@ -3,7 +3,7 @@ library(ggplot2)
 
 load("Datasets/hsesub.Rdata")
 
-# Assume drinkYN_19 is binomally distributed with unknown probability p and calculate confidence intervals this way
+# Assume drinkYN_19 is Bernoulli distributed with unknown probability p and calculate confidence intervals this way
 # Can do similar for cigarette/e-cig consumption using cigsta3_19 and NDPNow_19 variables
 
 calculate_binomial_ci <- function(dat_vec, weights = rep(1, length.out = length(dat_vec)), alpha = 0.05) {

@@ -112,11 +112,12 @@ sd16plus <- subdat %>%
     
     # Define new variables
     
-    current_smoker = as.numeric(cigsta3_19 == "Current cigarette smoker"),
-    age_estim = if_else(
-      Age35g != "90+",
-      purrr::map2_dbl(as.numeric(gsub("-.*", "", Age35g)), as.numeric(gsub(".*-", "", Age35g)), \(x, y) mean(c(x, y))),
-      92.5
+    current_smoker = as.factor(cigsta3_19 == "Current cigarette smoker"),
+    age_estim =
+      case_when(
+        Age35g != "90+" ~ purrr::map2_dbl(as.numeric(substr(Age35g,0,2)), as.numeric(substr(Age35g,4,5)), \(x, y) mean(c(x, y))),
+        !(is.na(Age35g)) ~ 92.5,
+        T ~ NA_real_
     )
   )
 
