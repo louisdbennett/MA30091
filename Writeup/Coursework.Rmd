@@ -74,9 +74,10 @@ sd16plus <- subdat %>%
     ),
     topqual2 = as.factor(
       case_when(
-        grepl('Degree or equiv|degree|FT Student', topqual2) ~ 'Higher Education', 
-        grepl('A Level equiv', topqual2) ~ 'A-Levels',
-        grepl('O Level equiv|CSE other grade equiv', topqual2) ~ 'O-Levels',
+        grepl('Higher ed|FT Student', topqual2) ~ 'Higher Education', 
+        grepl('NVQ4', topqual2) ~ 'Further Education',
+        grepl('NVQ3', topqual2) ~ 'A-Level equiv.',
+        grepl('NVQ1|NVQ2', topqual2) ~ 'GCSE equiv.',
         T ~ as.character(topqual2)
       )
     ),
@@ -92,6 +93,13 @@ sd16plus <- subdat %>%
       case_when(
         grepl('Town', urban14b) ~ 'Not Urban', 
         T ~ as.character(urban14b)
+      )
+    ),
+    origin2 = as.factor(
+      case_when(
+        grepl('Mixed', origin2) ~ 'Multiple',
+        grepl('other', origin2) ~ 'Other',
+        T ~ as.character(origin2)
       )
     ),
     NDPNow_19 = as.factor(
@@ -111,6 +119,17 @@ sd16plus <- subdat %>%
       92.5
     )
   )
+
+# Remove superfluous factor levels
+
+sd16plus$Sex = droplevels(sd16plus$Sex)
+sd16plus$ag16g10 = droplevels(sd16plus$ag16g10)
+sd16plus$Age35g = droplevels(sd16plus$Age35g)
+sd16plus$topqual2 = droplevels(sd16plus$topqual2)
+sd16plus$origin2 = droplevels(sd16plus$origin2)
+sd16plus$cigsta3_19 = droplevels(sd16plus$cigsta3_19)
+sd16plus$drinkYN_19 = droplevels(sd16plus$drinkYN_19)
+sd16plus$GOR1 = droplevels(sd16plus$GOR1)
 ```
 
 ```{r proportion bar plot function}
@@ -403,6 +422,34 @@ knitr::kable(
 ```
 
 **Interpretation of table/results - e-cig is much lower, drinking very common etc**
+
+Note that for the purposes of model building, we coded CASI/CAPI responses about alcohol and cigarette consumption in the following way:
+
+
+| Variable  | Code | Label                                 | Decode                        | 
+|-----------|------|---------------------------------------|-------------------------------|
+| NDPNow_19 | 1    | E-cigarettes or vaping devices only   | Smokes E-cigarettes           |
+|    ''     | 2    | Other nicotine delivery products only | Doesn't smoke E-cigarettes    |     
+|    ''     | 3    | Both                                  | Smokes E-cigarettes           |
+|    ''     | 4    | None                                  | Doesn't smoke E-cigarettes    |    
+|    ''     | -1   | Not Applicable                        | NA                            |
+|    ''     | -8   | Don't know                            | NA                            |
+|    ''     | -9   | Refused                               | NA                            |
+| dnoft_19  | 1    | Almost every day                      | Frequently                    |      
+|    ''     | 2    | Five or six days a week               | Frequently                    |
+|    ''     | 3    | Three or four days a week             | Frequently                    |
+|    ''     | 4    | Once or twice a week                  | Occasionally                  |
+|    ''     | 5    | Once or twice a month                 | Occasionally                  |
+|    ''     | 6    | Once every couple of months           | Rarely                        |
+|    ''     | 7    | Once or twice a year                  | Rarely                        |
+|    ''     | 8    | Not at all in the last 12 months      | Rarely                        |
+|    ''     | -1   | Not Applicable                        | NA                            |
+|    ''     | -8   | Don't know                            | NA                            |
+|    ''     | -9   | Refused                               | NA                            |
+
+  dnoft_19 %in% c('Almost every day', 'Five or six days a week', 'Three or four days a week') ~ "Frequent",
+        dnoft_19 %in% c('Once or twice a week', 'Once or twice a month') ~ "Occasional",
+        dnoft_19 %in% c('Once every couple of months', 'Once or twice a year', 'Not at all in the last 12 months') ~ "Rarely",
 
 **We can also...**
 
