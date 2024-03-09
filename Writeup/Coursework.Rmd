@@ -429,27 +429,24 @@ Note that for the purposes of model building, we coded CASI/CAPI responses about
 | Variable  | Code | Label                                 | Decode                        | 
 |-----------|------|---------------------------------------|-------------------------------|
 | NDPNow_19 | 1    | E-cigarettes or vaping devices only   | Smokes E-cigarettes           |
-|    ''     | 2    | Other nicotine delivery products only | Doesn't smoke E-cigarettes    |     
-|    ''     | 3    | Both                                  | Smokes E-cigarettes           |
-|    ''     | 4    | None                                  | Doesn't smoke E-cigarettes    |    
-|    ''     | -1   | Not Applicable                        | NA                            |
-|    ''     | -8   | Don't know                            | NA                            |
-|    ''     | -9   | Refused                               | NA                            |
+|           | 2    | Other nicotine delivery products only | Doesn't smoke E-cigarettes    |     
+|           | 3    | Both                                  | Smokes E-cigarettes           |
+|           | 4    | None                                  | Doesn't smoke E-cigarettes    |    
+|           | -1   | Not Applicable                        | NA                            |
+|           | -8   | Don't know                            | NA                            |
+|           | -9   | Refused                               | NA                            |
 | dnoft_19  | 1    | Almost every day                      | Frequently                    |      
-|    ''     | 2    | Five or six days a week               | Frequently                    |
-|    ''     | 3    | Three or four days a week             | Frequently                    |
-|    ''     | 4    | Once or twice a week                  | Occasionally                  |
-|    ''     | 5    | Once or twice a month                 | Occasionally                  |
-|    ''     | 6    | Once every couple of months           | Rarely                        |
-|    ''     | 7    | Once or twice a year                  | Rarely                        |
-|    ''     | 8    | Not at all in the last 12 months      | Rarely                        |
-|    ''     | -1   | Not Applicable                        | NA                            |
-|    ''     | -8   | Don't know                            | NA                            |
-|    ''     | -9   | Refused                               | NA                            |
+|           | 2    | Five or six days a week               | Frequently                    |
+|           | 3    | Three or four days a week             | Frequently                    |
+|           | 4    | Once or twice a week                  | Occasionally                  |
+|           | 5    | Once or twice a month                 | Occasionally                  |
+|           | 6    | Once every couple of months           | Rarely                        |
+|           | 7    | Once or twice a year                  | Rarely                        |
+|           | 8    | Not at all in the last 12 months      | Rarely                        |
+|           | -1   | Not Applicable                        | NA                            |
+|           | -8   | Don't know                            | NA                            |
+|           | -9   | Refused                               | NA                            |
 
-  dnoft_19 %in% c('Almost every day', 'Five or six days a week', 'Three or four days a week') ~ "Frequent",
-        dnoft_19 %in% c('Once or twice a week', 'Once or twice a month') ~ "Occasional",
-        dnoft_19 %in% c('Once every couple of months', 'Once or twice a year', 'Not at all in the last 12 months') ~ "Rarely",
 
 **We can also...**
 
