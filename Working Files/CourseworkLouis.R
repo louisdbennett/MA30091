@@ -139,3 +139,30 @@ fitted_model <- step(full_model, scope = list(lower = null_model, upper = full_m
 summary(fitted_model)
 
 plot(fitted_model, 2)
+
+# Model q3
+
+
+ggplot(data = train16plus, aes(x = age_estim, y = omsysval)) +
+  geom_point() +
+  geom_smooth()
+
+full_mod_inv <- glm(
+  formula = omsysval ~ cigsta3_19 + age_estim + marstatD + urban14b + BMIVal + I(BMIVal ^ 2) + Sex + d7many3_19 + BMIVal:Sex + age_estim:Sex + BMIVal:age_estim,
+  family = inverse.gaussian,
+  data = na.omit(train16plus)
+)
+
+summary(full_mod_inv)
+
+step(full_mod_inv)
+
+sensitivity_mod <- glm(
+  formula = omsysval ~ cigsta3_19 + age_estim + marstatD + urban14b + BMIVal + I(BMIVal ^ 2) + Sex + d7many3_19 + BMIVal:Sex + age_estim:Sex,
+  family = inverse.gaussian,
+  data = filter(na.omit(train16plus), BMIVal <= 54 & omsysval <= 180)
+)
+
+summary(sensitivity_mod)
+
+plot(sensitivity_mod, 2)
