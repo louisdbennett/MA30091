@@ -59,6 +59,8 @@ sd16plus <- subdat %>%
   filter(Age35g >= 7 & !is.na(Age35g)) %>% 
   # Remove duplicated entries
   distinct(pick(!c(SerialA)), .keep_all = T) %>% 
+  # Filter out BMI outliers
+  filter(BMIVal <= 54) %>% 
   mutate(
     across(
       all_of(fct_variables), 

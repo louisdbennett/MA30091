@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.7.13)  11 MAR 2024 14:02
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.7.13)  11 MAR 2024 14:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -668,23 +668,22 @@ File: Coursework_files/figure-latex/output calibration chart-1.pdf Graphic file
  (type pdf)
 <use Coursework_files/figure-latex/output calibration chart-1.pdf>
 Package pdftex.def Info: Coursework_files/figure-latex/output calibration chart
--1.pdf  used on input line 370.
+-1.pdf  used on input line 369.
 (pdftex.def)             Requested size: 279.05032pt x 279.05032pt.
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.375 \end{figure}
-                   [4 <./Coursework_files/figure-latex/output prevelance plot-1
-.pdf>]
+l.375 
+       [4 <./Coursework_files/figure-latex/output prevelance plot-1.pdf>]
 <Coursework_files/figure-latex/output distribution plots-1.pdf, id=78, 844.1537
 5pt x 269.005pt>
 File: Coursework_files/figure-latex/output distribution plots-1.pdf Graphic fil
 e (type pdf)
 <use Coursework_files/figure-latex/output distribution plots-1.pdf>
 Package pdftex.def Info: Coursework_files/figure-latex/output distribution plot
-s-1.pdf  used on input line 385.
+s-1.pdf  used on input line 384.
 (pdftex.def)             Requested size: 542.0341pt x 172.72905pt.
 <Coursework_files/figure-latex/output qq plot for q3-1.pdf, id=79, 279.0425pt x
  277.035pt>
@@ -692,14 +691,14 @@ File: Coursework_files/figure-latex/output qq plot for q3-1.pdf Graphic file (t
 ype pdf)
 <use Coursework_files/figure-latex/output qq plot for q3-1.pdf>
 Package pdftex.def Info: Coursework_files/figure-latex/output qq plot for q3-1.
-pdf  used on input line 394.
+pdf  used on input line 393.
 (pdftex.def)             Requested size: 279.04181pt x 277.03432pt.
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.400 
+l.399 
        [5 <./Coursework_files/figure-latex/output calibration chart-1.pdf> <./C
 oursework_files/figure-latex/output distribution plots-1.pdf>]
 <Coursework_files/figure-latex/output relationship plots-1.pdf, id=103, 847.165
@@ -708,21 +707,21 @@ File: Coursework_files/figure-latex/output relationship plots-1.pdf Graphic fil
 e (type pdf)
 <use Coursework_files/figure-latex/output relationship plots-1.pdf>
 Package pdftex.def Info: Coursework_files/figure-latex/output relationship plot
-s-1.pdf  used on input line 402.
+s-1.pdf  used on input line 401.
 (pdftex.def)             Requested size: 542.04155pt x 175.3286pt.
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.409 \newpage
+l.408 \newpage
                [6 <./Coursework_files/figure-latex/output qq plot for q3-1.pdf>
  <./Coursework_files/figure-latex/output relationship plots-1.pdf>]
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.431 \end{document}
+l.430 \end{document}
                      [7] (./Coursework.aux) ) 
 Here is how much of TeX's memory you used:
  15598 strings out of 476025
@@ -731,7 +730,7 @@ Here is how much of TeX's memory you used:
  35686 multiletter control sequences out of 15000+600000
  572163 words of font info for 109 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 63i,9n,67p,1007b,467s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 63i,9n,67p,1007b,460s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2023/texmf-dis
 t/fonts/type1/public/lm/lmbx10.pfb></usr/local/texlive/2023/texmf-dist/fonts/ty
 pe1/public/lm/lmbx12.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public
@@ -744,7 +743,7 @@ ts/type1/public/lm/lmr17.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/pu
 blic/lm/lmr6.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr8
 .pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr
 /local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy8.pfb>
-Output written on Coursework.pdf (7 pages, 727543 bytes).
+Output written on Coursework.pdf (7 pages, 709347 bytes).
 PDF statistics:
  239 PDF objects out of 1000 (max. 8388607)
  180 compressed objects within 2 object streams
