@@ -4,6 +4,7 @@ output:
     keep_tex: true
     fig_caption: true
     latex_engine: pdflatex
+    extra_dependencies: ["float"]
 header-includes:
   - \usepackage{hyperref}
   - \usepackage{array}   
@@ -33,7 +34,7 @@ link-citations: true
 \pagenumbering{gobble}
 
 ```{r setup, include=F}
-knitr::opts_chunk$set(include = F, echo = F, message = F, warning = F)
+knitr::opts_chunk$set(include = F, echo = F, message = F, warning = F, fig.pos = "H", out.extra = "")
 ```
 
 <!-- Put all code at start and only call plots when we need them in line -->
@@ -47,7 +48,7 @@ library(pROC)
 library(caret)
 library(patchwork)
 
-load("~/MA30091/Coursework/MA30091/Datasets/hsesub.Rdata")
+load("hsesub.Rdata")
 
 fct_variables <- c(
   'Sex', 'Age35g', 'ag16g10', 'topqual2', 'urban14b', 'origin2', 'marstatD', 'GOR1', 'cigsta3_19', 'NDPNow_19', 'drinkYN_19', 'dnoft_19'
@@ -55,11 +56,14 @@ fct_variables <- c(
 
 # filter to over 16s, relabel all factors
 sd16plus <- subdat %>% 
-  filter(Age35g >= 7 & !is.na(Age35g)) %>%
+  filter(Age35g >= 7 & !is.na(Age35g)) %>% 
+  # Remove duplicated entries
+  distinct(pick(!c(SerialA)), .keep_all = T) %>% 
   mutate(
     across(
       all_of(fct_variables), 
-      ~ factor(as.factor(.x), levels = attr(subdat[[cur_column()]], 'labels'), labels = names(attr(subdat[[cur_column()]], 'labels')))
+      # drop excess factor levels
+      ~ droplevels(factor(as.factor(.x), levels = attr(subdat[[cur_column()]], 'labels'), labels = names(attr(subdat[[cur_column()]], 'labels'))))
     ), 
     across(!all_of(fct_variables), as.numeric)
   ) %>% 
@@ -112,7 +116,7 @@ sd16plus <- subdat %>%
     
     # Define new variables
     
-    current_smoker = as.factor(cigsta3_19 == "Current cigarette smoker"),
+    current_smoker = as.numeric(cigsta3_19 == "Current cigarette smoker"),
     age_estim =
       case_when(
         Age35g != "90+" ~ purrr::map2_dbl(as.numeric(substr(Age35g,0,2)), as.numeric(substr(Age35g,4,5)), \(x, y) mean(c(x, y))),
@@ -120,17 +124,6 @@ sd16plus <- subdat %>%
         T ~ NA_real_
     )
   )
-
-# Remove superfluous factor levels
-
-sd16plus$Sex = droplevels(sd16plus$Sex)
-sd16plus$ag16g10 = droplevels(sd16plus$ag16g10)
-sd16plus$Age35g = droplevels(sd16plus$Age35g)
-sd16plus$topqual2 = droplevels(sd16plus$topqual2)
-sd16plus$origin2 = droplevels(sd16plus$origin2)
-sd16plus$cigsta3_19 = droplevels(sd16plus$cigsta3_19)
-sd16plus$drinkYN_19 = droplevels(sd16plus$drinkYN_19)
-sd16plus$GOR1 = droplevels(sd16plus$GOR1)
 ```
 
 ```{r proportion bar plot function}
@@ -256,7 +249,7 @@ create_confidence_int_plot <- function(group_variable, facet_variable, plotting_
     select(-c(dat_vec, wt_int, summary))
   
   ggplot(data = data, aes(x = !!sym(group_variable), y = p_hat, ymin = lower, ymax = upper)) +
-    geom_point(size = 3) +
+    geom_bar(stat = 'identity', fill = 'skyblue') +
     geom_errorbar(width = 0.5) +
     facet_wrap(as.formula(paste('~ ', facet_variable))) +
     scale_y_continuous(labels = scales::percent) +
@@ -361,9 +354,71 @@ create_binom_model_calibration_chart <- function(fit) {
     stat_summary_bin(fun = "mean", bins = 10, geom = "line", aes(group = 1)) +  # Connect points with lines
     labs(x = "Predicted Probability", y = "Mean Actual Outcome") +
     geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "red") +
+    xlim(c(0, 1)) +
+    ylim(c(0, 1)) +
     theme_minimal()
 }
 ```
+
+```{r distribution plots}
+create_distribution_plot <- function(variable, label) {
+  ggplot() +
+  geom_violin(
+    data = sd16plus, aes(y = !!sym(variable), x = as.factor(1)),
+    scale = "width", alpha = 0.5, color = "black", fill = "blue"
+  ) +
+  geom_boxplot(
+    data = sd16plus, aes(y = !!sym(variable), x = as.factor(1)),
+    width = 0.2,
+    fill = "white", 
+    outlier.shape = 3, 
+    outlier.colour = "red", 
+    outlier.alpha = 1, 
+    outlier.size = 4
+  ) +
+  ylab(label) +
+  theme_minimal() +
+  coord_flip() +
+  scale_y_continuous(breaks = scales::pretty_breaks()) +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+}
+```
+
+```{r fitting q3 model}
+q3_model <- glm(
+  formula = omsysval ~ cigsta3_19 + age_estim + marstatD + urban14b + BMIVal + I(BMIVal ^ 2) + Sex + d7many3_19 + BMIVal:Sex + age_estim:Sex + BMIVal:age_estim,
+  family = inverse.gaussian,
+  data = na.omit(train16plus)
+)
+```
+
+```{r qqplot function}
+create_qq_plot <- function(fit) {
+  pred <- rstandard(fit)
+  
+  ggplot(mapping = aes(sample = pred)) +
+    stat_qq() +
+    stat_qq_line(linetype = 'dashed', col = 'red') +
+    theme_minimal() +
+    labs(x = "Theoretical Quantiles", y = "Std. Pearson Residuals")
+}
+```
+
+
+```{r relationship plots for q3}
+create_relationship_plots <- function(variable, labels) {
+  ggplot(data = train16plus, aes(x = !!sym(variable), y = omsysval)) +
+    geom_point() +
+    geom_smooth() +
+    labs(y = "Omron Valid Mean Systolic Blood Pressure (mmHg)", x = labels$x) +
+    theme_minimal()
+}
+```
+
 
 <!-- Start of write-up -->
 
@@ -386,8 +441,7 @@ p2 <- create_proportion_bar_plot('ag16g10', 'Sex', 'dnoft_19', labels = list(x =
 
 p1 + p2
 ```
-<!-- these slashes are needed to insert breaks after plots -->
-\
+
 
 ```{r output deprivation plot, include = T, fig.width=10, fig.height=3, fig.cap="Drinking, smoking and E-cig status proportions by level of deprivation"}
 p1 <- create_stacked_bar_plot('qimd19', 'cigsta3_19', labels = list(x = 'Level of Deprivation', y = 'Proportion', legend.title = 'Drinking Status'))
@@ -396,7 +450,6 @@ p3 <- create_stacked_bar_plot('qimd19', 'NDPNow_19', labels = list(x = 'Level of
 
 p1 + p2 + p3
 ```
-\
 
 ## Methology
 
@@ -451,10 +504,9 @@ Note that for the purposes of model building, we coded CASI/CAPI responses about
 
 **We can also...**
 
-```{r output prevelance plot, include = T, fig.width=12, fig.height=4, fig.cap="Estimation of the prevelance of smokers by deprivation"}
-create_confidence_int_plot('qimd19', 'Sex', 'cigsta3_19', required_levels = c('Current cigarette smoker'), list(x = 'Deprivation', y = '% Smokers'))
+```{r output prevelance plot, include = T, fig.height=4, fig.width=12, fig.cap="Estimation of the prevelance of smokers by deprivation"}
+create_confidence_int_plot('qimd19', 'Sex', 'cigsta3_19', required_levels = c('Current cigarette smoker'), list(x = 'Deprivation Level', y = '% Smokers'))
 ```
-\
 
 <!-- Are we doing the same for Gamma distribution with number of cigarettes here? -->
 
@@ -487,7 +539,7 @@ knitr::kable(
 
 **Some model diagnostics**
 
-```{r output calibration chart, include = T, fig.width=10, fig.height=4, fig.cap="Calibration chart for binomial model"}
+```{r output calibration chart, include = T, fig.width=4, fig.height=4, fig.align='center', fig.cap="Calibration chart for Binomial model"}
 create_binom_model_calibration_chart(q2_model)
 ```
 
@@ -498,7 +550,34 @@ create_binom_model_calibration_chart(q2_model)
 
 ### Which lifestyle habits are associated with systolic blood pressure?
 
+```{r output distribution plots, include = T, fig.height=4, fig.width=12, fig.cap="Distribution of BMI and Mean Systolic Blood Pressure"}
+p1 <- create_distribution_plot('omsysval', 'Omron Valid Mean Systolic Blood Pressure (mmHg)')
+p2 <- create_distribution_plot('BMIVal', 'Body Mass Index (kg/m^2)') +
+  geom_hline(yintercept = c(18.5, 25, 30), colour = c("orange", "orange", "red"), size = 0.5) +
+  geom_text(
+    aes(x = 0.4, y = c(18.4, 24.9, 29.9), label = c("Underweight", "Overweight", "Obese")), 
+    color = "black", angle = 90, size = 4, vjust = 0, hjust = 0
+  )
+
+p1 + p2
+```
+
+**Why did we remove outliers**
+
 **Question Three**
+
+```{r output qq plot for q3, include = T, fig.height=4, fig.width=4, fig.align='center', fig.cap="Q-Q plot of Inverse-Normal model residuals"}
+create_qq_plot(q3_model)
+```
+
+```{r output relationship plots, include = T, fig.height=4, fig.width=12, fig.cap="Relationship of BMI and Age with Mean Systolic Blood Pressure"}
+p1 <- create_relationship_plots('age_estim', labels = list(x = "Estimated Age (yrs)"))
+p2 <- create_relationship_plots('BMIVal', labels = list(x = "Body Mass Index (kg/m^2)"))
+
+p1 + p2
+```
+
+
 
 ## Results/Conclusion
 

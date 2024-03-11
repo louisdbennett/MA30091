@@ -6,16 +6,19 @@
   11pt,
 ]{article}
 \usepackage{amsmath,amssymb}
-\usepackage{lmodern}
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
 \else % if luatex or xetex
-  \usepackage{unicode-math}
+  \usepackage{unicode-math} % this also loads fontspec
   \defaultfontfeatures{Scale=MatchLowercase}
   \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
 \fi
 % Use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
@@ -62,28 +65,38 @@
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
 \newlength{\cslhangindent}
 \setlength{\cslhangindent}{1.5em}
 \newlength{\csllabelwidth}
 \setlength{\csllabelwidth}{3em}
-\newlength{\cslentryspacingunit} % times entry-spacing
-\setlength{\cslentryspacingunit}{\parskip}
-\newenvironment{CSLReferences}[2] % #1 hanging-ident, #2 entry spacing
- {% don't indent paragraphs
-  \setlength{\parindent}{0pt}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
   % turn on hanging indent if param 1 is 1
   \ifodd #1
-  \let\oldpar\par
-  \def\par{\hangindent=\cslhangindent\oldpar}
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
   \fi
   % set entry spacing
-  \setlength{\parskip}{#2\cslentryspacingunit}
- }%
- {}
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
 \usepackage{calc}
-\newcommand{\CSLBlock}[1]{#1\hfill\break}
-\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{#1}}
-\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{#1}\break}
+\newcommand{\CSLBlock}[1]{\hfill\break#1\hfill\break}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
 \newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
 \usepackage{hyperref}
 \usepackage{array}
@@ -96,12 +109,13 @@
 \usepackage[para,online,flushleft]{threeparttable}
 \DeclareMathOperator{\logit}{logit}
 \DeclareMathOperator{\var}{var}
+\usepackage{float}
 \ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\urlstyle{same} % disable monospaced font for URLs
+\urlstyle{same}
 \hypersetup{
   pdftitle={Analysis of Health Survey for England (HSE) 2019},
   pdfauthor={Candidate Numbers Here},
@@ -110,7 +124,7 @@
 
 \title{Analysis of Health Survey for England (HSE) 2019}
 \author{Candidate Numbers Here}
-\date{March 09, 2024}
+\date{March 11, 2024}
 
 \begin{document}
 \maketitle
@@ -125,11 +139,9 @@ England 2019.
 
 \newpage
 
-\hypertarget{summary-non-technical}{%
-\subsection{Summary (Non-Technical)}\label{summary-non-technical}}
+\subsection{Summary (Non-Technical)}\label{summary-non-technical}
 
-\hypertarget{introduction}{%
-\subsection{Introduction}\label{introduction}}
+\subsection{Introduction}\label{introduction}
 
 In the UK, smoking, vaping, and alcohol consumption are widespread,
 particularly among youngsters. It is crucial to be aware of the
@@ -138,39 +150,37 @@ cause in later-life. The Office for National Statistics (ONS), regarded
 as the foremost statistical institute in the UK, is the ``go-to'' for
 insights into public health trends. According to their estimations,
 approximately 14.1\% of the adult population aged 18 and above were
-identified as cigarette smokers (\protect\hyperlink{ref-1ONS}{ONS
-2019a}). Furthermore, their data revealed there were 7,565 deaths
-attributed to alcohol-specific causes in 2019
-(\protect\hyperlink{ref-2ONS}{ONS 2019b}). These statistics alone
-warrant a need for an understanding of health-related behaviours and the
-outcome. Therefore, the aim of our study is to investigate not only the
-prevalence but also the severity of these habits, exploring different
-socioeconomic factors that may potentially contribute to each.
-Additionally, we will investigate the greater implications of these bad
-habits and how they relate to systolic blood pressure levels throughout
-the UK population.
+identified as cigarette smokers (\citeproc{ref-1ONS}{ONS 2019a}).
+Furthermore, their data revealed there were 7,565 deaths attributed to
+alcohol-specific causes in 2019 (\citeproc{ref-2ONS}{ONS 2019b}). These
+statistics alone warrant a need for an understanding of health-related
+behaviours and the outcome. Therefore, the aim of our study is to
+investigate not only the prevalence but also the severity of these
+habits, exploring different socioeconomic factors that may potentially
+contribute to each. Additionally, we will investigate the greater
+implications of these bad habits and how they relate to systolic blood
+pressure levels throughout the UK population.
 
-\hypertarget{exploratory-analysis}{%
-\subsection{Exploratory Analysis}\label{exploratory-analysis}}
+\subsection{Exploratory Analysis}\label{exploratory-analysis}
 
 \textbf{We start by investigating the data}
 
-\includegraphics{Coursework_files/figure-latex/output smoking and drinking by age plot-1.pdf}
-\\
+\begin{figure}[H]
+\includegraphics{Coursework_files/figure-latex/output smoking and drinking by age plot-1} \caption{Smoking and drinking status proportions by age group and gender}\label{fig:output smoking and drinking by age plot}
+\end{figure}
 
-\includegraphics{Coursework_files/figure-latex/output deprivation plot-1.pdf}\\
+\begin{figure}[H]
+\includegraphics{Coursework_files/figure-latex/output deprivation plot-1} \caption{Drinking, smoking and E-cig status proportions by level of deprivation}\label{fig:output deprivation plot}
+\end{figure}
 
-\hypertarget{methology}{%
-\subsection{Methology}\label{methology}}
+\subsection{Methology}\label{methology}
 
 \textbf{Define all variables used in analysis}
 
-\hypertarget{analysis}{%
-\subsection{Analysis}\label{analysis}}
+\subsection{Analysis}\label{analysis}
 
-\hypertarget{what-is-the-prevelance-of-drinking-smoking-and-e-cig-usage}{%
 \subsubsection{What is the prevelance of drinking, smoking and E-cig
-usage?}\label{what-is-the-prevelance-of-drinking-smoking-and-e-cig-usage}}
+usage?}\label{what-is-the-prevelance-of-drinking-smoking-and-e-cig-usage}
 
 To calculate the prevalence of each habit we assume each of the \(n\)
 observations, \(x_1,…,x_n\) , to be independent, identically distributed
@@ -194,18 +204,19 @@ confidence intervals for each habit, which are shown in the table below.
 \begin{longtable}[]{@{}lll@{}}
 \caption{Estimates and 95\% Confidence Intervals for \% of
 Population}\tabularnewline
-\toprule()
+\toprule\noalign{}
 Habit & Estimate & C.I. \\
-\midrule()
+\midrule\noalign{}
 \endfirsthead
-\toprule()
+\toprule\noalign{}
 Habit & Estimate & C.I. \\
-\midrule()
+\midrule\noalign{}
 \endhead
-Drinking & 80.3\% & (79.5\%, 81.2\%) \\
+\bottomrule\noalign{}
+\endlastfoot
+Drinking & 80.4\% & (79.5\%, 81.2\%) \\
 Smoking & 16.5\% & (15.7\%, 17.3\%) \\
 Smoking E-cigarettes & 4.28\% & (3.84\%, 4.72\%) \\
-\bottomrule()
 \end{longtable}
 
 \textbf{Interpretation of table/results - e-cig is much lower, drinking
@@ -219,7 +230,7 @@ responses about alcohol and cigarette consumption in the following way:
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0690}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4483}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3563}}@{}}
-\toprule()
+\toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Variable
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -229,8 +240,10 @@ Label
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Decode
 \end{minipage} \\
-\midrule()
+\midrule\noalign{}
 \endhead
+\bottomrule\noalign{}
+\endlastfoot
 NDPNow\_19 & 1 & E-cigarettes or vaping devices only & Smokes
 E-cigarettes \\
 & 2 & Other nicotine delivery products only & Doesn't smoke
@@ -251,44 +264,45 @@ dnoft\_19 & 1 & Almost every day & Frequently \\
 & -1 & Not Applicable & NA \\
 & -8 & Don't know & NA \\
 & -9 & Refused & NA \\
-\bottomrule()
 \end{longtable}
 
 \textbf{We can also\ldots{}}
 
-\includegraphics{Coursework_files/figure-latex/output prevelance plot-1.pdf}\\
+\begin{figure}[H]
+\includegraphics{Coursework_files/figure-latex/output prevelance plot-1} \caption{Estimation of the prevelance of smokers by deprivation}\label{fig:output prevelance plot}
+\end{figure}
 
-\hypertarget{how-is-smoking-associated-with-socioeconomic-factors-and-age}{%
 \subsubsection{How is smoking associated with socioeconomic factors and
-age?}\label{how-is-smoking-associated-with-socioeconomic-factors-and-age}}
+age?}\label{how-is-smoking-associated-with-socioeconomic-factors-and-age}
 
 \textbf{Explanation of why we split into test/train dataset.}
 
-This leaves us with 6563 observations in our training dataset. The
+This leaves us with 6561 observations in our training dataset. The
 number of missing observations for each are shown:
 
 \begin{longtable}[]{@{}lrl@{}}
 \caption{Missing values in the training dataset}\tabularnewline
-\toprule()
+\toprule\noalign{}
 Variable & Missing Values & \% Missing \\
-\midrule()
+\midrule\noalign{}
 \endfirsthead
-\toprule()
+\toprule\noalign{}
 Variable & Missing Values & \% Missing \\
-\midrule()
+\midrule\noalign{}
 \endhead
-omsysval & 3235 & 49.3\% \\
-BMIVal & 1201 & 18.3\% \\
-dnoft\_19 & 1180 & 18\% \\
-cigdyal\_19 & 39 & 0.594\% \\
-cigsta3\_19 & 38 & 0.579\% \\
-d7many3\_19 & 37 & 0.564\% \\
-drinkYN\_19 & 36 & 0.549\% \\
-NDPNow\_19 & 35 & 0.533\% \\
-topqual2 & 28 & 0.427\% \\
-origin2 & 19 & 0.29\% \\
+\bottomrule\noalign{}
+\endlastfoot
+omsysval & 3221 & 49.1\% \\
+BMIVal & 1198 & 18.3\% \\
+dnoft\_19 & 1193 & 18.2\% \\
+cigdyal\_19 & 46 & 0.701\% \\
+cigsta3\_19 & 44 & 0.671\% \\
+NDPNow\_19 & 44 & 0.671\% \\
+d7many3\_19 & 42 & 0.64\% \\
+drinkYN\_19 & 41 & 0.625\% \\
+topqual2 & 40 & 0.61\% \\
+origin2 & 25 & 0.381\% \\
 marstatD & 1 & 0.0152\% \\
-\bottomrule()
 \end{longtable}
 
 \textbf{Explanation of first model - binomial with logit link}
@@ -301,7 +315,7 @@ marstatD & 1 & 0.0152\% \\
   >{\raggedleft\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.0752}}
   >{\raggedleft\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1053}}@{}}
 \caption{Comparison of selected model evaluations}\tabularnewline
-\toprule()
+\toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Linear Predictor
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
@@ -315,9 +329,9 @@ Test RMSE
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
 Test Accuracy
 \end{minipage} \\
-\midrule()
+\midrule\noalign{}
 \endfirsthead
-\toprule()
+\toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Linear Predictor
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
@@ -331,64 +345,84 @@ Test RMSE
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
 Test Accuracy
 \end{minipage} \\
-\midrule()
+\midrule\noalign{}
 \endhead
+\bottomrule\noalign{}
+\endlastfoot
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i + a_i^2 + m_i + q_i + u_i + o_i + t_i + s_i + q_i:u_i\)
-& 4959.9 & 0.751 & 0.341 & 0.329 & 0.858 \\
+& 4971.3 & 0.758 & 0.341 & 0.326 & 0.863 \\
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i + a_i^2 + m_i + q_i + u_i + o_i + t_i + s_i\)
-& 4961.4 & 0.752 & 0.341 & 0.329 & 0.859 \\
+& 4970.8 & 0.758 & 0.341 & 0.326 & 0.863 \\
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i + m_i + q_i + u_i + o_i + t_i + s_i\)
-& 5021.8 & 0.739 & 0.343 & 0.330 & 0.857 \\
+& 5034.7 & 0.750 & 0.343 & 0.327 & 0.865 \\
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i^{(5)} + m_i + q_i + u_i + o_i + t_i + s_i\)
-& 4970.9 & 0.750 & 0.340 & 0.329 & 0.859 \\
+& 4983.3 & 0.760 & 0.341 & 0.326 & 0.863 \\
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i^{(10)} + m_i + q_i + u_i + o_i + t_i + s_i\)
-& 4987.5 & 0.752 & 0.341 & 0.329 & 0.858 \\
-\bottomrule()
+& 4990.7 & 0.754 & 0.341 & 0.327 & 0.865 \\
 \end{longtable}
 
 \textbf{Explain why we selected the model we did - lowest AIC}
 
 \textbf{Some model diagnostics}
 
-\begin{figure}
-\centering
-\includegraphics{Coursework_files/figure-latex/output calibration chart-1.pdf}
-\caption{Calibration chart for binomial model}
+\begin{figure}[H]
+
+{\centering \includegraphics{Coursework_files/figure-latex/output calibration chart-1} 
+
+}
+
+\caption{Calibration chart for Binomial model}\label{fig:output calibration chart}
 \end{figure}
 
 \textbf{Interpretation of model coefficients etc}
 
 \textbf{Limitations of model}
 
-\hypertarget{which-lifestyle-habits-are-associated-with-systolic-blood-pressure}{%
 \subsubsection{Which lifestyle habits are associated with systolic blood
-pressure?}\label{which-lifestyle-habits-are-associated-with-systolic-blood-pressure}}
+pressure?}\label{which-lifestyle-habits-are-associated-with-systolic-blood-pressure}
+
+\begin{figure}[H]
+\includegraphics{Coursework_files/figure-latex/output distribution plots-1} \caption{Distribution of BMI and Mean Systolic Blood Pressure}\label{fig:output distribution plots}
+\end{figure}
+
+\textbf{Why did we remove outliers}
 
 \textbf{Question Three}
 
-\hypertarget{resultsconclusion}{%
-\subsection{Results/Conclusion}\label{resultsconclusion}}
+\begin{figure}[H]
 
-NatCen Social Research and Health (\protect\hyperlink{ref-Main}{2019})
+{\centering \includegraphics{Coursework_files/figure-latex/output qq plot for q3-1} 
+
+}
+
+\caption{Q-Q plot of Inverse-Normal model residuals}\label{fig:output qq plot for q3}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics{Coursework_files/figure-latex/output relationship plots-1} \caption{Relationship of BMI and Age with Mean Systolic Blood Pressure}\label{fig:output relationship plots}
+\end{figure}
+
+\subsection{Results/Conclusion}\label{resultsconclusion}
+
+NatCen Social Research and Health (\citeproc{ref-Main}{2019})
 
 \newpage
 
-\hypertarget{references}{%
-\section*{References}\label{references}}
+\section*{References}\label{references}
 \addcontentsline{toc}{section}{References}
 
-\hypertarget{refs}{}
+\phantomsection\label{refs}
 \begin{CSLReferences}{1}{0}
-\leavevmode\vadjust pre{\hypertarget{ref-Main}{}}%
+\bibitem[\citeproctext]{ref-Main}
 NatCen Social Research, Department of Epidemiology, University College
 London, and Public Health. 2019. {``{Health Survey for England}.''}
 \url{http://doi.org/10.5255/UKDA-SN-8860-1}.
 
-\leavevmode\vadjust pre{\hypertarget{ref-1ONS}{}}%
+\bibitem[\citeproctext]{ref-1ONS}
 ONS. 2019a. {``{Adult smoking habits in the UK: 2019}.''}
 \url{https://shorturl.at/qQW27}.
 
-\leavevmode\vadjust pre{\hypertarget{ref-2ONS}{}}%
+\bibitem[\citeproctext]{ref-2ONS}
 ---------. 2019b. {``{Alcohol-specific deaths in the UK: registered in
 2019}.''} \url{https://shorturl.at/gqxY1}.
 
