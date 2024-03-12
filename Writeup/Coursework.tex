@@ -124,7 +124,7 @@
 
 \title{Analysis of Health Survey for England (HSE) 2019}
 \author{Candidate Numbers Here}
-\date{March 11, 2024}
+\date{March 12, 2024}
 
 \begin{document}
 \maketitle
@@ -163,67 +163,34 @@ pressure levels throughout the UK population.
 
 \subsection{Exploratory Analysis}\label{exploratory-analysis}
 
-\textbf{We start by investigating the data}
+We are using data from the 2019 Health Survey for England (HSE) to
+conduct our analysis. Before proceeding with any investigations
+involving the data, we checked for any common errors in large datasets.
+Our initial step involved pre-processing the data, which entailed
+filtering observations to include only those above the age of 16 and
+removing 3 pairs of observations that were identical in every
+descriptive variable except for the ID, resulting in a dataset of
+\texttt{r} observations. As we have two different grouped age variables,
+we ensured they were consistent with one another. \emph{Don't know if
+this final sentence needs to be included}
 
-\begin{figure}[H]
-\includegraphics{Coursework_files/figure-latex/output smoking and drinking by age plot-1} \caption{Smoking and drinking status proportions by age group and gender}\label{fig:output smoking and drinking by age plot}
-\end{figure}
+\emph{Need the table copied over here with the variable names/a
+paragraph explaining these}
 
-\begin{figure}[H]
-\includegraphics{Coursework_files/figure-latex/output deprivation plot-1} \caption{Drinking, smoking and E-cig status proportions by level of deprivation}\label{fig:output deprivation plot}
-\end{figure}
+We also found 36 pairs with exact entries excluding lab measurements,
+but we do not remove these from our analysis. We suspect these may be
+individuals who have either initially refused a nurse visit but later
+changed their mind, or simply have had two nurse visits where their lab
+measurements vary slightly between the two. The supporting documentation
+doesn't state a protocol for repeated visits, so we will assume these
+are genuine observations from different participants and include them.
+\emph{Maybe rewording this?}
 
-\subsection{Methology}\label{methology}
-
-\textbf{Define all variables used in analysis}
-
-\subsection{Analysis}\label{analysis}
-
-\subsubsection{What is the prevelance of drinking, smoking and E-cig
-usage?}\label{what-is-the-prevelance-of-drinking-smoking-and-e-cig-usage}
-
-To calculate the prevalence of each habit we assume each of the \(n\)
-observations, \(x_1,…,x_n\) , to be independent, identically distributed
-(iid) random variables (RVs) where
-\(x_i \sim Bern(p)\, \forall i=1,…,n\) and \(p\) denotes the probability
-of an observation having the relevant habit. We use the household
-weights to calculate a weighted Maximum Likelihood Estimate (MLE) of
-\(p\). That is, letting \(w_i\) denote the weight of the \(i^{th}\)
-observation, we alter the standard likelihood function of a Bernoulli
-distribution as below:
-\[L(p|\textbf{x}) = \prod_{i = 1}^{n} (p^{x_i}(1-p)^{1-x_i})^{w_i}\]
-From this, we calculate our weighted MLE as:
-\[\widehat{p} = \frac{\sum_{i=1}^{n} x_iw_i}{\sum_{i=1}^{n} w_i}\]
-
-It can also be shown that this MLE has variance given by
-\(\mathop{\mathrm{var}}(\widehat{p})=\frac{p(1-p)}{\sum_{i=1}^{n}w_i}\),
-which we can estimate using \(\widehat{p}\) and use large sample
-properties of the MLE to get a normal approximation and estimate 95\%
-confidence intervals for each habit, which are shown in the table below.
-
-\begin{longtable}[]{@{}lll@{}}
-\caption{Estimates and 95\% Confidence Intervals for \% of
-Population}\tabularnewline
-\toprule\noalign{}
-Habit & Estimate & C.I. \\
-\midrule\noalign{}
-\endfirsthead
-\toprule\noalign{}
-Habit & Estimate & C.I. \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-Drinking & 81.8\% & (80.9\%, 82.7\%) \\
-Smoking & 16.7\% & (15.8\%, 17.6\%) \\
-Smoking E-cigarettes & 4.4\% & (3.91\%, 4.89\%) \\
-\end{longtable}
-
-\textbf{Interpretation of table/results - e-cig is much lower, drinking
-very common etc}
-
-Note that for the purposes of model building, we coded CASI/CAPI
-responses about alcohol and cigarette consumption in the following way:
+\emph{I think this table could be replaced with a paragraph that may
+save space} All variables are coded as numeric in our dataset, so we
+recoded all factor variables accordingly. Note that for the purposes of
+model building, we coded CASI/CAPI responses about alcohol and cigarette
+consumption in the following way:
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1264}}
@@ -266,19 +233,15 @@ dnoft\_19 & 1 & Almost every day & Frequently \\
 & -9 & Refused & NA \\
 \end{longtable}
 
-\textbf{We can also\ldots{}}
+We code a binary variable to group current smoking status into `yes' or
+`no', with the `Ex-Reg' smokers falling into the `no' category. For
+`topqual2' we group respondents into `higher education' or `basic
+education' \emph{This has changed since}. Similarly, `urban14b' now has
+two levels being `rural' and `urban' and `marstatD' now only has
+`married' and `not married' levels.
 
-\begin{figure}[H]
-\includegraphics{Coursework_files/figure-latex/output prevelance plot-1} \caption{Estimation of the prevelance of smokers by deprivation}\label{fig:output prevelance plot}
-\end{figure}
-
-\subsubsection{How is smoking associated with socioeconomic factors and
-age?}\label{how-is-smoking-associated-with-socioeconomic-factors-and-age}
-
-\textbf{Explanation of why we split into test/train dataset.}
-
-This leaves us with 5335 observations in our training dataset. The
-number of missing observations for each are shown:
+The number of missing observations for each are shown in Table
+@ref(tab:output NA table):
 
 \begin{longtable}[]{@{}lrl@{}}
 \caption{Missing values in the training dataset}\tabularnewline
@@ -292,19 +255,155 @@ Variable & Missing Values & \% Missing \\
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-omsysval & 2359 & 44.2\% \\
-dnoft\_19 & 878 & 16.5\% \\
-topqual2 & 15 & 0.281\% \\
-cigsta3\_19 & 13 & 0.244\% \\
-NDPNow\_19 & 13 & 0.244\% \\
-cigdyal\_19 & 12 & 0.225\% \\
-d7many3\_19 & 12 & 0.225\% \\
-drinkYN\_19 & 11 & 0.206\% \\
-origin2 & 2 & 0.0375\% \\
+omsysval & 2972 & 55.7\% \\
+dnoft\_19 & 1097 & 20.6\% \\
+topqual2 & 19 & 0.356\% \\
+cigsta3\_19 & 16 & 0.3\% \\
+cigdyal\_19 & 15 & 0.281\% \\
+NDPNow\_19 & 14 & 0.262\% \\
+d7many3\_19 & 14 & 0.262\% \\
+drinkYN\_19 & 13 & 0.244\% \\
+origin2 & 5 & 0.0937\% \\
 marstatD & 1 & 0.0187\% \\
 \end{longtable}
 
-\textbf{Explanation of first model - binomial with logit link}
+As expected, there is a lot of missingness in the lab values,
+particularly `omsysval'. \emph{Maybe some explanation of why this is
+expected?} When conducting our analysis of these, we will use a subset
+including only observations with at least one of these taken. The only
+other variable with a substantial amount of data missing is `dnoft\_19'
+and, as this is derived from a retrospective question, this may be a
+case of recall bias. Questions involving lifestyle habits such as
+alcohol consumption are considered sensitive, with many individuals
+potentially not being willing to answer, more likely to be the issue
+here. With this level of missingness in `dnoft\_19', we decide not to
+use it in any of our models. `topqual2', `origin2' and `marstatD' are
+the only demographic variables with any missing entries, with 19
+observations (0.356\% of the data) missing at least one. As all three of
+these variables are not necessary for identifiability, we do not expect
+every participant to answer these questions due to personal preference.
+
+Finally, we analysed the two lab measurement variables in Figure
+@ref(tab:output distribution plots), finding potential outliers to be
+present in both. The readings for `omsysval' are collected by taking an
+average of three readings, each five minutes apart, performed by a
+trained nurse who deemed each reading to be valid. For this reason, it
+seems highly unlikely that these readings are mistakes, and we include
+them in our analysis. However, our BMI variable is estimated if the
+participants weight is over 130kg. These extremely high BMI values are
+most likely to be caused by the over-estimation of these participants
+weights. We deem these to be errors and code them as missing in the
+dataset.
+
+\begin{figure}[H]
+\includegraphics{Coursework_files/figure-latex/output distribution plots-1} \caption{Distribution of BMI and Mean Systolic Blood Pressure}\label{fig:output distribution plots}
+\end{figure}
+
+\subsection{Methology}\label{methology}
+
+\subsubsection{What is the prevelance of drinking, smoking and E-cig
+usage?}\label{what-is-the-prevelance-of-drinking-smoking-and-e-cig-usage}
+
+To calculate the prevalence of each habit we assume each of the \(n\)
+observations, \(x_1,…,x_n\) , to be independent, identically distributed
+(iid) random variables (RVs) where
+\(x_i \sim Bern(p)\, \forall i=1,…,n\) and \(p\) denotes the probability
+of an observation having the relevant habit. We use the household
+weights to calculate a weighted Maximum Likelihood Estimate (MLE) of
+\(p\). That is, letting \(w_i\) denote the weight of the \(i^{th}\)
+observation, we alter the standard likelihood function of a Bernoulli
+distribution as below:
+\[L(p|\textbf{x}) = \prod_{i = 1}^{n} (p^{x_i}(1-p)^{1-x_i})^{w_i}\]
+From this, we calculate our weighted MLE as:
+\[\widehat{p} = \frac{\sum_{i=1}^{n} x_iw_i}{\sum_{i=1}^{n} w_i}\]
+
+It can also be shown that this MLE has variance given by
+\(\mathop{\mathrm{var}}(\widehat{p})=\frac{p(1-p)}{\sum_{i=1}^{n}w_i}\),
+which we can estimate using \(\widehat{p}\) and use large sample
+properties of the MLE to get a normal approximation and estimate 95\%
+confidence intervals for each habit, which are shown in Table
+@ref(tab:output estimates table).
+
+\begin{longtable}[]{@{}lll@{}}
+\caption{Estimates and 95\% Confidence Intervals for \% of
+Population}\tabularnewline
+\toprule\noalign{}
+Habit & Estimate & C.I. \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Habit & Estimate & C.I. \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Drinking & 81.8\% & (80.9\%, 82.7\%) \\
+Smoking & 16.7\% & (15.8\%, 17.6\%) \\
+Smoking E-cigarettes & 4.4\% & (3.91\%, 4.89\%) \\
+\end{longtable}
+
+\textbf{Interpretation of table/results - e-cig is much lower, drinking
+very common etc}
+
+We segmented our data by gender, age brackets and level of deprivation
+and regrouped the levels of each lifestyle factor variables into more
+manageable buckets \emph{This bit should read better, but I'm not sure
+the changes - just needs to be a sentence to introduce the plots}
+
+\begin{figure}[H]
+\includegraphics{Coursework_files/figure-latex/output smoking and drinking by age plot-1} \caption{Smoking and drinking status proportions by age group and gender}\label{fig:output smoking and drinking by age plot}
+\end{figure}
+
+\emph{I will change this plot to include all three (smoking, drinking,
+ecigs) in one graph, similarly needs a sentence intro}
+
+\begin{figure}[H]
+\includegraphics{Coursework_files/figure-latex/output prevelance plot-1} \caption{Estimation of the prevelance of smokers by deprivation}\label{fig:output prevelance plot}
+\end{figure}
+
+We found that the usage of e-cigarette usage among adults is relatively
+low, making it challenging to dissect any significant trends within the
+data. \emph{Maybe reword?} We noted an inverse correlation between age
+and the proportion of `occasional' drinking, while `frequent' drinking
+showed a positive correlation. Additionally, males demonstrate a higher
+prevalence of drinking across nearly all demographic categories in
+comparison to females. `Active' smoking appears to follow a similar
+relationship to `occasional' drinkers, with the number of `active'
+smokers decreasing with age. Interestingly, the proportion of males who
+quit smoking in later-life is consistently greater than that of females.
+
+\emph{This probably needs rewording} It is important to mention the
+variable `Level of Deprivation' ranges from 1 (meaning most deprived) to
+5 (least deprived). We can clearly see that smoking prevalence increases
+with our deprivation variable, meaning that smokers tend to be from
+lower levels of deprivation. This correlation may be caused by the hefty
+tobacco duties the UK impose on its' residents
+(\citeproc{ref-GovUK}{GOV.UK 2014}). Less deprived individuals they can
+take-up more unnecessary, expensive habits, with smoking being one of
+the main candidates.
+
+\subsubsection{How is smoking associated with socioeconomic factors and
+age?}\label{how-is-smoking-associated-with-socioeconomic-factors-and-age}
+
+Before attempting to fit any suitable models, we split the data into a
+80/20 test train data. This reduces the risk of overfitting and allows
+us to test the predictive power of each model.
+
+This leaves us with 5335 observations in our training dataset.
+\emph{Summary of NA of this? maybe just important variables,
+i.e.~smoking binary}
+
+We use the binary smoker/non-smoker variable as a response and
+fit\ldots{} \emph{Finish this paragraph!}
+
+\emph{Reword intro here} This suggests that modelling age as continuous
+may be more effective. To achieve this, we defined the estimated age of
+the \(i^{th}\) observation as the midpoint of their respective 5-year
+age bracket (taking the estimation of the 90+ category as 92.5), denoted
+\(a_i\). We believe that age may represent a somewhat quadratic effect
+on the probability of smoking, leading us to include a \(a_i^2\) term in
+our model. A comparison of these models are summarised in Table
+@ref(tab:output model selection table).
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.5940}}
@@ -349,20 +448,28 @@ Test Accuracy
 \bottomrule\noalign{}
 \endlastfoot
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i + a_i^2 + m_i + q_i + u_i + o_i + t_i + s_i + q_i:u_i\)
-& 4001.0 & 0.767 & 0.338 & 0.337 & 0.845 \\
+& 3961.9 & 0.727 & 0.337 & 0.342 & 0.849 \\
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i + a_i^2 + m_i + q_i + u_i + o_i + t_i + s_i\)
-& 4001.6 & 0.767 & 0.338 & 0.337 & 0.846 \\
+& 3965.8 & 0.728 & 0.337 & 0.341 & 0.850 \\
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i + m_i + q_i + u_i + o_i + t_i + s_i\)
-& 4039.6 & 0.757 & 0.339 & 0.338 & 0.845 \\
+& 4006.0 & 0.721 & 0.338 & 0.342 & 0.847 \\
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i^{(5)} + m_i + q_i + u_i + o_i + t_i + s_i\)
-& 4013.3 & 0.766 & 0.338 & 0.337 & 0.847 \\
+& 3978.6 & 0.730 & 0.336 & 0.342 & 0.847 \\
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i^{(10)} + m_i + q_i + u_i + o_i + t_i + s_i\)
-& 4016.0 & 0.761 & 0.338 & 0.337 & 0.848 \\
+& 3977.2 & 0.726 & 0.337 & 0.342 & 0.849 \\
 \end{longtable}
 
-\textbf{Explain why we selected the model we did - lowest AIC}
+We selected the model based on AIC, which should help us find balance
+between model complexity and how well the model fits the data. This
+approach helps avoid overfitting meaning that the model generalises well
+to new data, without any loss of practicality.
 
-\textbf{Some model diagnostics}
+To test the predictive performance of our model using our test data, we
+plot the predicted probability of each `probability bin' against the
+mean actual outcomes and obtained the calibration chart in Figure
+@ref(tab:output calibration chart). As we can see the calibration curve
+closely follows the line \(y = x\), which is indicative of a
+well-calibrated model.
 
 \begin{figure}[H]
 
@@ -373,20 +480,22 @@ Test Accuracy
 \caption{Calibration chart for Binomial model}\label{fig:output calibration chart}
 \end{figure}
 
-\textbf{Interpretation of model coefficients etc}
+We show a forest plot of the odds ratio in Figure \emph{Need code for
+this} for each variable in our model. Note, it is important to state the
+reference level of each factor variable, so we have a baseline for
+comparison among other levels. The intercept (roughly 0.25) can be
+interpreted as the probability of being a smoker if all factor variables
+are at their reference level. Any blue variables, i.e.~age, imd and
+urban, increase the probability by a scale of its corresponding odds
+ratio and all red variables are associated with a decreased probability
+of being a smoker.
 
-\textbf{Limitations of model}
+\emph{Limitations of model -}
 
 \subsubsection{Which lifestyle habits are associated with systolic blood
 pressure?}\label{which-lifestyle-habits-are-associated-with-systolic-blood-pressure}
 
-\begin{figure}[H]
-\includegraphics{Coursework_files/figure-latex/output distribution plots-1} \caption{Distribution of BMI and Mean Systolic Blood Pressure}\label{fig:output distribution plots}
-\end{figure}
-
-\textbf{Why did we remove outliers}
-
-\textbf{Question Three}
+\emph{I will do this tomorrow!}
 
 \begin{figure}[H]
 
@@ -403,7 +512,35 @@ pressure?}\label{which-lifestyle-habits-are-associated-with-systolic-blood-press
 
 \subsection{Results/Conclusion}\label{resultsconclusion}
 
-NatCen Social Research and Health (\citeproc{ref-Main}{2019})
+Our analysis showed that alcohol consumption is extremely common among
+UK adults, with approximately 81.8\% being consumers, while smoking and
+vaping rates are lower at 16.7\% and 4.4\%, respectively. Older males
+show the highest tendencies for alcohol consumption, with `frequent'
+drinking the most prevalent among males aged 65-74. Unlike `frequent'
+alcohol consumption, the prevalence of smoking decreases with age.
+Individuals aged 16-24 appear to be the worst offenders when it comes to
+smoking cigarettes, indicating a significant issue within youth culture.
+Moreover, we found an interesting relationship between deprivation
+levels and smoking and drinking behaviours. Smoking prevalence seemed to
+increase as deprivation levels decrease, while alcohol consumption
+appeared to do the opposite.
+
+To help us uncover the underlying socio-economic factors that may drive
+the prevalence of smoking, we first looked at the most `comparable'
+respondent type in our dataset. This `respondent' is a white, single
+male who has no qualifications and lives in an urban area. We found that
+the probability of our hypothetical respondent being a smoker is
+approximately 25\% \emph{Where is this from?} (notably higher than the
+population average of 16.7). \emph{Maybe worth talking about confidence
+intervals here - is value outside 95\%} The only socio-economic
+variables to certainly increase this probability is the deprivation
+level our respondent falls under. The rest of the socio-economic
+variables we have access to, appear to decrease the likelihood of
+smoking. For example, if our respondent is any of the following: Asian,
+black, married, or went on to further education, the chances of them
+being a smoker is at-least halved.
+
+NatCen Social Research and Health (\citeproc{ref-Main}{2019}) \emph{?}
 
 \newpage
 
@@ -412,6 +549,10 @@ NatCen Social Research and Health (\citeproc{ref-Main}{2019})
 
 \phantomsection\label{refs}
 \begin{CSLReferences}{1}{0}
+\bibitem[\citeproctext]{ref-GovUK}
+GOV.UK. 2014. {``{Tax on shopping and services}.''}
+\url{https://www.gov.uk/tax-on-shopping/alcohol-tobacco}.
+
 \bibitem[\citeproctext]{ref-Main}
 NatCen Social Research, Department of Epidemiology, University College
 London, and Public Health. 2019. {``{Health Survey for England}.''}

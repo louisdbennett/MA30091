@@ -41,12 +41,12 @@ knitr::opts_chunk$set(include = F, echo = F, message = F, warning = F, fig.pos =
 
 ```{r initial data filtering and splitting}
 library(dplyr)
+library(patchwork)
 library(haven)
 library(ggplot2)
 library(broom)
 library(pROC)
 library(caret)
-library(patchwork)
 
 load("hsesub.Rdata")
 
@@ -124,7 +124,7 @@ sd16plus <- subdat %>%
         Age35g != "90+" ~ purrr::map2_dbl(as.numeric(substr(Age35g,0,2)), as.numeric(substr(Age35g,4,5)), \(x, y) mean(c(x, y))),
         !(is.na(Age35g)) ~ 92.5,
         T ~ NA_real_
-    )
+      )
   )
 ```
 
@@ -271,7 +271,20 @@ test16plus <- sd16plus %>% anti_join(train16plus, by = c('SerialA'))
 ```
 
 ```{r summary of data set}
-variable_na_table <- train16plus %>% 
+variable_na_table <- sd16plus %>% 
+  select(-c(SerialA, current_smoker, age_estim)) %>% 
+  summarise(
+    across(everything(), ~ sum(is.na(.x)))
+  ) %>% 
+  tidyr::pivot_longer(
+    cols = everything(), names_to = 'Variable', values_to = 'SumNA'
+  ) %>% 
+  # Can filter out variables with 0 NAs for table?
+  filter(SumNA != 0) %>%
+  mutate(PercNA = paste0(100 * signif(SumNA / NROW(train16plus), digits = 3), '%')) %>% 
+  arrange(desc(SumNA))
+
+variable_na_table_train <- train16plus %>% 
   select(-c(SerialA, current_smoker, age_estim)) %>% 
   summarise(
     across(everything(), ~ sum(is.na(.x)))
@@ -410,7 +423,6 @@ create_qq_plot <- function(fit) {
 }
 ```
 
-
 ```{r relationship plots for q3}
 create_relationship_plots <- function(variable, labels) {
   ggplot(data = train16plus, aes(x = !!sym(variable), y = omsysval)) +
@@ -435,52 +447,14 @@ These statistics alone warrant a need for an understanding of health-related beh
 
 ## Exploratory Analysis
 
-**We start by investigating the data**
+We are using data from the 2019 Health Survey for England (HSE) to conduct our analysis. Before proceeding with any investigations involving the data, we checked for any common errors in large datasets. Our initial step involved pre-processing the data, which entailed filtering observations to include only those above the age of 16 and removing 3 pairs of observations that were identical in every descriptive variable except for the ID, resulting in a dataset of `r ` observations. As we have two different grouped age variables, we ensured they were consistent with one another. *Don't know if this final sentence needs to be included*
 
-```{r output smoking and drinking by age plot, include = T, fig.width=12, fig.height=4, fig.cap="Smoking and drinking status proportions by age group and gender"}
-p1 <- create_proportion_bar_plot('ag16g10', 'Sex', 'cigsta3_19', labels = list(x = 'Age Group', y = 'Proportion', legend.title = 'Smoking Status'))
-p2 <- create_proportion_bar_plot('ag16g10', 'Sex', 'dnoft_19', labels = list(x = 'Age Group', y = 'Proportion', legend.title = 'Drinking Status'))
+*Need the table copied over here with the variable names/a paragraph explaining these*
 
-p1 + p2
-```
+We also found 36 pairs with exact entries excluding lab measurements, but we do not remove these from our analysis. We suspect these may be individuals who have either initially refused a nurse visit but later changed their mind, or simply have had two nurse visits where their lab measurements vary slightly between the two. The supporting documentation doesn’t state a protocol for repeated visits, so we will assume these are genuine observations from different participants and include them. *Maybe rewording this?*
 
-
-```{r output deprivation plot, include = T, fig.width=10, fig.height=3, fig.cap="Drinking, smoking and E-cig status proportions by level of deprivation"}
-p1 <- create_stacked_bar_plot('qimd19', 'cigsta3_19', labels = list(x = 'Level of Deprivation', y = 'Proportion', legend.title = 'Drinking Status'))
-p2 <- create_stacked_bar_plot('qimd19', 'dnoft_19', labels = list(x = 'Level of Deprivation', y = 'Proportion', legend.title = 'Smoking Status'))
-p3 <- create_stacked_bar_plot('qimd19', 'NDPNow_19', labels = list(x = 'Level of Deprivation', y = 'Proportion', legend.title = 'E-cig Status'))
-
-p1 + p2 + p3
-```
-
-## Methology
-
-**Define all variables used in analysis**
-
-## Analysis
-
-### What is the prevelance of drinking, smoking and E-cig usage?
-
-To calculate the prevalence of each habit we assume each of the $n$ observations, $x_1,…,x_n$ , to be independent, identically distributed (iid) random variables (RVs) where $x_i \sim Bern(p)\, \forall i=1,…,n$ and $p$ denotes the probability of an observation having the relevant habit. 
-We use the household weights to calculate a weighted Maximum Likelihood Estimate (MLE) of $p$. That is, letting $w_i$ denote the weight of the $i^{th}$ observation, we alter the standard likelihood function of a Bernoulli distribution as below:
-$$L(p|\textbf{x}) = \prod_{i = 1}^{n} (p^{x_i}(1-p)^{1-x_i})^{w_i}$$
-From this, we calculate our weighted MLE as:
-$$\widehat{p} = \frac{\sum_{i=1}^{n} x_iw_i}{\sum_{i=1}^{n} w_i}$$
-
-It can also be shown that this MLE has variance given by $\var(\widehat{p})=\frac{p(1-p)}{\sum_{i=1}^{n}w_i}$, which we can estimate using $\widehat{p}$ and use large sample properties of the MLE to get a normal approximation and estimate 95% confidence intervals for each habit, which are shown in the table below.
-
-```{r output estimates table, include = T}
-knitr::kable(
-  prevelance_table, 
-  col.names = c('Habit', 'Estimate', 'C.I.'), 
-  caption = "Estimates and 95% Confidence Intervals for % of Population"
-)
-```
-
-**Interpretation of table/results - e-cig is much lower, drinking very common etc**
-
-Note that for the purposes of model building, we coded CASI/CAPI responses about alcohol and cigarette consumption in the following way:
-
+*I think this table could be replaced with a paragraph that may save space*
+All variables are coded as numeric in our dataset, so we recoded all factor variables accordingly. Note that for the purposes of model building, we coded CASI/CAPI responses about alcohol and cigarette consumption in the following way:
 
 | Variable  | Code | Label                                 | Decode                        | 
 |-----------|------|---------------------------------------|-------------------------------|
@@ -503,20 +477,9 @@ Note that for the purposes of model building, we coded CASI/CAPI responses about
 |           | -8   | Don't know                            | NA                            |
 |           | -9   | Refused                               | NA                            |
 
+We code a binary variable to group current smoking status into ‘yes’ or ‘no’, with the ‘Ex-Reg’ smokers falling into the ‘no’ category. For ‘topqual2’ we group respondents into ‘higher education’ or ‘basic education’ *This has changed since*. Similarly, ‘urban14b’ now has two levels being ‘rural’ and ‘urban’ and ‘marstatD’ now only has ‘married’ and ‘not married’ levels.
 
-**We can also...**
-
-```{r output prevelance plot, include = T, fig.height=4, fig.width=12, fig.cap="Estimation of the prevelance of smokers by deprivation"}
-create_confidence_int_plot('qimd19', 'Sex', 'cigsta3_19', required_levels = c('Current cigarette smoker'), list(x = 'Deprivation Level', y = '% Smokers'))
-```
-
-<!-- Are we doing the same for Gamma distribution with number of cigarettes here? -->
-
-### How is smoking associated with socioeconomic factors and age?
-
-**Explanation of why we split into test/train dataset.**
-
-This leaves us with `r NROW(train16plus)` observations in our training dataset. The number of missing observations for each are shown:
+The number of missing observations for each are shown in Table \@ref(tab:output NA table):
 
 ```{r output NA table, include = T}
 knitr::kable(
@@ -526,31 +489,9 @@ knitr::kable(
 )
 ```
 
-**Explanation of first model - binomial with logit link**
+As expected, there is a lot of missingness in the lab values, particularly ‘omsysval’. *Maybe some explanation of why this is expected?* When conducting our analysis of these, we will use a subset including only observations with at least one of these taken. The only other variable with a substantial amount of data missing is ‘dnoft_19’ and, as this is derived from a retrospective question, this may be a case of recall bias. Questions involving lifestyle habits such as alcohol consumption are considered sensitive, with many individuals potentially not being willing to answer, more likely to be the issue here. With this level of missingness in ‘dnoft_19’, we decide not to use it in any of our models. ‘topqual2’, ‘origin2’ and ‘marstatD’ are the only demographic variables with any missing entries, with `r filter(variable_na_table, Variable == 'topqual2')$SumNA` observations (`r filter(variable_na_table, Variable == 'topqual2')$PercNA` of the data) missing at least one. As all three of these variables are not necessary for identifiability, we do not expect every participant to answer these questions due to personal preference.
 
-```{r output model selection table, include = T}
-knitr::kable(
-  model_table_output,
-  col.names = c('Linear Predictor', 'Train AIC', 'Test AUC', "Train RMSE", "Test RMSE", 'Test Accuracy'), 
-  caption = "Comparison of selected model evaluations",
-  escape = FALSE
-)
-```
-
-**Explain why we selected the model we did - lowest AIC**
-
-**Some model diagnostics**
-
-```{r output calibration chart, include = T, fig.width=4, fig.height=4, fig.align='center', fig.cap="Calibration chart for Binomial model"}
-create_binom_model_calibration_chart(q2_model)
-```
-
-
-**Interpretation of model coefficients etc**
-
-**Limitations of model**
-
-### Which lifestyle habits are associated with systolic blood pressure?
+Finally, we analysed the two lab measurement variables in Figure \@ref(tab:output distribution plots), finding potential outliers to be present in both. The readings for ‘omsysval’ are collected by taking an average of three readings, each five minutes apart, performed by a trained nurse who deemed each reading to be valid. For this reason, it seems highly unlikely that these readings are mistakes, and we include them in our analysis. However, our BMI variable is estimated if the participants weight is over 130kg. These extremely high BMI values are most likely to be caused by the over-estimation of these participants weights. We deem these to be errors and code them as missing in the dataset.
 
 ```{r output distribution plots, include = T, fig.height=4, fig.width=12, fig.cap="Distribution of BMI and Mean Systolic Blood Pressure"}
 p1 <- create_distribution_plot('omsysval', 'Omron Valid Mean Systolic Blood Pressure (mmHg)')
@@ -561,12 +502,94 @@ p2 <- create_distribution_plot('BMIVal', 'Body Mass Index (kg/m^2)') +
     color = "black", angle = 90, size = 4, vjust = 0, hjust = 0
   )
 
-p1 + p2
+p2
 ```
 
-**Why did we remove outliers**
 
-**Question Three**
+```{r output deprivation plot, include = F, fig.width=10, fig.height=3, fig.cap="Drinking, smoking and E-cig status proportions by level of deprivation"}
+p1 <- create_stacked_bar_plot('qimd19', 'cigsta3_19', labels = list(x = 'Level of Deprivation', y = 'Proportion', legend.title = 'Drinking Status'))
+p2 <- create_stacked_bar_plot('qimd19', 'dnoft_19', labels = list(x = 'Level of Deprivation', y = 'Proportion', legend.title = 'Smoking Status'))
+p3 <- create_stacked_bar_plot('qimd19', 'NDPNow_19', labels = list(x = 'Level of Deprivation', y = 'Proportion', legend.title = 'E-cig Status'))
+
+p1
+```
+
+## Methology
+
+### What is the prevelance of drinking, smoking and E-cig usage?
+
+To calculate the prevalence of each habit we assume each of the $n$ observations, $x_1,…,x_n$ , to be independent, identically distributed (iid) random variables (RVs) where $x_i \sim Bern(p)\, \forall i=1,…,n$ and $p$ denotes the probability of an observation having the relevant habit. 
+We use the household weights to calculate a weighted Maximum Likelihood Estimate (MLE) of $p$. That is, letting $w_i$ denote the weight of the $i^{th}$ observation, we alter the standard likelihood function of a Bernoulli distribution as below:
+$$L(p|\textbf{x}) = \prod_{i = 1}^{n} (p^{x_i}(1-p)^{1-x_i})^{w_i}$$
+From this, we calculate our weighted MLE as:
+$$\widehat{p} = \frac{\sum_{i=1}^{n} x_iw_i}{\sum_{i=1}^{n} w_i}$$
+
+It can also be shown that this MLE has variance given by $\var(\widehat{p})=\frac{p(1-p)}{\sum_{i=1}^{n}w_i}$, which we can estimate using $\widehat{p}$ and use large sample properties of the MLE to get a normal approximation and estimate 95% confidence intervals for each habit, which are shown in Table \@ref(tab:output estimates table).
+
+```{r output estimates table, include = T}
+knitr::kable(
+  prevelance_table, 
+  col.names = c('Habit', 'Estimate', 'C.I.'), 
+  caption = "Estimates and 95% Confidence Intervals for % of Population"
+)
+```
+
+**Interpretation of table/results - e-cig is much lower, drinking very common etc**
+
+We segmented our data by gender, age brackets and level of deprivation and regrouped the levels of each lifestyle factor variables into more manageable buckets *This bit should read better, but I'm not sure the changes - just needs to be a sentence to introduce the plots*
+
+```{r output smoking and drinking by age plot, include = T, fig.width=12, fig.height=4, fig.cap="Smoking and drinking status proportions by age group and gender"}
+p1 <- create_proportion_bar_plot('ag16g10', 'Sex', 'cigsta3_19', labels = list(x = 'Age Group', y = 'Proportion', legend.title = 'Smoking Status'))
+p2 <- create_proportion_bar_plot('ag16g10', 'Sex', 'dnoft_19', labels = list(x = 'Age Group', y = 'Proportion', legend.title = 'Drinking Status'))
+
+p1
+```
+
+*I will change this plot to include all three (smoking, drinking, ecigs) in one graph, similarly needs a sentence intro*
+ 
+```{r output prevelance plot, include = T, fig.height=4, fig.width=12, fig.cap="Estimation of the prevelance of smokers by deprivation"}
+create_confidence_int_plot('ag16g10', 'Sex', 'cigsta3_19', required_levels = c('Current cigarette smoker'), list(x = 'Age Group', y = '% Smokers'))
+```
+
+We found that the usage of e-cigarette usage among adults is relatively low, making it challenging to dissect any significant trends within the data. *Maybe reword?* We noted an inverse correlation between age and the proportion of 'occasional' drinking, while 'frequent' drinking showed a positive correlation. Additionally, males demonstrate a higher prevalence of drinking across nearly all demographic categories in comparison to females. ‘Active’ smoking appears to follow a similar relationship to ‘occasional’ drinkers, with the number of ‘active’ smokers decreasing with age. Interestingly, the proportion of males who quit smoking in later-life is consistently greater than that of females.
+
+*This probably needs rewording*
+It is important to mention the variable 'Level of Deprivation' ranges from 1 (meaning most deprived) to 5 (least deprived). We can clearly see that smoking prevalence increases with our deprivation variable, meaning that smokers tend to be from lower levels of deprivation. This correlation may be caused by the hefty tobacco duties the UK impose on its’ residents [@GovUK]. Less deprived individuals they can take-up more unnecessary, expensive habits, with smoking being one of the main candidates.
+
+### How is smoking associated with socioeconomic factors and age?
+
+Before attempting to fit any suitable models, we split the data into a 80/20 test train data. This reduces the risk of overfitting and allows us to test the predictive power of each model.
+
+This leaves us with `r NROW(train16plus)` observations in our training dataset. *Summary of NA of this? maybe just important variables, i.e. smoking binary*
+
+We use the binary smoker/non-smoker variable as a response and fit... *Finish this paragraph!*
+
+*Reword intro here* This suggests that modelling age as continuous may be more effective. To achieve this, we defined the estimated age of the $i^{th}$ observation as the midpoint of their respective 5-year age bracket (taking the estimation of the 90+ category as 92.5), denoted $a_i$. We believe that age may represent a somewhat quadratic effect on the probability of smoking, leading us to include a $a_i^2$ term in our model. A comparison of these models are summarised in Table \@ref(tab:output model selection table).
+
+```{r output model selection table, include = T}
+knitr::kable(
+  model_table_output,
+  col.names = c('Linear Predictor', 'Train AIC', 'Test AUC', "Train RMSE", "Test RMSE", 'Test Accuracy'), 
+  caption = "Comparison of selected model evaluations",
+  escape = FALSE
+)
+```
+
+We selected the model based on AIC, which should help us find balance between model complexity and how well the model fits the data. This approach helps avoid overfitting meaning that the model generalises well to new data, without any loss of practicality.
+
+To test the predictive performance of our model using our test data, we plot the predicted probability of each ‘probability bin’ against the mean actual outcomes and obtained the calibration chart in Figure \@ref(tab:output calibration chart). As we can see the calibration curve closely follows the line $y = x$, which is indicative of a well-calibrated model.
+
+```{r output calibration chart, include = T, fig.width=4, fig.height=4, fig.align='center', fig.cap="Calibration chart for Binomial model"}
+create_binom_model_calibration_chart(q2_model)
+```
+
+We show a forest plot of the odds ratio in Figure *Need code for this* for each variable in our model. Note, it is important to state the reference level of each factor variable, so we have a baseline for comparison among other levels. The intercept (roughly 0.25) can be interpreted as the probability of being a smoker if all factor variables are at their reference level. Any blue variables, i.e. age, imd and urban, increase the probability by a scale of its corresponding odds ratio and all red variables are associated with a decreased probability of being a smoker.
+
+*Limitations of model -*
+
+### Which lifestyle habits are associated with systolic blood pressure?
+
+*I will do this tomorrow!*
 
 ```{r output qq plot for q3, include = T, fig.height=4, fig.width=4, fig.align='center', fig.cap="Q-Q plot of Inverse-Normal model residuals"}
 create_qq_plot(q3_model)
@@ -576,14 +599,16 @@ create_qq_plot(q3_model)
 p1 <- create_relationship_plots('age_estim', labels = list(x = "Estimated Age (yrs)"))
 p2 <- create_relationship_plots('BMIVal', labels = list(x = "Body Mass Index (kg/m^2)"))
 
-p1 + p2
+p2
 ```
-
-
 
 ## Results/Conclusion
 
-@Main
+Our analysis showed that alcohol consumption is extremely common among UK adults, with approximately `r round(100 * overall_drinking$p_hat, digits = 1)`% being consumers, while smoking and vaping rates are lower at `r round(100 * overall_smoking$p_hat, digits = 1)`% and `r round(100 * overall_ecigs$p_hat, digits = 1)`%, respectively. Older males show the highest tendencies for alcohol consumption, with ‘frequent’ drinking the most prevalent among males aged 65-74. Unlike ‘frequent’ alcohol consumption, the prevalence of smoking decreases with age. Individuals aged 16-24 appear to be the worst offenders when it comes to smoking cigarettes, indicating a significant issue within youth culture. Moreover, we found an interesting relationship between deprivation levels and smoking and drinking behaviours. Smoking prevalence seemed to increase as deprivation levels decrease, while alcohol consumption appeared to do the opposite.
+
+To help us uncover the underlying socio-economic factors that may drive the prevalence of smoking, we first looked at the most ‘comparable’ respondent type in our dataset. This ‘respondent’ is a white, single male who has no qualifications and lives in an urban area. We found that the probability of our hypothetical respondent being a smoker is approximately 25% *Where is this from?* (notably higher than the population average of `r round(100 * overall_smoking$p_hat, digits = 1)`). *Maybe worth talking about confidence intervals here - is value outside 95%* The only socio-economic variables to certainly increase this probability is the deprivation level our respondent falls under. The rest of the socio-economic variables we have access to, appear to decrease the likelihood of smoking. For example, if our respondent is any of the following: Asian, black, married, or went on to further education, the chances of them being a smoker is at-least halved.
+
+@Main *?*
 
 \newpage
 # References
