@@ -166,3 +166,43 @@ sensitivity_mod <- glm(
 summary(sensitivity_mod)
 
 plot(sensitivity_mod, 2)
+
+# model tests q3
+
+q3_model <- glm(
+  formula = omsysval ~ cigsta3_19 + age_estim + marstatD + urban14b + BMIVal + I(BMIVal ^ 2) + Sex + d7many3_19 + BMIVal:Sex + age_estim:Sex + BMIVal:age_estim,
+  family = inverse.gaussian(),
+  # Filter out BMI outliers and NA omsysval
+  data = train16plus %>% filter(BMIVal <= 54, !is.na(omsysval), !is.na(BMIVal))
+)
+
+summary(q3_model)
+
+test <- filter(test16plus, BMIVal <= 54, !is.na(omsysval), !is.na(BMIVal))
+
+pred <- predict(q3_model, test, type = 'response')
+
+sqrt(mean((test$omsysval - pred) ^ 2, na.rm = T))
+
+create_qq_plot(q3_model)
+
+
+create_effects_plot <- function(fit, terms, labels = list()) {
+  sjPlot::plot_model(fit, type = "pred", terms = terms) +
+    labs(x = labels$x, y = labels$y) +
+    theme_minimal() +
+    theme(plot.title = element_blank(), legend.position = 'bottom', legend.title = element_blank())
+}
+
+drinking_effects <- tibble(ggeffects::ggpredict(model = q3_model, terms = c('d7many3_19')))
+
+mean(diff(drinking_effects$predicted))
+
+cig_sex_effects <- tibble(ggeffects::ggpredict(model = q3_model, terms = c('cigsta3_19', 'Sex')))
+
+age_sex_effects <- tibble(ggeffects::ggpredict(model = q3_model, terms = c('age_estim', 'Sex')))
+
+
+create_effects_plot(q3_model, c('cigsta3_19', 'Sex'), labels = list(x = 'Smoking Status', y = 'Predicted Mean Systolic Blood Pressure (mm Hg)'))
+create_effects_plot(q3_model, c('BMIVal', 'Sex'), labels = list(x = 'BMI', y = 'Predicted Mean Systolic Blood Pressure (mm Hg)'))
+create_effects_plot(q3_model, c('d7many3_19', 'Sex'), labels = list(x = 'Number of Days Alcohol Consumed in the Previous Week', y = 'Predicted Mean Systolic Blood Pressure (mm Hg)'))
