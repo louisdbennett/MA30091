@@ -124,7 +124,7 @@
 
 \title{Analysis of Health Survey for England (HSE) 2019}
 \author{Candidate Numbers Here}
-\date{March 12, 2024}
+\date{March 13, 2024}
 
 \begin{document}
 \maketitle
@@ -169,10 +169,10 @@ involving the data, we checked for any common errors in large datasets.
 Our initial step involved pre-processing the data, which entailed
 filtering observations to include only those above the age of 16 and
 removing 3 pairs of observations that were identical in every
-descriptive variable except for the ID, resulting in a dataset of
-\texttt{r} observations. As we have two different grouped age variables,
-we ensured they were consistent with one another. \emph{Don't know if
-this final sentence needs to be included}
+descriptive variable except for the ID, resulting in a dataset of 6669
+observations. As we have two different grouped age variables, we ensured
+they were consistent with one another. \emph{Don't know if this final
+sentence needs to be included}
 
 \emph{Need the table copied over here with the variable names/a
 paragraph explaining these}
@@ -241,10 +241,11 @@ two levels being `rural' and `urban' and `marstatD' now only has
 `married' and `not married' levels.
 
 The number of missing observations for each are shown in Table
-@ref(tab:output NA table):
+\ref{tab:output-na-table}:
 
 \begin{longtable}[]{@{}lrl@{}}
-\caption{Missing values in the training dataset}\tabularnewline
+\caption{Missing values in the training
+dataset\label{tab:output-na-table}}\tabularnewline
 \toprule\noalign{}
 Variable & Missing Values & \% Missing \\
 \midrule\noalign{}
@@ -284,7 +285,7 @@ these variables are not necessary for identifiability, we do not expect
 every participant to answer these questions due to personal preference.
 
 Finally, we analysed the two lab measurement variables in Figure
-@ref(tab:output distribution plots), finding potential outliers to be
+\ref{fig:output-distribution-plots}, finding potential outliers to be
 present in both. The readings for `omsysval' are collected by taking an
 average of three readings, each five minutes apart, performed by a
 trained nurse who deemed each reading to be valid. For this reason, it
@@ -296,7 +297,7 @@ weights. We deem these to be errors and code them as missing in the
 dataset.
 
 \begin{figure}[H]
-\includegraphics{Coursework_files/figure-latex/output distribution plots-1} \caption{Distribution of BMI and Mean Systolic Blood Pressure}\label{fig:output distribution plots}
+\includegraphics{Coursework_files/figure-latex/output-distribution-plots-1} \caption{Distribution of BMI and Mean Systolic Blood Pressure}\label{fig:output-distribution-plots}
 \end{figure}
 
 \subsection{Methology}\label{methology}
@@ -322,11 +323,11 @@ It can also be shown that this MLE has variance given by
 which we can estimate using \(\widehat{p}\) and use large sample
 properties of the MLE to get a normal approximation and estimate 95\%
 confidence intervals for each habit, which are shown in Table
-@ref(tab:output estimates table).
+\ref{tab:output-estimates-table}.
 
 \begin{longtable}[]{@{}lll@{}}
 \caption{Estimates and 95\% Confidence Intervals for \% of
-Population}\tabularnewline
+Population\label{tab:output-estimates-table}}\tabularnewline
 \toprule\noalign{}
 Habit & Estimate & C.I. \\
 \midrule\noalign{}
@@ -403,7 +404,7 @@ age bracket (taking the estimation of the 90+ category as 92.5), denoted
 \(a_i\). We believe that age may represent a somewhat quadratic effect
 on the probability of smoking, leading us to include a \(a_i^2\) term in
 our model. A comparison of these models are summarised in Table
-@ref(tab:output model selection table).
+\ref{tab:output-model-selection-table}.
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.5940}}
@@ -412,7 +413,8 @@ our model. A comparison of these models are summarised in Table
   >{\raggedleft\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.0827}}
   >{\raggedleft\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.0752}}
   >{\raggedleft\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1053}}@{}}
-\caption{Comparison of selected model evaluations}\tabularnewline
+\caption{Comparison of selected model
+evaluations\label{tab:output-model-selection-table}}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Linear Predictor
@@ -448,15 +450,15 @@ Test Accuracy
 \bottomrule\noalign{}
 \endlastfoot
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i + a_i^2 + m_i + q_i + u_i + o_i + t_i + s_i + q_i:u_i\)
-& 3961.9 & 0.727 & 0.337 & 0.342 & 0.849 \\
+& 4007.4 & 0.785 & 0.338 & 0.337 & 0.840 \\
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i + a_i^2 + m_i + q_i + u_i + o_i + t_i + s_i\)
-& 3965.8 & 0.728 & 0.337 & 0.341 & 0.850 \\
+& 4009.2 & 0.785 & 0.338 & 0.337 & 0.841 \\
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i + m_i + q_i + u_i + o_i + t_i + s_i\)
-& 4006.0 & 0.721 & 0.338 & 0.342 & 0.847 \\
+& 4045.4 & 0.776 & 0.340 & 0.338 & 0.845 \\
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i^{(5)} + m_i + q_i + u_i + o_i + t_i + s_i\)
-& 3978.6 & 0.730 & 0.336 & 0.342 & 0.847 \\
+& 4020.2 & 0.783 & 0.338 & 0.338 & 0.845 \\
 \(\mathop{\mathrm{logit}}(\mu_i) \sim a_i^{(10)} + m_i + q_i + u_i + o_i + t_i + s_i\)
-& 3977.2 & 0.726 & 0.337 & 0.342 & 0.849 \\
+& 4023.7 & 0.783 & 0.338 & 0.337 & 0.844 \\
 \end{longtable}
 
 We selected the model based on AIC, which should help us find balance
@@ -467,17 +469,17 @@ to new data, without any loss of practicality.
 To test the predictive performance of our model using our test data, we
 plot the predicted probability of each `probability bin' against the
 mean actual outcomes and obtained the calibration chart in Figure
-@ref(tab:output calibration chart). As we can see the calibration curve
+\ref{fig:output-calibration-chart}. As we can see the calibration curve
 closely follows the line \(y = x\), which is indicative of a
 well-calibrated model.
 
 \begin{figure}[H]
 
-{\centering \includegraphics{Coursework_files/figure-latex/output calibration chart-1} 
+{\centering \includegraphics{Coursework_files/figure-latex/output-calibration-chart-1} 
 
 }
 
-\caption{Calibration chart for Binomial model}\label{fig:output calibration chart}
+\caption{Calibration chart for Binomial model}\label{fig:output-calibration-chart}
 \end{figure}
 
 We show a forest plot of the odds ratio in Figure \emph{Need code for
