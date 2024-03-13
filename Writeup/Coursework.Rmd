@@ -28,6 +28,8 @@ date: "`r format(Sys.time(), '%B %d, %Y')`"
 bibliography: bibliography.bib
 nocite: '@*'
 link-citations: true
+classoption:
+- twocolumn
 ---
 
 <!-- Remove page numbers -->
@@ -46,10 +48,11 @@ library(ggplot2)
 library(broom)
 library(pROC)
 library(caret)
+library(kableExtra)
 
 set.seed(200)
 
-load("hsesub.Rdata")
+load("~/w_MA30091/Coursework/MA30091/Writeup/hsesub.Rdata")
 
 fct_variables <- c(
   'Sex', 'Age35g', 'ag16g10', 'topqual2', 'urban14b', 'origin2', 'marstatD', 'GOR1', 'cigsta3_19', 'NDPNow_19', 'drinkYN_19', 'dnoft_19'
@@ -351,11 +354,11 @@ q2_model <- model_diagnostics$model[[which.min(model_diagnostics$aic)]]
 
 ```{r create q2 model selector table}
 model_specs <- c(
-  "$\\logit(\\mu_i) \\sim a_i + a_i^2 + ms_i + q_i + u_i + o_i + t_i + s_i + q_i:u_i$",
-  "$\\logit(\\mu_i) \\sim a_i + a_i^2 + ms_i + q_i + u_i + o_i + t_i + s_i$",
-  "$\\logit(\\mu_i) \\sim a_i + ms_i + q_i + u_i + o_i + t_i + s_i$",
-  "$\\logit(\\mu_i) \\sim a_i^{(5)} + ms_i + q_i + u_i + o_i + t_i + s_i$",
-  "$\\logit(\\mu_i) \\sim a_i^{(10)} + ms_i + q_i + u_i + o_i + t_i + s_i$"
+  "$\\eta_i \\sim a_i + a_i^2 + ms_i + q_i + u_i + o_i + t_i + s_i + q_i:u_i$",
+  "$\\eta_i \\sim a_i + a_i^2 + ms_i + q_i + u_i + o_i + t_i + s_i$",
+  "$\\eta_i \\sim a_i + ms_i + q_i + u_i + o_i + t_i + s_i$",
+  "$\\eta_i \\sim a_i^{(5)} + ms_i + q_i + u_i + o_i + t_i + s_i$",
+  "$\\eta_i \\sim a_i^{(10)} + ms_i + q_i + u_i + o_i + t_i + s_i$"
 )
 
 model_table_output <- model_diagnostics %>% 
@@ -447,7 +450,7 @@ create_relationship_plots <- function(variable, labels) {
 
 <!-- Start of write-up -->
 
-\newpage
+\clearpage
 ## Summary (Non-Technical)
 
 ## Introduction
@@ -468,12 +471,12 @@ All variables are coded as numeric in our dataset, so we recoded all factor vari
 
 The number of missing observations for each are shown in Table \ref{tab:output-na-table}:
 
-```{r output-na-table, include = T}
-knitr::kable(
+```{r outputnatable, include = T}
+kbl(
   variable_na_table, 
   col.names = c('Variable', 'Missing Values', '% Missing'), 
-  caption = "Missing values in the training dataset\\label{tab:output-na-table}"
-)
+  caption = "Missing values in the training dataset\\label{tab:output-na-table}",
+  longtable=F) %>% row_spec (0, bold = T)
 ```
 
 There is significant missingness in the lab values, which can be explained by the fact additional consent was needed from the participant to allow a nurse visit. One variable with a substantial amount of data missing was the frequency of drinking in the last 12 months, which due to the retrospective and sensitive nature of the question could be explained by either recall bias or a participant’s refusal to answer. Education level, marital status and ethnicity are the only demographic variables with any missing entries, with `r filter(variable_na_table, Variable == 'topqual2')$SumNA` observations (`r filter(variable_na_table, Variable == 'topqual2')$PercNA` of the data) missing at least one of the three. These are not necessary for identifiability and as they are sensitive, we do not expect every participant to answer these questions. Therefore, we did not remove these observations.
@@ -511,12 +514,13 @@ We use the household weights to calculate a weighted Maximum Likelihood Estimate
 $$L(p|\textbf{x}) = \prod_{i = 1}^{n} (p^{x_i}(1-p)^{1-x_i})^{w_i}$$
 From this, we calculated our weighted MLE as $\widehat{p} = \frac{\sum_{i=1}^{n} x_iw_i}{\sum_{i=1}^{n} w_i}$. It can also be shown that this MLE has variance given by $\var(\widehat{p})=\frac{p(1-p)}{\sum_{i=1}^{n}w_i}$, which we estimated using $\widehat{p}$. We used large sample properties of the MLE to get a normal approximation and estimated 95% confidence intervals for each habit, which are shown in Table \ref{tab:output-estimates-table}.
 
-```{r output-estimates-table, include = T}
-knitr::kable(
+```{r outputestimatestable, include = T}
+kbl(
   prevelance_table, 
   col.names = c('Habit', 'Estimate', 'C.I.'), 
-  caption = "Estimates and 95% Confidence Intervals for % of Population\\label{tab:output-estimates-table}"
-)
+  caption = "Estimates and 95\\% Confidence Intervals for \\% of Population\\label{tab:output-estimates-table}",
+  longtable=F
+) %>% row_spec (0, bold = T)
 ```
 
 We found that the usage of e-cigarette usage among adults is relatively low, making it challenging to dissect any significant trends within the data. *Maybe a wee bit more here*
@@ -547,17 +551,18 @@ In the dataset, there were two variables that categorised age. They differed onl
 
 Under the assumption that ages were approximately uniformly distributed within their respective age bands, we also defined the estimated age of the $i^{th}$ observation as the midpoint of their respective 5-year age bracket (taking the estimation of the 90+ category as 92.5), denoted $a_i$. We found that age may represent a somewhat quadratic effect on the probability of smoking, leading us to include a $a_i^2$ term in our model. A comparison of these models are summarised in Table \ref{tab:output-model-selection-table}.
 
-```{r output-model-selection-table, include = T}
-knitr::kable(
+```{r outputmodelselectiontable, include = T}
+kbl(
   model_table_output,
-  col.names = c('Linear Predictor', 'Train AIC', 'Test AUC', "Train RMSE", "Test RMSE", 'Test Accuracy'), 
-  caption = "Comparison of selected model evaluations\\label{tab:output-model-selection-table}",
-  escape = FALSE
-)
+  col.names = c('Model', 'AIC', 'AUC', "Train", "Test", 'Acc.'), 
+  caption = "Comparison of selected model evaluations, wherein $\\eta_i = \\text{logit}(\\mu_i)$, and Acc. refers to the model accuracy on test data.\\label{tab:output-model-selection-table}",
+  escape = FALSE,
+  longtable=F
+) %>% column_spec(1, width = "7em") %>% add_header_above(c(" " = 3, "RMSE" = 2, " " = 1)) %>% row_spec (0, bold = T)
 ```
 
 We selected the model based on AIC, which enabled us to balance model complexity and model fit. This model is *change factors*
-$$\logit(\mu_i) \sim \beta_0 + \beta_1a + \beta_2a^2 + \beta_3q + \alpha^{ms}_j + \alpha^{u}_k + \alpha^{o}_l + \alpha^{t}_m + \alpha^{s}_n$$
+$$\text{logit}(\mu_i) \sim \beta_0 + \beta_1a + \beta_2a^2 + \beta_3q + \alpha^{ms}_j + \alpha^{u}_k + \alpha^{o}_l + \alpha^{t}_m + \alpha^{s}_n$$
 where $j \in \{Married,Not\,Married\}$, $k \in \{Urban,Not\,Urban\}$, $l \in \{White,...,Other\}$, $n \in \{Male,Female\}$ and $m \in \{Further\,Education,...,No\,qualification\}$.
 
 To evaluate the predictive performance of our final model using our test data, Figure \ref{fig:output-calibration-chart} demonstrates the predicted probability of each ‘probability bin’ against the mean actual outcomes. As we can see the calibration curve closely follows the line $y = x$, which is indicative of a well-calibrated model.
@@ -588,5 +593,5 @@ To help us uncover the underlying socio-economic factors that may drive the prev
 
 @Main *?*
 
-\newpage
+\clearpage
 # References

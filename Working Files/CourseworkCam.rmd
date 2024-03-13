@@ -161,7 +161,7 @@ Firstly, we note that the study population is *adults from the population of Eng
 ```{r MissingNo}
 library(haven) # Required to present the summary of labelled data.
 library(dplyr) # Required to use the pipe operator %>%.
-load("~/MA30091/Coursework/MA30091/Datasets/hsesub.Rdata") # The dset is called subdat.
+load("~/w_MA30091/Coursework/MA30091/Writeup/hsesub.Rdata") # The dset is called subdat.
 # I have checked, and the two age category variables match up.
 subdat = data.frame(subdat)
 sd16plus <- subdat %>%
