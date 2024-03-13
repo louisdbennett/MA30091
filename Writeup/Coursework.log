@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.7.13)  13 MAR 2024 19:17
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.7.13)  13 MAR 2024 21:52
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -608,15 +608,15 @@ e
 * layout: <same size as paper>
 * layoutoffset:(h,v)=(0.0pt,0.0pt)
 * modes: 
-* h-part:(L,W,R)=(36.135pt, 542.02501pt, 36.135pt)
-* v-part:(T,H,B)=(36.135pt, 722.7pt, 36.135pt)
+* h-part:(L,W,R)=(18.06749pt, 578.16002pt, 18.06749pt)
+* v-part:(T,H,B)=(18.06749pt, 758.835pt, 18.06749pt)
 * \paperwidth=614.295pt
 * \paperheight=794.96999pt
-* \textwidth=542.02501pt
-* \textheight=722.7pt
-* \oddsidemargin=-36.135pt
-* \evensidemargin=-36.135pt
-* \topmargin=-73.135pt
+* \textwidth=578.16002pt
+* \textheight=758.835pt
+* \oddsidemargin=-54.2025pt
+* \evensidemargin=-54.2025pt
+* \topmargin=-91.2025pt
 * \headheight=12.0pt
 * \headsep=25.0pt
 * \topskip=11.0pt
@@ -690,156 +690,160 @@ File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 
 ]
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 220.
+(Font)              <10> on input line 206.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7> on input line 206.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <5> on input line 206.
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.261 
+l.274 
        [2
 
-]
-<Coursework_files/figure-latex/output-distribution-plots-1.pdf, id=29, 709.6512
+{/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/loca
+l/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}]
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <9> on input line 285.
+<Coursework_files/figure-latex/output-distribution-plots-1.pdf, id=48, 709.6512
 5pt x 279.0425pt>
 File: Coursework_files/figure-latex/output-distribution-plots-1.pdf Graphic fil
 e (type pdf)
 <use Coursework_files/figure-latex/output-distribution-plots-1.pdf>
 Package pdftex.def Info: Coursework_files/figure-latex/output-distribution-plot
-s-1.pdf  used on input line 285.
-(pdftex.def)             Requested size: 266.0211pt x 104.60236pt.
+s-1.pdf  used on input line 356.
+(pdftex.def)             Requested size: 284.08286pt x 111.70442pt.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10.95> on input line 365.
 
-LaTeX Warning: Command \textellipsis invalid in math mode on input line 294.
+LaTeX Warning: Command \textellipsis invalid in math mode on input line 365.
 
 
-LaTeX Warning: Command \textellipsis invalid in math mode on input line 296.
+LaTeX Warning: Command \textellipsis invalid in math mode on input line 367.
 
-<Coursework_files/figure-latex/output-smoking-drinking-age-plot-1.pdf, id=32, 8
-57.2025pt x 266.9975pt>
+
+pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
+een already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.401 \end{table}
+                  [3{/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-m
+athsy.enc}{/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}
+ <./Coursework_files/figure-latex/output-distribution-plots-1.pdf>]
+<Coursework_files/figure-latex/output-smoking-drinking-age-plot-1.pdf, id=82, 8
+57.2025pt x 339.2675pt>
 File: Coursework_files/figure-latex/output-smoking-drinking-age-plot-1.pdf Grap
 hic file (type pdf)
 <use Coursework_files/figure-latex/output-smoking-drinking-age-plot-1.pdf>
 Package pdftex.def Info: Coursework_files/figure-latex/output-smoking-drinking-
-age-plot-1.pdf  used on input line 345.
-(pdftex.def)             Requested size: 266.0047pt x 82.85391pt.
-<Coursework_files/figure-latex/output-prevelance-plot-1.pdf, id=33, 857.2025pt 
-x 266.9975pt>
+age-plot-1.pdf  used on input line 420.
+(pdftex.def)             Requested size: 284.08104pt x 112.43488pt.
+<Coursework_files/figure-latex/output-prevelance-plot-1.pdf, id=83, 568.1225pt 
+x 339.2675pt>
 File: Coursework_files/figure-latex/output-prevelance-plot-1.pdf Graphic file (
 type pdf)
 <use Coursework_files/figure-latex/output-prevelance-plot-1.pdf>
 Package pdftex.def Info: Coursework_files/figure-latex/output-prevelance-plot-1
-.pdf  used on input line 349.
-(pdftex.def)             Requested size: 266.0047pt x 82.85391pt.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
+.pdf  used on input line 424.
+(pdftex.def)             Requested size: 284.08655pt x 169.64885pt.
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.351 
-       [3{/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{
-/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/local/tex
-live/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/local/texlive/2023/
-texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc} <./Coursework_files/figure-latex/o
-utput-distribution-plots-1.pdf> <./Coursework_files/figure-latex/output-smoking
--drinking-age-plot-1.pdf>]
-Overfull \hbox (22.44395pt too wide) in paragraph at lines 396--413
- [][] 
+l.518 
+       [4 <./Coursework_files/figure-latex/output-smoking-drinking-age-plot-1.p
+df> <./Coursework_files/figure-latex/output-prevelance-plot-1.pdf>]
+Underfull \hbox (badness 10000) in paragraph at lines 547--553
+\T1/lmr/m/n/10.95 (+20) where $\OML/lmm/m/it/10.95 j \OMS/lmsy/m/n/10.95 2 f[]g
+$\T1/lmr/m/n/10.95 (+20) ,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 417--422
-\T1/lmr/m/n/10.95 (+20) where $\OML/lmm/m/it/10.95 j \OMS/lmsy/m/n/10.95 2 f\OM
-L/lmm/m/it/10.95 Married; Not Married\OMS/lmsy/m/n/10.95 g$\T1/lmr/m/n/10.95 (+
-20) , $\OML/lmm/m/it/10.95 k \OMS/lmsy/m/n/10.95 2
+Underfull \hbox (badness 10000) in paragraph at lines 547--553
+\OML/lmm/m/it/10.95 k \OMS/lmsy/m/n/10.95 2 f[]g$\T1/lmr/m/n/10.95 (+20) , $\OM
+L/lmm/m/it/10.95 l \OMS/lmsy/m/n/10.95 2
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 417--422
-\OMS/lmsy/m/n/10.95 f\OML/lmm/m/it/10.95 Urban; Not Urban\OMS/lmsy/m/n/10.95 g$
-\T1/lmr/m/n/10.95 (+20) , $\OML/lmm/m/it/10.95 l \OMS/lmsy/m/n/10.95 2 f\OML/lm
-m/m/it/10.95 White; :::; Other\OMS/lmsy/m/n/10.95 g$\T1/lmr/m/n/10.95 (+20) ,
+Underfull \hbox (badness 10000) in paragraph at lines 547--553
+\OMS/lmsy/m/n/10.95 f[]g$\T1/lmr/m/n/10.95 (+20) ,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 417--422
-\OML/lmm/m/it/10.95 n \OMS/lmsy/m/n/10.95 2 f\OML/lmm/m/it/10.95 Male; Female\O
-MS/lmsy/m/n/10.95 g$ \T1/lmr/m/n/10.95 (+20) and $\OML/lmm/m/it/10.95 m \OMS/lm
-sy/m/n/10.95 2
+Underfull \hbox (badness 10000) in paragraph at lines 547--553
+\OML/lmm/m/it/10.95 n \OMS/lmsy/m/n/10.95 2 f[]g$ \T1/lmr/m/n/10.95 (+20) and $
+\OML/lmm/m/it/10.95 m \OMS/lmsy/m/n/10.95 2
  []
 
-<Coursework_files/figure-latex/output-calibration-chart-1.pdf, id=73, 279.0425p
-t x 279.0425pt>
+
+Overfull \hbox (210.66772pt too wide) in paragraph at lines 547--553
+\OMS/lmsy/m/n/10.95 f[]g$\T1/lmr/m/n/10.95 (-20) . 
+ []
+
+<Coursework_files/figure-latex/output-calibration-chart-1.pdf, id=112, 279.0425
+pt x 279.0425pt>
 File: Coursework_files/figure-latex/output-calibration-chart-1.pdf Graphic file
  (type pdf)
 <use Coursework_files/figure-latex/output-calibration-chart-1.pdf>
 Package pdftex.def Info: Coursework_files/figure-latex/output-calibration-chart
--1.pdf  used on input line 432.
-(pdftex.def)             Requested size: 266.02133pt x 266.02133pt.
+-1.pdf  used on input line 564.
+(pdftex.def)             Requested size: 279.05032pt x 279.05032pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-
-pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
-een already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.438 
-       [4 <./Coursework_files/figure-latex/output-prevelance-plot-1.pdf>]
-<Coursework_files/figure-latex/output-relationship-plots-1.pdf, id=93, 857.2025
-pt x 351.3125pt>
+<Coursework_files/figure-latex/output-relationship-plots-1.pdf, id=117, 857.202
+5pt x 351.3125pt>
 File: Coursework_files/figure-latex/output-relationship-plots-1.pdf Graphic fil
 e (type pdf)
 <use Coursework_files/figure-latex/output-relationship-plots-1.pdf>
 Package pdftex.def Info: Coursework_files/figure-latex/output-relationship-plot
-s-1.pdf  used on input line 468.
-(pdftex.def)             Requested size: 266.0047pt x 109.01831pt.
+s-1.pdf  used on input line 600.
+(pdftex.def)             Requested size: 284.08104pt x 116.42665pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-<Coursework_files/figure-latex/output-qq-plot-1.pdf, id=95, 279.0425pt x 277.03
-5pt>
-File: Coursework_files/figure-latex/output-qq-plot-1.pdf Graphic file (type pdf
-)
-<use Coursework_files/figure-latex/output-qq-plot-1.pdf>
-Package pdftex.def Info: Coursework_files/figure-latex/output-qq-plot-1.pdf  us
-ed on input line 483.
-(pdftex.def)             Requested size: 266.02133pt x 264.10751pt.
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.500 
-       [5 <./Coursework_files/figure-latex/output-calibration-chart-1.pdf> <./C
-oursework_files/figure-latex/output-relationship-plots-1.pdf> <./Coursework_fil
-es/figure-latex/output-qq-plot-1.pdf>]
-<Coursework_files/figure-latex/output-effect-plots-age-1.pdf, id=132, 279.0425p
+l.602 
+       [5 <./Coursework_files/figure-latex/output-calibration-chart-1.pdf>]
+<Coursework_files/figure-latex/output-qq-plot-1.pdf, id=139, 279.0425pt x 277.0
+35pt>
+File: Coursework_files/figure-latex/output-qq-plot-1.pdf Graphic file (type pdf
+)
+<use Coursework_files/figure-latex/output-qq-plot-1.pdf>
+Package pdftex.def Info: Coursework_files/figure-latex/output-qq-plot-1.pdf  us
+ed on input line 615.
+(pdftex.def)             Requested size: 279.04181pt x 277.03432pt.
+<Coursework_files/figure-latex/output-effect-plots-age-1.pdf, id=142, 279.0425p
 t x 278.03876pt>
 File: Coursework_files/figure-latex/output-effect-plots-age-1.pdf Graphic file 
 (type pdf)
 <use Coursework_files/figure-latex/output-effect-plots-age-1.pdf>
 Package pdftex.def Info: Coursework_files/figure-latex/output-effect-plots-age-
-1.pdf  used on input line 502.
-(pdftex.def)             Requested size: 266.02133pt x 265.06442pt.
-<Coursework_files/figure-latex/output-effect-plots-1.pdf, id=133, 857.2025pt x 
+1.pdf  used on input line 634.
+(pdftex.def)             Requested size: 279.04607pt x 278.04231pt.
+<Coursework_files/figure-latex/output-effect-plots-1.pdf, id=143, 857.2025pt x 
 345.29pt>
 File: Coursework_files/figure-latex/output-effect-plots-1.pdf Graphic file (typ
 e pdf)
 <use Coursework_files/figure-latex/output-effect-plots-1.pdf>
 Package pdftex.def Info: Coursework_files/figure-latex/output-effect-plots-1.pd
-f  used on input line 506.
-(pdftex.def)             Requested size: 266.0047pt x 107.14943pt.
-<Coursework_files/figure-latex/output-effect-plots-alc-1.pdf, id=135, 857.2025p
+f  used on input line 638.
+(pdftex.def)             Requested size: 284.08104pt x 114.43076pt.
+<Coursework_files/figure-latex/output-effect-plots-alc-1.pdf, id=145, 857.2025p
 t x 345.29pt>
 File: Coursework_files/figure-latex/output-effect-plots-alc-1.pdf Graphic file 
 (type pdf)
 <use Coursework_files/figure-latex/output-effect-plots-alc-1.pdf>
 Package pdftex.def Info: Coursework_files/figure-latex/output-effect-plots-alc-
-1.pdf  used on input line 515.
-(pdftex.def)             Requested size: 266.0047pt x 107.14943pt.
+1.pdf  used on input line 647.
+(pdftex.def)             Requested size: 284.08104pt x 114.43076pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
@@ -848,44 +852,48 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.548 \clearpage
-                 [6 <./Coursework_files/figure-latex/output-effect-plots-age-1.
-pdf> <./Coursework_files/figure-latex/output-effect-plots-1.pdf> <./Coursework_
-files/figure-latex/output-effect-plots-alc-1.pdf>]
+l.649 
+       [6 <./Coursework_files/figure-latex/output-relationship-plots-1.pdf> <./
+Coursework_files/figure-latex/output-qq-plot-1.pdf> <./Coursework_files/figure-
+latex/output-effect-plots-age-1.pdf> <./Coursework_files/figure-latex/output-ef
+fect-plots-1.pdf>]
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.589 \end{document}
-                     [7
-
-
-] (./Coursework.aux) ) 
+l.745 \end{document}
+                     [7 <./Coursework_files/figure-latex/output-effect-plots-al
+c-1.pdf>] (./Coursework.aux) ) 
 Here is how much of TeX's memory you used:
- 16863 strings out of 476025
- 278186 string characters out of 5790017
- 1870388 words of memory out of 5000000
- 36843 multiletter control sequences out of 15000+600000
- 573319 words of font info for 138 fonts, out of 8000000 for 9000
+ 17011 strings out of 476025
+ 280195 string characters out of 5790017
+ 1878388 words of memory out of 5000000
+ 36918 multiletter control sequences out of 15000+600000
+ 603408 words of font info for 186 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 66i,13n,67p,1007b,446s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm
-/lmbx10.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmbx12.pf
-b></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmex10.pfb></usr/lo
-cal/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></usr/local/texliv
-e/2023/texmf-dist/fonts/type1/public/lm/lmmi6.pfb></usr/local/texlive/2023/texm
-f-dist/fonts/type1/public/lm/lmmi8.pfb></usr/local/texlive/2023/texmf-dist/font
-s/type1/public/lm/lmr10.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/pub
-lic/lm/lmr12.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr1
-7.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr6.pfb></usr/
-local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr8.pfb></usr/local/texliv
-e/2023/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr/local/texlive/2023/tex
-mf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2023/texmf-dist/fo
-nts/type1/public/lm/lmsy8.pfb>
-Output written on Coursework.pdf (7 pages, 883468 bytes).
+ 66i,13n,67p,1007b,469s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/local/texlive/2023/texmf-dist/fonts/type1/p
+ublic/lm/lmbx10.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/l
+mbx12.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmbx9.pfb><
+/usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmex10.pfb></usr/local
+/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></usr/local/texlive/2
+023/texmf-dist/fonts/type1/public/lm/lmmi6.pfb></usr/local/texlive/2023/texmf-d
+ist/fonts/type1/public/lm/lmmi7.pfb></usr/local/texlive/2023/texmf-dist/fonts/t
+ype1/public/lm/lmmi8.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public
+/lm/lmmi9.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr10.p
+fb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/lo
+cal/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr17.pfb></usr/local/texlive
+/2023/texmf-dist/fonts/type1/public/lm/lmr6.pfb></usr/local/texlive/2023/texmf-
+dist/fonts/type1/public/lm/lmr7.pfb></usr/local/texlive/2023/texmf-dist/fonts/t
+ype1/public/lm/lmr8.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/
+lm/lmr9.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmri10.pf
+b></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/lo
+cal/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texlive
+/2023/texmf-dist/fonts/type1/public/lm/lmsy9.pfb>
+Output written on Coursework.pdf (7 pages, 983036 bytes).
 PDF statistics:
- 296 PDF objects out of 1000 (max. 8388607)
- 228 compressed objects within 3 object streams
- 32 named destinations out of 1000 (max. 500000)
- 32886 words of extra memory for PDF output out of 35830 (max. 10000000)
+ 381 PDF objects out of 1000 (max. 8388607)
+ 300 compressed objects within 3 object streams
+ 44 named destinations out of 1000 (max. 500000)
+ 49310 words of extra memory for PDF output out of 51595 (max. 10000000)
 
