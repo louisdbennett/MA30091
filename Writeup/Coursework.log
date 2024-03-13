@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.7.13)  8 MAR 2024 13:52
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.7.13)  13 MAR 2024 15:24
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -444,56 +444,63 @@ Package: tabularx 2020/01/15 v2.11c `tabularx' package (DPC)
 (/usr/local/texlive/2023/texmf-dist/tex/latex/threeparttable/threeparttable.sty
 Package: threeparttable 2003/06/13  v 3.0
 \@tempboxb=\box62
+) (/usr/local/texlive/2023/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count304
+\float@exts=\toks31
+\float@box=\box63
+\@float@everytoks=\toks32
+\@floatcapt=\box64
 ) (/usr/local/texlive/2023/texmf-dist/tex/latex/bookmark/bookmark.sty
 Package: bookmark 2020-11-06 v1.29 PDF bookmarks (HO)
 (/usr/local/texlive/2023/texmf-dist/tex/latex/bookmark/bkm-pdftex.def
 File: bkm-pdftex.def 2020-11-06 v1.29 bookmark driver for pdfTeX (HO)
-\BKM@id=\count304
+\BKM@id=\count305
 )) (/usr/local/texlive/2023/texmf-dist/tex/latex/xurl/xurl.sty
 Package: xurl 2022/01/09 v 0.10 modify URL breaks
 )
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 14
-5.
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 12
+9.
 (/usr/local/texlive/2023/texmf-dist/tex/latex/lm/t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) (/usr/local/texlive/2023/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2023-01-16 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count305
-\l__pdf_internal_box=\box63
+\l__color_backend_stack_int=\count306
+\l__pdf_internal_box=\box65
 ) (./Coursework.aux)
 \openout1 = `Coursework.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 145.
-LaTeX Font Info:    ... okay on input line 145.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 145.
-LaTeX Font Info:    ... okay on input line 145.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 145.
-LaTeX Font Info:    ... okay on input line 145.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 145.
-LaTeX Font Info:    ... okay on input line 145.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 145.
-LaTeX Font Info:    ... okay on input line 145.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 145.
-LaTeX Font Info:    ... okay on input line 145.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 145.
-LaTeX Font Info:    ... okay on input line 145.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 145.
-LaTeX Font Info:    ... okay on input line 145.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 145.
-LaTeX Font Info:    ... okay on input line 145.
-LaTeX Info: Redefining \microtypecontext on input line 145.
-Package microtype Info: Applying patch `item' on input line 145.
-Package microtype Info: Applying patch `toc' on input line 145.
-Package microtype Info: Applying patch `eqnum' on input line 145.
-Package microtype Info: Applying patch `footnote' on input line 145.
-Package microtype Info: Applying patch `verbatim' on input line 145.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 129.
+LaTeX Font Info:    ... okay on input line 129.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 129.
+LaTeX Font Info:    ... okay on input line 129.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 129.
+LaTeX Font Info:    ... okay on input line 129.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 129.
+LaTeX Font Info:    ... okay on input line 129.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 129.
+LaTeX Font Info:    ... okay on input line 129.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 129.
+LaTeX Font Info:    ... okay on input line 129.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 129.
+LaTeX Font Info:    ... okay on input line 129.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 129.
+LaTeX Font Info:    ... okay on input line 129.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 129.
+LaTeX Font Info:    ... okay on input line 129.
+LaTeX Info: Redefining \microtypecontext on input line 129.
+Package microtype Info: Applying patch `item' on input line 129.
+Package microtype Info: Applying patch `toc' on input line 129.
+Package microtype Info: Applying patch `eqnum' on input line 129.
+Package microtype Info: Applying patch `footnote' on input line 129.
+Package microtype Info: Applying patch `verbatim' on input line 129.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using protrusion set `basicmath'.
 Package microtype Info: Automatic font expansion enabled (level 2),
 (microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
 Package microtype Info: Using default expansion set `alltext-nott'.
-LaTeX Info: Redefining \showhyphens on input line 145.
+LaTeX Info: Redefining \showhyphens on input line 129.
 Package microtype Info: No adjustment of tracking.
 Package microtype Info: No adjustment of interword spacing.
 Package microtype Info: No adjustment of character kerning.
@@ -502,17 +509,17 @@ File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman
 (RS)
 ) (/usr/local/texlive/2023/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count306
+\scratchcounter=\count307
 \scratchdimen=\dimen198
-\scratchbox=\box64
-\nofMPsegments=\count307
-\nofMParguments=\count308
-\everyMPshowfont=\toks31
-\MPscratchCnt=\count309
+\scratchbox=\box66
+\nofMPsegments=\count308
+\nofMParguments=\count309
+\everyMPshowfont=\toks33
+\MPscratchCnt=\count310
 \MPscratchDim=\dimen199
-\MPnumerator=\count310
-\makeMPintoPDFobject=\count311
-\everyMPtoPDFconversion=\toks32
+\MPnumerator=\count311
+\makeMPintoPDFobject=\count312
+\everyMPtoPDFconversion=\toks34
 ) (/usr/local/texlive/2023/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
@@ -555,44 +562,45 @@ e
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-Package hyperref Info: Link coloring OFF on input line 145.
+Package hyperref Info: Link coloring OFF on input line 129.
 Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: float package is loaded.
 Package caption Info: threeparttable package is loaded.
 Package caption Info: End \AtBeginDocument code.
 LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 1
-47.
+31.
 (/usr/local/texlive/2023/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OML+lmm on input line 1
-47.
+31.
 (/usr/local/texlive/2023/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-147.
+131.
 (/usr/local/texlive/2023/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-147.
+131.
 (/usr/local/texlive/2023/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 147.
+(Font)              <12> on input line 131.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 147.
+(Font)              <8> on input line 131.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 147.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 147
+(Font)              <6> on input line 131.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 131
 .
 (/usr/local/texlive/2023/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 ) (/usr/local/texlive/2023/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 147
+LaTeX Font Info:    Trying to load font information for U+msb on input line 131
 .
 (/usr/local/texlive/2023/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
@@ -602,108 +610,122 @@ File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 
 {/usr/local/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/loc
 al/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}]
-<Coursework_files/figure-latex/output smoking and drinking by age plot-1.pdf, i
-d=15, 847.165pt x 255.95625pt>
-File: Coursework_files/figure-latex/output smoking and drinking by age plot-1.p
-df Graphic file (type pdf)
-<use Coursework_files/figure-latex/output smoking and drinking by age plot-1.pd
-f>
-Package pdftex.def Info: Coursework_files/figure-latex/output smoking and drink
-ing by age plot-1.pdf  used on input line 184.
-(pdftex.def)             Requested size: 542.04155pt x 163.76846pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 184--186
-
- []
-
-<Coursework_files/figure-latex/output deprivation plot-1.pdf, id=16, 710.655pt 
-x 189.70876pt>
-File: Coursework_files/figure-latex/output deprivation plot-1.pdf Graphic file 
-(type pdf)
-<use Coursework_files/figure-latex/output deprivation plot-1.pdf>
-Package pdftex.def Info: Coursework_files/figure-latex/output deprivation plot-
-1.pdf  used on input line 187.
-(pdftex.def)             Requested size: 542.04443pt x 144.69829pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 187--188
-
- []
-
+pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
+een already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.237 \end{longtable}
+                      [2]
+<Coursework_files/figure-latex/output-distribution-plots-1.pdf, id=28, 854.1912
+5pt x 206.7725pt>
+File: Coursework_files/figure-latex/output-distribution-plots-1.pdf Graphic fil
+e (type pdf)
+<use Coursework_files/figure-latex/output-distribution-plots-1.pdf>
+Package pdftex.def Info: Coursework_files/figure-latex/output-distribution-plot
+s-1.pdf  used on input line 275.
+(pdftex.def)             Requested size: 542.0144pt x 131.20442pt.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 198.
+(Font)              <10.95> on input line 283.
 
-LaTeX Warning: Command \textellipsis invalid in math mode on input line 199.
+LaTeX Warning: Command \textellipsis invalid in math mode on input line 284.
 
 
-LaTeX Warning: Command \textellipsis invalid in math mode on input line 201.
+LaTeX Warning: Command \textellipsis invalid in math mode on input line 286.
 
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.207 \[
-        L(p|\textbf{x}) = \prod_{i = 1}^{n} (p^{x_i}(1-p)^{1-x_i})^{w_i}\] [2{/
-usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/local/
-texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/local/texlive/2023/t
-exmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc} <./Coursework_files/figure-latex/ou
-tput smoking and drinking by age plot-1.pdf> <./Coursework_files/figure-latex/o
-utput deprivation plot-1.pdf>]
-<Coursework_files/figure-latex/output prevelance plot-1.pdf, id=50, 857.2025pt 
-x 273.02pt>
-File: Coursework_files/figure-latex/output prevelance plot-1.pdf Graphic file (
+l.292 ...i = 1}^{n} (p^{x_i}(1-p)^{1-x_i})^{w_i}\]
+                                                   [3{/usr/local/texlive/2023/t
+exmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/local/texlive/2023/texmf-dist/
+fonts/enc/dvips/lm/lm-rm.enc}{/usr/local/texlive/2023/texmf-dist/fonts/enc/dvip
+s/lm/lm-mathsy.enc} <./Coursework_files/figure-latex/output-distribution-plots-
+1.pdf>]
+<Coursework_files/figure-latex/output-smoking-drinking-age-plot-1.pdf, id=52, 8
+57.2025pt x 194.7275pt>
+File: Coursework_files/figure-latex/output-smoking-drinking-age-plot-1.pdf Grap
+hic file (type pdf)
+<use Coursework_files/figure-latex/output-smoking-drinking-age-plot-1.pdf>
+Package pdftex.def Info: Coursework_files/figure-latex/output-smoking-drinking-
+age-plot-1.pdf  used on input line 336.
+(pdftex.def)             Requested size: 542.02856pt x 123.1306pt.
+<Coursework_files/figure-latex/output-prevelance-plot-1.pdf, id=53, 857.2025pt 
+x 194.7275pt>
+File: Coursework_files/figure-latex/output-prevelance-plot-1.pdf Graphic file (
 type pdf)
-<use Coursework_files/figure-latex/output prevelance plot-1.pdf>
-Package pdftex.def Info: Coursework_files/figure-latex/output prevelance plot-1
-.pdf  used on input line 240.
-(pdftex.def)             Requested size: 542.02856pt x 172.63673pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 240--241
-
- []
-
+<use Coursework_files/figure-latex/output-prevelance-plot-1.pdf>
+Package pdftex.def Info: Coursework_files/figure-latex/output-prevelance-plot-1
+.pdf  used on input line 340.
+(pdftex.def)             Requested size: 542.02856pt x 123.1306pt.
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.273 \end{longtable}
-                      [3{/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/lm/
-lm-mathex.enc} <./Coursework_files/figure-latex/output prevelance plot-1.pdf>]
-<Coursework_files/figure-latex/output calibration chart-1.pdf, id=69, 712.6625p
-t x 279.0425pt>
-File: Coursework_files/figure-latex/output calibration chart-1.pdf Graphic file
+l.351 
+       [4{/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc} 
+<./Coursework_files/figure-latex/output-smoking-drinking-age-plot-1.pdf> <./Cou
+rsework_files/figure-latex/output-prevelance-plot-1.pdf>]
+<Coursework_files/figure-latex/output-calibration-chart-1.pdf, id=83, 279.0425p
+t x 206.7725pt>
+File: Coursework_files/figure-latex/output-calibration-chart-1.pdf Graphic file
  (type pdf)
-<use Coursework_files/figure-latex/output calibration chart-1.pdf>
-Package pdftex.def Info: Coursework_files/figure-latex/output calibration chart
--1.pdf  used on input line 337.
-(pdftex.def)             Requested size: 542.04236pt x 212.2363pt.
+<use Coursework_files/figure-latex/output-calibration-chart-1.pdf>
+Package pdftex.def Info: Coursework_files/figure-latex/output-calibration-chart
+-1.pdf  used on input line 455.
+(pdftex.def)             Requested size: 279.05032pt x 206.77829pt.
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.352 \newpage
-               [4 <./Coursework_files/figure-latex/output calibration chart-1.p
-df>]
+l.461 
+       [5]
+<Coursework_files/figure-latex/output relationship plots-1.pdf, id=91, 857.2025
+pt x 279.0425pt>
+File: Coursework_files/figure-latex/output relationship plots-1.pdf Graphic fil
+e (type pdf)
+<use Coursework_files/figure-latex/output relationship plots-1.pdf>
+Package pdftex.def Info: Coursework_files/figure-latex/output relationship plot
+s-1.pdf  used on input line 466.
+(pdftex.def)             Requested size: 542.02856pt x 176.44489pt.
+<Coursework_files/figure-latex/output qq plot for q3-1.pdf, id=92, 279.0425pt x
+ 204.765pt>
+File: Coursework_files/figure-latex/output qq plot for q3-1.pdf Graphic file (t
+ype pdf)
+<use Coursework_files/figure-latex/output qq plot for q3-1.pdf>
+Package pdftex.def Info: Coursework_files/figure-latex/output qq plot for q3-1.
+pdf  used on input line 471.
+(pdftex.def)             Requested size: 279.05032pt x 204.77072pt.
+
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.352 \newpage
-               [5]
+l.477 
+       [6 <./Coursework_files/figure-latex/output-calibration-chart-1.pdf> <./C
+oursework_files/figure-latex/output relationship plots-1.pdf>]
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.369 \end{document}
-                     [6] (./Coursework.aux) ) 
+l.510 \newpage
+               [7 <./Coursework_files/figure-latex/output qq plot for q3-1.pdf>
+]
+pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
+een already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.536 \end{document}
+                     [8] (./Coursework.aux) ) 
 Here is how much of TeX's memory you used:
- 15490 strings out of 476025
- 253334 string characters out of 5790017
- 1867388 words of memory out of 5000000
- 35593 multiletter control sequences out of 15000+600000
- 572163 words of font info for 109 fonts, out of 8000000 for 9000
+ 15655 strings out of 476025
+ 257083 string characters out of 5790017
+ 1870388 words of memory out of 5000000
+ 35681 multiletter control sequences out of 15000+600000
+ 579458 words of font info for 142 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  63i,9n,67p,1007b,585s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2023/texmf-dis
@@ -716,12 +738,13 @@ ve/2023/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/texlive/2023/tex
 mf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive/2023/texmf-dist/fon
 ts/type1/public/lm/lmr17.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/pu
 blic/lm/lmr6.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr8
-.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr
-/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy8.pfb>
-Output written on Coursework.pdf (6 pages, 244128 bytes).
+.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr
+/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/tex
+live/2023/texmf-dist/fonts/type1/public/lm/lmsy8.pfb>
+Output written on Coursework.pdf (8 pages, 777216 bytes).
 PDF statistics:
- 193 PDF objects out of 1000 (max. 8388607)
- 144 compressed objects within 2 object streams
- 19 named destinations out of 1000 (max. 500000)
- 34917 words of extra memory for PDF output out of 35830 (max. 10000000)
+ 241 PDF objects out of 1000 (max. 8388607)
+ 182 compressed objects within 2 object streams
+ 25 named destinations out of 1000 (max. 500000)
+ 36967 words of extra memory for PDF output out of 42996 (max. 10000000)
 

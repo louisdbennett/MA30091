@@ -3,7 +3,7 @@ library(ggplot2)
 
 load("Datasets/hsesub.Rdata")
 
-# Assume drinkYN_19 is binomally distributed with unknown probability p and calculate confidence intervals this way
+# Assume drinkYN_19 is Bernoulli distributed with unknown probability p and calculate confidence intervals this way
 # Can do similar for cigarette/e-cig consumption using cigsta3_19 and NDPNow_19 variables
 
 calculate_binomial_ci <- function(dat_vec, weights = rep(1, length.out = length(dat_vec)), alpha = 0.05) {
@@ -139,3 +139,30 @@ fitted_model <- step(full_model, scope = list(lower = null_model, upper = full_m
 summary(fitted_model)
 
 plot(fitted_model, 2)
+
+# Model q3
+
+
+ggplot(data = train16plus, aes(x = age_estim, y = omsysval)) +
+  geom_point() +
+  geom_smooth()
+
+full_mod_inv <- glm(
+  formula = omsysval ~ cigsta3_19 + age_estim + marstatD + urban14b + BMIVal + I(BMIVal ^ 2) + Sex + d7many3_19 + BMIVal:Sex + age_estim:Sex + BMIVal:age_estim,
+  family = inverse.gaussian,
+  data = na.omit(train16plus)
+)
+
+summary(full_mod_inv)
+
+step(full_mod_inv)
+
+sensitivity_mod <- glm(
+  formula = omsysval ~ cigsta3_19 + age_estim + marstatD + urban14b + BMIVal + I(BMIVal ^ 2) + Sex + d7many3_19 + BMIVal:Sex + age_estim:Sex,
+  family = inverse.gaussian,
+  data = filter(na.omit(train16plus), BMIVal <= 54 & omsysval <= 180)
+)
+
+summary(sensitivity_mod)
+
+plot(sensitivity_mod, 2)

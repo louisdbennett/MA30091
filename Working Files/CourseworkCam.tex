@@ -125,7 +125,7 @@
 
 \title{Analysis of Health Survey for England (HSE) 2019}
 \author{Candidate Numbers Here}
-\date{March 07, 2024}
+\date{March 08, 2024}
 
 \begin{document}
 \maketitle
@@ -1016,6 +1016,17 @@ omsysval.
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(sd16plusA}\SpecialCharTok{$}\NormalTok{BMIVal)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+##   14.53   23.92   27.06   27.87   30.86   73.49    1522
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{library}\NormalTok{(ggplot2)}
 \FunctionTok{par}\NormalTok{(}\AttributeTok{cex.lab=}\FloatTok{2.5}\NormalTok{)}
 \FunctionTok{par}\NormalTok{(}\AttributeTok{cex.axis=}\FloatTok{2.5}\NormalTok{) }
@@ -1047,7 +1058,7 @@ omsysval.
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{par}\NormalTok{(}\AttributeTok{cex.lab=}\FloatTok{2.5}\NormalTok{)}
-\FunctionTok{par}\NormalTok{(}\AttributeTok{cex.axis=}\FloatTok{2.5}\NormalTok{) }
+\FunctionTok{par}\NormalTok{(}\AttributeTok{cex.axis=}\FloatTok{2.5}\NormalTok{)}
 
 \CommentTok{\# Basic combined violin and box plot}
 \NormalTok{sd16plusA}\SpecialCharTok{$}\NormalTok{incl }\OtherTok{\textless{}{-}}\NormalTok{ haven}\SpecialCharTok{::}\FunctionTok{as\_factor}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{8204}\NormalTok{))}
