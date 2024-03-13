@@ -232,35 +232,46 @@ prevelance_table <- tibble(
   select(-c(LowerCI, UpperCI))
 ```
 
-```{r calculations by age groups}
-create_confidence_int_plot <- function(group_variable, facet_variable, plotting_variable, required_levels, labels = list()) {
+```{r confidence interval plots}
+create_confidence_int_plot <- function(group_variable, facet_variable, labels = list()) {
   data <- sd16plus %>% 
-    filter(!if_any(all_of(plotting_variable), is.na)) %>% 
+    filter(!if_any(c(cigsta3_19, drinkYN_19, NDPNow_19), is.na)) %>% 
     group_by(
       across(all_of(c(group_variable, facet_variable)))
     ) %>% 
     summarise(
-      across(all_of(plotting_variable), ~ list(.x %in% required_levels), .names = 'dat_vec'),
-      wt_int = list(wt_int), .groups = 'drop'
+      cig = list(cigsta3_19 == 'Current cigarette smoker'),
+      alc = list(drinkYN_19 == 'Yes'),
+      ecig = list(NDPNow_19 == 'Smokes E-cigarettes'),
+      wt_int = list(wt_int), 
+      .groups = 'drop'
     ) %>% 
     mutate(
-      summary = purrr::map2(dat_vec, wt_int, calculate_binomial_ci),
+      across(c(cig, alc, ecig), ~ purrr::map2(.x, wt_int, calculate_binomial_ci))
+    ) %>% 
+    select(-c(wt_int)) %>%
+    tidyr::pivot_longer(
+      cols = c(cig:ecig), names_to = 'category', values_to = 'summary'
+    ) %>% 
+    mutate(
       p_hat = purrr::map_dbl(summary, \(x) x$p_hat),
       lower = purrr::map_dbl(summary, \(x) x$ci[1]),
       upper = purrr::map_dbl(summary, \(x) x$ci[2])
     ) %>% 
-    select(-c(dat_vec, wt_int, summary))
+    select(-c(summary))
   
-  ggplot(data = data, aes(x = !!sym(group_variable), y = p_hat, ymin = lower, ymax = upper)) +
-    geom_bar(stat = 'identity', fill = 'skyblue') +
-    geom_errorbar(width = 0.5) +
+  ggplot(data = data, aes(x = !!sym(group_variable), y = p_hat, ymin = lower, ymax = upper, group = category, fill = category)) +
+    geom_bar(stat = 'identity', position = position_dodge(width = 1)) +
+    geom_errorbar(width = 0.5, position = position_dodge(width = 1)) +
     facet_wrap(as.formula(paste('~ ', facet_variable))) +
     scale_y_continuous(labels = scales::percent) +
     labs(x = labels$x, y = labels$y) +
+    scale_fill_brewer(
+      palette = "Pastel1", name = labels$legend.title, labels = c("ecig" = "Smoking E-Cigarettes", "cig" = "Smoking", 'alc' = 'Drinking')
+    ) +
     theme_minimal() +
     theme(
-      axis.text.x = element_text(angle = 45, hjust = 1), 
-      strip.text = element_text(face = 'bold', size = 12)
+      strip.text = element_text(face = 'bold', size = 12), legend.position = 'bottom'
     )
 }
 ```
@@ -549,7 +560,7 @@ cowplot::plot_grid(p1, p2)
 *I will change this plot to include all three (smoking, drinking, ecigs) in one graph, similarly needs a sentence intro*
  
 ```{r output prevelance plot, include = T, fig.height=4, fig.width=12, fig.cap="Estimation of the prevelance of smokers by deprivation"}
-create_confidence_int_plot('ag16g10', 'Sex', 'cigsta3_19', required_levels = c('Current cigarette smoker'), list(x = 'Age Group', y = '% Smokers'))
+create_confidence_int_plot('ag16g10', 'Sex', list(x = 'Age Group', y = '% Prevelance In Population', legend.title = "Habit"))
 ```
 
 We found that the usage of e-cigarette usage among adults is relatively low, making it challenging to dissect any significant trends within the data. *Maybe reword?* We noted an inverse correlation between age and the proportion of 'occasional' drinking, while 'frequent' drinking showed a positive correlation. Additionally, males demonstrate a higher prevalence of drinking across nearly all demographic categories in comparison to females. ‘Active’ smoking appears to follow a similar relationship to ‘occasional’ drinkers, with the number of ‘active’ smokers decreasing with age. Interestingly, the proportion of males who quit smoking in later-life is consistently greater than that of females.
