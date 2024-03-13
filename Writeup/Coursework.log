@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.7.13)  13 MAR 2024 14:59
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.7.13)  13 MAR 2024 15:24
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -668,17 +668,6 @@ l.351
        [4{/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc} 
 <./Coursework_files/figure-latex/output-smoking-drinking-age-plot-1.pdf> <./Cou
 rsework_files/figure-latex/output-prevelance-plot-1.pdf>]
-Overfull \hbox (98.6795pt too wide) in paragraph at lines 440--445
-\T1/lmr/m/n/10.95 (-20) where $\OML/lmm/m/it/10.95 j \OMS/lmsy/m/n/10.95 2 f\OM
-L/lmm/m/it/10.95 Married; Not Married\OMS/lmsy/m/n/10.95 g$\T1/lmr/m/n/10.95 (-
-20) , $\OML/lmm/m/it/10.95 k \OMS/lmsy/m/n/10.95 2 f\OML/lmm/m/it/10.95 Urban; 
-Not Urban\OMS/lmsy/m/n/10.95 g$\T1/lmr/m/n/10.95 (-20) , $\OML/lmm/m/it/10.95 l
- \OMS/lmsy/m/n/10.95 2 f\OML/lmm/m/it/10.95 White; :::; Other\OMS/lmsy/m/n/10.9
-5 g$\T1/lmr/m/n/10.95 (-20) , $\OML/lmm/m/it/10.95 m \OMS/lmsy/m/n/10.95 2 f\OM
-L/lmm/m/it/10.95 Further Education; :::; No qualification\OMS/lmsy/m/n/10.95 g$
-
- []
-
 <Coursework_files/figure-latex/output-calibration-chart-1.pdf, id=83, 279.0425p
 t x 206.7725pt>
 File: Coursework_files/figure-latex/output-calibration-chart-1.pdf Graphic file
@@ -752,7 +741,7 @@ blic/lm/lmr6.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr8
 .pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr
 /local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/tex
 live/2023/texmf-dist/fonts/type1/public/lm/lmsy8.pfb>
-Output written on Coursework.pdf (8 pages, 777188 bytes).
+Output written on Coursework.pdf (8 pages, 777216 bytes).
 PDF statistics:
  241 PDF objects out of 1000 (max. 8388607)
  182 compressed objects within 2 object streams

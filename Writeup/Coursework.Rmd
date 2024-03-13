@@ -351,11 +351,11 @@ q2_model <- model_diagnostics$model[[which.min(model_diagnostics$aic)]]
 
 ```{r create q2 model selector table}
 model_specs <- c(
-  "$\\logit(\\mu_i) \\sim a_i + a_i^2 + m_i + q_i + u_i + o_i + t_i + s_i + q_i:u_i$",
-  "$\\logit(\\mu_i) \\sim a_i + a_i^2 + m_i + q_i + u_i + o_i + t_i + s_i$",
-  "$\\logit(\\mu_i) \\sim a_i + m_i + q_i + u_i + o_i + t_i + s_i$",
-  "$\\logit(\\mu_i) \\sim a_i^{(5)} + m_i + q_i + u_i + o_i + t_i + s_i$",
-  "$\\logit(\\mu_i) \\sim a_i^{(10)} + m_i + q_i + u_i + o_i + t_i + s_i$"
+  "$\\logit(\\mu_i) \\sim a_i + a_i^2 + ms_i + q_i + u_i + o_i + t_i + s_i + q_i:u_i$",
+  "$\\logit(\\mu_i) \\sim a_i + a_i^2 + ms_i + q_i + u_i + o_i + t_i + s_i$",
+  "$\\logit(\\mu_i) \\sim a_i + ms_i + q_i + u_i + o_i + t_i + s_i$",
+  "$\\logit(\\mu_i) \\sim a_i^{(5)} + ms_i + q_i + u_i + o_i + t_i + s_i$",
+  "$\\logit(\\mu_i) \\sim a_i^{(10)} + ms_i + q_i + u_i + o_i + t_i + s_i$"
 )
 
 model_table_output <- model_diagnostics %>% 
@@ -557,8 +557,8 @@ knitr::kable(
 ```
 
 We selected the model based on AIC, which enabled us to balance model complexity and model fit. This model is *change factors*
-$$\logit(\mu_i) \sim \beta_0 + \beta_1a + \beta_2a^2 + \beta_3q + \alpha^{m}_j + \alpha^{u}_k + \alpha^{o}_l + \alpha^{t}_m + \alpha^{s}_n + \beta^{*}_kq$$
-where $j \in \{Married,Not\,Married\}$, $k \in \{Urban,Not\,Urban\}$, $l \in \{White,...,Other\}$, $m \in \{Further\,Education,...,No\,qualification\}$ and $n \in \{Male,Female\}$
+$$\logit(\mu_i) \sim \beta_0 + \beta_1a + \beta_2a^2 + \beta_3q + \alpha^{ms}_j + \alpha^{u}_k + \alpha^{o}_l + \alpha^{t}_m + \alpha^{s}_n$$
+where $j \in \{Married,Not\,Married\}$, $k \in \{Urban,Not\,Urban\}$, $l \in \{White,...,Other\}$, $n \in \{Male,Female\}$ and $m \in \{Further\,Education,...,No\,qualification\}$.
 
 To evaluate the predictive performance of our final model using our test data, Figure \ref{fig:output-calibration-chart} demonstrates the predicted probability of each ‘probability bin’ against the mean actual outcomes. As we can see the calibration curve closely follows the line $y = x$, which is indicative of a well-calibrated model.
 *This model doesn't predict high values...*
