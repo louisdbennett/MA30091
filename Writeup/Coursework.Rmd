@@ -17,7 +17,7 @@ header-includes:
   - \usepackage[para,online,flushleft]{threeparttable} 
   - \DeclareMathOperator{\logit}{logit}
   - \DeclareMathOperator{\var}{var}
-geometry: margin=0.25in
+geometry: margin=0.1in
 pagenumbers: no
 fontsize: 11pt
 endnote: no
@@ -52,7 +52,7 @@ library(kableExtra)
 
 set.seed(200)
 
-load("~/w_MA30091/Coursework/MA30091/Writeup/hsesub.Rdata")
+load("hsesub.Rdata")
 
 fct_variables <- c(
   'Sex', 'Age35g', 'ag16g10', 'topqual2', 'urban14b', 'origin2', 'marstatD', 'GOR1', 'cigsta3_19', 'NDPNow_19', 'drinkYN_19', 'dnoft_19'
@@ -476,6 +476,26 @@ cig_sex_effects <- tibble(ggeffects::ggpredict(model = q3_model, terms = c('cigs
 age_sex_effects <- tibble(ggeffects::ggpredict(model = q3_model, terms = c('age_estim', 'Sex')))
 ```
 
+```{r deprivation summary}
+# Create deprivation summary
+deprivation_smoking_summary <- sd16plus %>% 
+  filter(!if_any(c(cigsta3_19, drinkYN_19, NDPNow_19), is.na)) %>% 
+  group_by(
+    qimd19
+  ) %>% 
+  summarise(
+    cig = list(cigsta3_19 == 'Current cigarette smoker'),
+    wt_int = list(wt_int), 
+    .groups = 'drop'
+  ) %>% 
+  mutate(
+    summary = purrr::map2(cig, wt_int, calculate_binomial_ci),
+    p_hat = purrr::map_dbl(summary, \(x) x$p_hat),
+    lower = purrr::map_dbl(summary, \(x) x$ci[1]),
+    upper = purrr::map_dbl(summary, \(x) x$ci[2])
+  )
+```
+
 <!-- Start of write-up -->
 
 \clearpage
@@ -487,8 +507,6 @@ In England, smoking, “vaping” and alcohol consumption are widespread habits 
 We conducted this analysis on a subset containing 8,204 adults living in England (ages 16+), who were interviewed in their homes about their demographics and their smoking and drinking habits as part of the Health Survey for England (HSE) 2019. 4,947 of these participants who consented to an at-home nurse visit had vitals such as blood pressure, weight and height measured. We investigated which features of a participant are associated with smoking habits, and which habits are associated with high blood pressure.
 
 We found alcohol consumption to be the most prevalent lifestyle habit under investigation. Older males drink the most, especially those aged 65-74. Also, smoking tends to be higher in more deprived areas, while alcohol consumption is higher in less deprived areas. Socio-economic factors play an important role in the likelihood of smoking. On average, females are 25% less likely to be smokers than males. Ethnicity also play a great role, being Black or Asian decreases the likelihood of smoking by over 70% and 65%, respectively. Females are much less likely to experience hypertension in comparison to males. However, systolic blood pressure levels are positively correlated with age and how often the respondent drinks alcohol, regardless of gender.
-
-**This is where our non-technical summary of results should go**
 
 ## Introduction
 
@@ -512,7 +530,7 @@ kbl(
   df, "latex", 
   col.names = c('Variable', 'Definition', 'Notation'), 
   caption = "Summary of the analysis variables used in our report. (D) indicates that a variable was derived.\\label{tab:output-var-table}",
-  longtable=F, escape = F) %>% column_spec(2, width = "11em") %>% column_spec(1, width = "7em") %>% row_spec (0, bold = T) %>% kable_styling(font_size = 10)
+  longtable=F, escape = F) %>% column_spec(2, width = "11em") %>% column_spec(1, width = "7em") %>% row_spec (0, bold = T) %>% kable_styling(font_size = 8)
 ```
 ### Duplicates
 
@@ -594,8 +612,7 @@ cowplot::plot_grid(p1, p2)
 create_confidence_int_plot('ag16g10', 'Sex', list(x = 'Age Group', y = '% Prevelance In Population', legend.title = "Habit"))
 ```
 
-*Additionally, males demonstrate a higher prevalence of drinking across nearly all demographic categories in comparison to females.*
-*We can clearly see that smoking prevalence increases with our deprivation variable, meaning that smokers tend to be from lower levels of deprivation. This correlation may be caused by the hefty tobacco duties the UK impose on its’ residents [@GovUK]. Less deprived individuals they can take-up more unnecessary, expensive habits, with smoking being one of the main candidates.*
+We found males demonstrate a higher prevalence of drinking across nearly all demographic categories in comparison to females. We observed a positive correlation between smoking and deprivation levels, with `r round(100 * filter(deprivation_smoking_summary, qimd19 == 5)$p_hat, digits = 2)`% of individuals in the most deprived quintile being smokers, a significant increase when compared to `r round(100 * filter(deprivation_smoking_summary, qimd19 == 1)$p_hat, digits = 2)`% in the least deprived.
 
 ### How is smoking associated with socioeconomic factors and age? 
 
@@ -631,7 +648,7 @@ kbl(
   caption = "Comparison of selected model evaluations, wherein $\\eta_i = \\text{logit}(\\mu_i)$, and Acc. refers to the model accuracy on test data.\\label{tab:output-model-selection-table}",
   escape = FALSE,
   longtable=F
-) %>% column_spec(1, width = "7em") %>% add_header_above(c(" " = 3, "RMSE" = 2, " " = 1)) %>% row_spec (0, bold = T) %>% kable_styling(font_size = 9)
+) %>% column_spec(1, width = "7em") %>% add_header_above(c(" " = 3, "RMSE" = 2, " " = 1)) %>% row_spec (0, bold = T) %>% kable_styling(font_size = 8)
 ```
 
 To evaluate the predictive performance of our final model using our test data, Figure 4 demonstrates the predicted probability of each ‘probability bin’ against the mean actual outcomes.  As we can see the calibration curve closely follows the line $y = x$, which is indicative of a well-calibrated model.
@@ -641,7 +658,8 @@ This model doesn't predict high values due to the low prevalence of smoking with
 ```{r output-calibration-chart, include = T, fig.width=4, fig.height=3, fig.align='center', fig.cap="Calibration chart for Binomial model"}
 create_binom_model_calibration_chart(q2_model)
 ```
-```{r output-forest-plot, include = T, fig.height=5, fig.width=8, fig.cap="Forest plot of Odds Ratios for the binomial model"}
+
+```{r output-forest-plot, include = T, fig.height=4, fig.width=8, fig.cap="Forest plot of Odds Ratios for the binomial model"}
 # Create df and set reference levels
 data <- data.frame(
   Sex = factor(train16plus$Sex),
@@ -717,22 +735,23 @@ To determine the predictors in the final model, we used a stepwise approach star
 $MODEL$
 
 The Q-Q plot in Figure \ref{fig:output-qq-plot} shows a good fit to the distribution and, despite some deviation at both ends of the scale, the model can capture the outliers more accurately than other distributions we tried. On our testing dataset we achieve a RMSE of 14.3mmHg, which is relatively small compared to the threshold for hypertensive crisis of 140mmHg+.
-```{r output-qq-plot, include = T, fig.height=3, fig.width=4, fig.align='center', fig.cap="Q-Q plot of Inverse-Normal model residuals"}
+```{r output-qq-plot, include = T, fig.height=2, fig.width=4, fig.align='center', fig.cap="Q-Q plot of Inverse-Normal model residuals"}
 create_qq_plot(q3_model)
 ```
 We found that, on average, young females are predicted lower blood pressure than young men but as they age, their blood pressure increases at a faster rate. Controlling for other lifestyle choices included in the model, a female’s blood pressure can be expected to exceed an equivalent male’s at around 72 years old. Figure \ref{fig:output-effect-plots-age} shows this relationship.
 One of the biggest influences on BP was smoking status, and we found smoking was associated with higher blood pressure for both males and females, also shown in Figure \ref{fig:output-effect-plots}. This effect is largest for males and a typical male can expect a `r round(filter(cig_sex_effects, group == "Male")$percentage_change, digits = 2)`% increase in BP by taking up smoking. 
-```{r output-effect-plots-age, include = T, fig.height=3, fig.width=4, fig.cap="Marginal effects of Age on Systolic Blood Pressure"}
-create_effects_plot(q3_model, c('age_estim', 'Sex'), labels = list(x = 'Estimated Age', y = 'Predicted Mean Systolic Blood Pressure (mm Hg)'))
+```{r output-effect-plots-age, include = T, fig.height=3, fig.width=6, fig.cap="Marginal effects of Age on Systolic Blood Pressure"}
+create_effects_plot(q3_model, c('age_estim', 'Sex'), labels = list(x = 'Estimated Age', y = 'Predicted Mean BP (mm Hg)'))
 ```
+
 ```{r output-effect-plots, include = T, fig.height=5, fig.width=12, fig.cap="Marginal effects of Smoking Status and BMI on Systolic Blood Pressure"}
-p1 <- create_effects_plot(q3_model, c('cigsta3_19', 'Sex'), labels = list(x = 'Smoking Status', y = 'Predicted Mean Systolic Blood Pressure (mm Hg)'))
-p2 <- create_effects_plot(q3_model, c('BMIVal', 'Sex'), labels = list(x = 'BMI', y = 'Predicted Mean Systolic Blood Pressure (mm Hg)'))
+p1 <- create_effects_plot(q3_model, c('cigsta3_19', 'Sex'), labels = list(x = 'Smoking Status', y = 'Predicted Mean BP (mm Hg)'))
+p2 <- create_effects_plot(q3_model, c('BMIVal', 'Sex'), labels = list(x = 'BMI', y = 'Predicted Mean BP (mm Hg)'))
 cowplot::plot_grid(p1, p2)
 ```
 Drinking was also related to higher BP, and we observe a linear relationship in Figure \ref{fig:output-effect-plots-alc} with the number of days that alcohol was consumed in the previous week. On average, one extra day of drinking led to an increase of `r round(mean_drinking_change, 2)` mmHg.
-```{r output-effect-plots-alc, include = T, fig.height=3, fig.width=12, fig.cap="Marginal effects of alcohol consumption on Systolic Blood Pressure"}
-create_effects_plot(q3_model, c('d7many3_19', 'Sex'), labels = list(x = 'Number of Days Alcohol Consumed in the Previous Week', y = 'Predicted Mean Systolic Blood Pressure (mm Hg)'))
+```{r output-effect-plots-alc, include = T, fig.height=3, fig.width=6, fig.cap="Marginal effects of alcohol consumption on Systolic Blood Pressure"}
+create_effects_plot(q3_model, c('d7many3_19', 'Sex'), labels = list(x = 'Number of Days Alcohol Consumed in the Previous Week', y = 'Predicted Mean BP (mm Hg)'))
 ```
 
 ## Results/Conclusion

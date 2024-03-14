@@ -206,3 +206,30 @@ age_sex_effects <- tibble(ggeffects::ggpredict(model = q3_model, terms = c('age_
 create_effects_plot(q3_model, c('cigsta3_19', 'Sex'), labels = list(x = 'Smoking Status', y = 'Predicted Mean Systolic Blood Pressure (mm Hg)'))
 create_effects_plot(q3_model, c('BMIVal', 'Sex'), labels = list(x = 'BMI', y = 'Predicted Mean Systolic Blood Pressure (mm Hg)'))
 create_effects_plot(q3_model, c('d7many3_19', 'Sex'), labels = list(x = 'Number of Days Alcohol Consumed in the Previous Week', y = 'Predicted Mean Systolic Blood Pressure (mm Hg)'))
+
+
+# *We can clearly see that smoking prevalence increases with our deprivation variable, meaning that smokers tend to be from lower levels of deprivation. This correlation may be caused by the hefty tobacco duties the UK impose on its’ residents [@GovUK]. Less deprived individuals they can take-up more unnecessary, expensive habits, with smoking being one of the main candidates.*
+
+deprivation_smoking_summary <- sd16plus %>% 
+  filter(!if_any(c(cigsta3_19, drinkYN_19, NDPNow_19), is.na)) %>% 
+  group_by(
+    qimd19
+  ) %>% 
+  summarise(
+    cig = list(cigsta3_19 == 'Current cigarette smoker'),
+    wt_int = list(wt_int), 
+    .groups = 'drop'
+  ) %>% 
+  mutate(
+    summary = purrr::map2(cig, wt_int, calculate_binomial_ci),
+    p_hat = purrr::map_dbl(summary, \(x) x$p_hat),
+    lower = purrr::map_dbl(summary, \(x) x$ci[1]),
+    upper = purrr::map_dbl(summary, \(x) x$ci[2])
+  )
+
+# We found males demonstrate a higher prevalence of drinking across nearly all demographic categories in comparison to females. We observed a positive 
+# correlation between smoking and deprivation levels, with `r round(100 * filter(deprivation_smoking_summary, qimd19 == 5)$p_hat, digits = 2)`% of individuals in 
+# the most deprived quintile being smokers, a significant increase when compared to `r round(100 * filter(deprivation_smoking_summary, qimd19 == 1)$p_hat, digits = 2)`%
+# in the least deprived.
+
+round(100 * filter(deprivation_smoking_summary, qimd19 == 5)$p_hat, digits = 2)
