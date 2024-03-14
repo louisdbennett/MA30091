@@ -696,4 +696,5 @@ Our analysis showed that alcohol consumption is extremely common among UK adults
 
 To help us uncover the underlying socio-economic factors that may drive the prevalence of smoking, we first looked at the most ‘comparable’ respondent type in our dataset. This ‘respondent’ is a white, single male who has no qualifications and lives in an urban area. We found that the probability of our hypothetical respondent being a smoker is approximately 25% *Where is this from?* (notably higher than the population average of `r round(100 * overall_smoking$p_hat, digits = 1)`). *Maybe worth talking about confidence intervals here - is value outside 95%* The only socio-economic variables to certainly increase this probability is the deprivation level our respondent falls under. The rest of the socio-economic variables we have access to, appear to decrease the likelihood of smoking. For example, if our respondent is any of the following: Asian, black, married, or went on to further education, the chances of them being a smoker is at-least halved.
 
+\clearpage
 # References
