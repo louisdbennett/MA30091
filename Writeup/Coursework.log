@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.7.13)  14 MAR 2024 16:41
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.7.13)  14 MAR 2024 16:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -798,59 +798,65 @@ File: Coursework_files/figure-latex/output-relationship-plots-1.pdf Graphic fil
 e (type pdf)
 <use Coursework_files/figure-latex/output-relationship-plots-1.pdf>
 Package pdftex.def Info: Coursework_files/figure-latex/output-relationship-plot
-s-1.pdf  used on input line 620.
+s-1.pdf  used on input line 630.
 (pdftex.def)             Requested size: 294.92422pt x 120.87057pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.633 
+l.632 
        [5 <./Coursework_files/figure-latex/output-calibration-chart-1.pdf> <./C
-oursework_files/figure-latex/output-forest-plot-1.pdf> <./Coursework_files/figu
-re-latex/output-relationship-plots-1.pdf>]
-<Coursework_files/figure-latex/output-qq-plot-1.pdf, id=154, 279.0425pt x 135.5
+oursework_files/figure-latex/output-forest-plot-1.pdf>]
+<Coursework_files/figure-latex/output-qq-plot-1.pdf, id=143, 279.0425pt x 135.5
 0626pt>
 File: Coursework_files/figure-latex/output-qq-plot-1.pdf Graphic file (type pdf
 )
 <use Coursework_files/figure-latex/output-qq-plot-1.pdf>
 Package pdftex.def Info: Coursework_files/figure-latex/output-qq-plot-1.pdf  us
-ed on input line 636.
+ed on input line 646.
 (pdftex.def)             Requested size: 279.05032pt x 135.51004pt.
-<Coursework_files/figure-latex/output-effect-plots-age-1.pdf, id=157, 423.5825p
+<Coursework_files/figure-latex/output-effect-plots-age-1.pdf, id=146, 423.5825p
 t x 200.75pt>
 File: Coursework_files/figure-latex/output-effect-plots-age-1.pdf Graphic file 
 (type pdf)
 <use Coursework_files/figure-latex/output-effect-plots-age-1.pdf>
 Package pdftex.def Info: Coursework_files/figure-latex/output-effect-plots-age-
-1.pdf  used on input line 656.
+1.pdf  used on input line 666.
 (pdftex.def)             Requested size: 294.92867pt x 139.77661pt.
-<Coursework_files/figure-latex/output-effect-plots-1.pdf, id=158, 857.2025pt x 
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+<Coursework_files/figure-latex/output-effect-plots-1.pdf, id=147, 857.2025pt x 
 345.29pt>
 File: Coursework_files/figure-latex/output-effect-plots-1.pdf Graphic file (typ
 e pdf)
 <use Coursework_files/figure-latex/output-effect-plots-1.pdf>
 Package pdftex.def Info: Coursework_files/figure-latex/output-effect-plots-1.pd
-f  used on input line 660.
+f  used on input line 670.
 (pdftex.def)             Requested size: 294.92422pt x 118.79851pt.
-<Coursework_files/figure-latex/output-effect-plots-alc-1.pdf, id=160, 423.5825p
+<Coursework_files/figure-latex/output-effect-plots-alc-1.pdf, id=149, 423.5825p
 t x 200.75pt>
 File: Coursework_files/figure-latex/output-effect-plots-alc-1.pdf Graphic file 
 (type pdf)
 <use Coursework_files/figure-latex/output-effect-plots-alc-1.pdf>
 Package pdftex.def Info: Coursework_files/figure-latex/output-effect-plots-alc-
-1.pdf  used on input line 669.
+1.pdf  used on input line 679.
 (pdftex.def)             Requested size: 294.92867pt x 139.77661pt.
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.713 
-       [6 <./Coursework_files/figure-latex/output-qq-plot-1.pdf> <./Coursework_
-files/figure-latex/output-effect-plots-age-1.pdf> <./Coursework_files/figure-la
-tex/output-effect-plots-1.pdf> <./Coursework_files/figure-latex/output-effect-p
-lots-alc-1.pdf>]
+l.696 
+       [6 <./Coursework_files/figure-latex/output-relationship-plots-1.pdf> <./
+Coursework_files/figure-latex/output-qq-plot-1.pdf> <./Coursework_files/figure-
+latex/output-effect-plots-age-1.pdf> <./Coursework_files/figure-latex/output-ef
+fect-plots-1.pdf> <./Coursework_files/figure-latex/output-effect-plots-alc-1.pd
+f>]
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
@@ -891,7 +897,7 @@ mf-dist/fonts/type1/public/lm/lmr8.pfb></usr/local/texlive/2023/texmf-dist/font
 s/type1/public/lm/lmr9.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/publ
 ic/lm/lmri10.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy
 10.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy8.pfb>
-Output written on Coursework.pdf (8 pages, 968630 bytes).
+Output written on Coursework.pdf (8 pages, 968687 bytes).
 PDF statistics:
  373 PDF objects out of 1000 (max. 8388607)
  294 compressed objects within 3 object streams
