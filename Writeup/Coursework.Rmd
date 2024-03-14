@@ -23,9 +23,9 @@ fontsize: 11pt
 endnote: no
 title: "Analysis of Health Survey for England (HSE) 2019"
 author: Candidate Numbers Here
-abstract: "This report provides an analysis of data related to health, age, socio-economic factors and lifestyle habits in adults (from the age of 16) from the population in England, derived from the Health Survey for England 2019."
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 bibliography: bibliography.bib
+abstract: "This report provides an analysis of data related to health, age, socio-economic factors and lifestyle habits in adults (from the age of 16) from the population in England, derived from the Health Survey for England 2019. Please note, no generative AI technology was utilized in the creation of this report or the subsequent data analysis presented herein. All findings and conclusions are derived from human-driven methodologies."
 nocite: '@*'
 link-citations: true
 classoption:
@@ -52,7 +52,7 @@ library(kableExtra)
 
 set.seed(200)
 
-load("hsesub.Rdata")
+load("~/w_MA30091/Coursework/MA30091/Writeup/hsesub.Rdata")
 
 fct_variables <- c(
   'Sex', 'Age35g', 'ag16g10', 'topqual2', 'urban14b', 'origin2', 'marstatD', 'GOR1', 'cigsta3_19', 'NDPNow_19', 'drinkYN_19', 'dnoft_19'

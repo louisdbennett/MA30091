@@ -6,19 +6,16 @@
   11pt,
   twocolumn]{article}
 \usepackage{amsmath,amssymb}
+\usepackage{lmodern}
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
 \else % if luatex or xetex
-  \usepackage{unicode-math} % this also loads fontspec
+  \usepackage{unicode-math}
   \defaultfontfeatures{Scale=MatchLowercase}
   \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
-\fi
-\usepackage{lmodern}
-\ifPDFTeX\else
-  % xetex/luatex font selection
 \fi
 % Use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
@@ -55,38 +52,28 @@
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
-% definitions for citeproc citations
-\NewDocumentCommand\citeproctext{}{}
-\NewDocumentCommand\citeproc{mm}{%
-  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
-\makeatletter
- % allow citations to break across lines
- \let\@cite@ofmt\@firstofone
- % avoid brackets around text for \cite:
- \def\@biblabel#1{}
- \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
-\makeatother
 \newlength{\cslhangindent}
 \setlength{\cslhangindent}{1.5em}
 \newlength{\csllabelwidth}
 \setlength{\csllabelwidth}{3em}
-\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
- {\begin{list}{}{%
-  \setlength{\itemindent}{0pt}
-  \setlength{\leftmargin}{0pt}
-  \setlength{\parsep}{0pt}
+\newlength{\cslentryspacingunit} % times entry-spacing
+\setlength{\cslentryspacingunit}{\parskip}
+\newenvironment{CSLReferences}[2] % #1 hanging-ident, #2 entry spacing
+ {% don't indent paragraphs
+  \setlength{\parindent}{0pt}
   % turn on hanging indent if param 1 is 1
   \ifodd #1
-   \setlength{\leftmargin}{\cslhangindent}
-   \setlength{\itemindent}{-1\cslhangindent}
+  \let\oldpar\par
+  \def\par{\hangindent=\cslhangindent\oldpar}
   \fi
   % set entry spacing
-  \setlength{\itemsep}{#2\baselineskip}}}
- {\end{list}}
+  \setlength{\parskip}{#2\cslentryspacingunit}
+ }%
+ {}
 \usepackage{calc}
-\newcommand{\CSLBlock}[1]{\hfill\break#1\hfill\break}
-\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
-\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLBlock}[1]{#1\hfill\break}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{#1}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{#1}\break}
 \newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
 \usepackage{hyperref}
 \usepackage{array}
@@ -118,7 +105,7 @@
 \fi
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\urlstyle{same}
+\urlstyle{same} % disable monospaced font for URLs
 \hypersetup{
   pdftitle={Analysis of Health Survey for England (HSE) 2019},
   pdfauthor={Candidate Numbers Here},
@@ -127,7 +114,7 @@
 
 \title{Analysis of Health Survey for England (HSE) 2019}
 \author{Candidate Numbers Here}
-\date{March 13, 2024}
+\date{March 14, 2024}
 
 \begin{document}
 \maketitle
@@ -135,23 +122,28 @@
 This report provides an analysis of data related to health, age,
 socio-economic factors and lifestyle habits in adults (from the age of
 16) from the population in England, derived from the Health Survey for
-England 2019.
+England 2019. Please note, no generative AI technology was utilized in
+the creation of this report or the subsequent data analysis presented
+herein. All findings and conclusions are derived from human-driven
+methodologies.
 \end{abstract}
 
 \pagenumbering{gobble}
 
 \clearpage
 
-\section{Summary}\label{summary}
+\hypertarget{summary}{%
+\section{Summary}\label{summary}}
 
 In England, smoking, ``vaping'' and alcohol consumption are widespread
 habits among adults, particularly younger adults. In fact, it is
 estimated that around 13.9\% of adults in England identified as
-cigarette smokers (\citeproc{ref-1ONS}{ONS 2019a}), and a similar study
-found that there were 10.9 alcohol-related deaths per 100,000 people
-living in England in 2019 (\citeproc{ref-2ONS}{ONS 2019c}). Thus, it is
-crucial to be aware of the predictors and consequences of these habits,
-which is the motivation for this analysis.
+cigarette smokers (\protect\hyperlink{ref-1ONS}{ONS 2019a}), and a
+similar study found that there were 10.9 alcohol-related deaths per
+100,000 people living in England in 2019
+(\protect\hyperlink{ref-2ONS}{ONS 2019c}). Thus, it is crucial to be
+aware of the predictors and consequences of these habits, which is the
+motivation for this analysis.
 
 We conducted this analysis on a subset containing 8,204 adults living in
 England (ages 16+), who were interviewed in their homes about their
@@ -164,19 +156,20 @@ high blood pressure.
 
 \textbf{This is where our non-technical summary of results should go}
 
-\subsection{Introduction}\label{introduction}
+\hypertarget{introduction}{%
+\subsection{Introduction}\label{introduction}}
 
 The mechanisms which drive lifestyle habits are part of a complex and
 ever-changing field in behavioural psychology. What is known, however,
 is that such habits are driven by cues and cravings {[}Anastasia
 Droungas
-(\citeproc{ref-SmokeCue}{1995}){]}(\citeproc{ref-DrinkCue}{Kambouropoulos
+(\protect\hyperlink{ref-SmokeCue}{1995}){]}(\protect\hyperlink{ref-DrinkCue}{Kambouropoulos
 2009}). The HSE 2019 captures demographic and socioeconomic
 characteristics that have the potential to make such cues more visible
 and cravings harder to resist. For example, living in a region where
 smoking is more prevalent or not having a husband/wife for an
 accountability partner to help you quit or resist these habits
-(\citeproc{ref-AccountPartner}{ONS 2019b}).
+(\protect\hyperlink{ref-AccountPartner}{ONS 2019b}).
 
 In this report, we will use weighting variables to estimate prevalence
 of cigarette, e-cig, and alcohol users in our population, and compare it
@@ -188,18 +181,21 @@ associated with increased values of systolic blood pressure. \emph{This
 will be crucial in enabling healthcare providers to implement
 preventative care for people at risk of developing hypertension.}
 
-\section{Methodology}\label{methodology}
+\hypertarget{methodology}{%
+\section{Methodology}\label{methodology}}
 
-\subsection{Exploratory Analysis}\label{exploratory-analysis}
+\hypertarget{exploratory-analysis}{%
+\subsection{Exploratory Analysis}\label{exploratory-analysis}}
 
 The full HSE 2019 cross-sectional data set contains 10,299 observations
-across thousands of variables (\citeproc{ref-Main}{NatCen Social
-Research and Health 2019}), but we only studied patients over the age of
-16 among key variables. Our subset includes 8,204 participants and 19
-variables, which are described in Table \ref{tab:output-var-table}.
+across thousands of variables (\protect\hyperlink{ref-Main}{NatCen
+Social Research and Health 2019}), but we only studied patients over the
+age of 16 among key variables. Our subset includes 8,204 participants
+and 19 variables, which are described in Table
+\ref{tab:output-var-table}.
 
 \begin{table}
-\centering
+
 \caption{\label{tab:outputvartable}Summary of the analysis variables used in our report. (D) indicates that a variable was derived.\label{tab:output-var-table}}
 \centering
 \fontsize{10}{12}\selectfont
@@ -248,7 +244,8 @@ dnoft\_19 & Frequency of alcohol consumed in the last 12 months (grouped) & NA\\
 \end{tabular}
 \end{table}
 
-\subsubsection{Duplicates}\label{duplicates}
+\hypertarget{duplicates}{%
+\subsubsection{Duplicates}\label{duplicates}}
 
 We found 36 pairs of observations with exactly equal variables
 (excluding ID variables and lab measurements), but we did not remove
@@ -260,7 +257,8 @@ lab variables also. We believed that these were true duplicates and
 removed one observation from each of the three pairs resulting in a
 dataset of 8201 observations.
 
-\subsubsection{Dichotomy of Factors}\label{dichotomy-of-factors}
+\hypertarget{dichotomy-of-factors}{%
+\subsubsection{Dichotomy of Factors}\label{dichotomy-of-factors}}
 
 All variables were originally coded as numeric in our dataset, so we
 recoded these to factor variables accordingly. Some of the variables
@@ -272,13 +270,14 @@ status into `Married' and `Not Married'. We group respondents into
 `Higher Education', `Further Education', `A-Level equiv.', `GCSE
 equiv.', `No qualification' and `Foreign/other'.
 
-\subsubsection{Missingness}\label{missingness}
+\hypertarget{missingness}{%
+\subsubsection{Missingness}\label{missingness}}
 
 The number of missing observations for each are shown in Table
 \ref{tab:output-na-table}.
 
 \begin{table}
-\centering
+
 \caption{\label{tab:outputnatable}Missing values in the training dataset\label{tab:output-na-table}}
 \centering
 \fontsize{9}{11}\selectfont
@@ -326,7 +325,9 @@ three. These are not necessary for identifiability and as they are
 sensitive, we do not expect every participant to answer these questions.
 Therefore, we did not remove these observations.
 
-\subsubsection{Outliers and Data Issues}\label{outliers-and-data-issues}
+\hypertarget{outliers-and-data-issues}{%
+\subsubsection{Outliers and Data
+Issues}\label{outliers-and-data-issues}}
 
 We attempted to determine whether the two lab measurement variables
 contained potential outliers, and as can be seen in Figure
@@ -344,22 +345,24 @@ average of three readings, each five minutes apart, performed by a
 trained nurse who had to declare each reading to be valid. For this
 reason, it seemed highly unlikely that these readings were mistakes, and
 so we included them in our analysis. The measurement device used has
-been validated for use in this environment (\citeproc{ref-Omron}{Yechiam
-Ostchega PhD 2009}). We did, however, note that values of systolic blood
-pressure that were this consistently high (\textgreater140mmHg) were
-indicators for hypertensive crisis, and so a part of our population may
-have serious underlying health conditions that could affect the
-generalisability of our findings (\citeproc{ref-heart}{Association
-2023}).
+been validated for use in this environment
+(\protect\hyperlink{ref-Omron}{Yechiam Ostchega PhD 2009}). We did,
+however, note that values of systolic blood pressure that were this
+consistently high (\textgreater140mmHg) were indicators for hypertensive
+crisis, and so a part of our population may have serious underlying
+health conditions that could affect the generalisability of our findings
+(\protect\hyperlink{ref-heart}{Association 2023}).
 
 \begin{figure}[H]
 \includegraphics{Coursework_files/figure-latex/output-distribution-plots-1} \caption{Distribution of BMI and Mean Systolic Blood Pressure}\label{fig:output-distribution-plots}
 \end{figure}
 
-\subsection{Analysis}\label{analysis}
+\hypertarget{analysis}{%
+\subsection{Analysis}\label{analysis}}
 
+\hypertarget{what-is-the-prevelence-of-drinking-smoking-and-e-cig-usage}{%
 \subsubsection{What is the prevelence of drinking, smoking and E-cig
-usage?}\label{what-is-the-prevelence-of-drinking-smoking-and-e-cig-usage}
+usage?}\label{what-is-the-prevelence-of-drinking-smoking-and-e-cig-usage}}
 
 To calculate the prevalence of these three habits we assumed each of the
 \(n\) observations, \(x_1,…,x_n\) , to be independent, identically
@@ -383,7 +386,7 @@ confidence intervals for each habit, which are shown in Table
 \ref{tab:output-estimates-table}.
 
 \begin{table}
-\centering
+
 \caption{\label{tab:outputestimatestable}Estimates and 95\% Confidence Intervals for \% of Population\label{tab:output-estimates-table}}
 \centering
 \fontsize{9}{11}\selectfont
@@ -404,8 +407,9 @@ We found that the usage of e-cigarette usage among adults is relatively
 low, making it challenging to dissect any significant trends within the
 data. \emph{Maybe a wee bit more here}
 
+\hypertarget{how-is-smoking-associated-with-socioeconomic-factors-and-age}{%
 \subsubsection{How is smoking associated with socioeconomic factors and
-age?}\label{how-is-smoking-associated-with-socioeconomic-factors-and-age}
+age?}\label{how-is-smoking-associated-with-socioeconomic-factors-and-age}}
 
 Next, we worked to uncover factors that have possible associations with
 smoking prevalence. We started with the demographic factors of age and
@@ -429,9 +433,10 @@ across nearly all demographic categories in comparison to females.}
 \emph{We can clearly see that smoking prevalence increases with our
 deprivation variable, meaning that smokers tend to be from lower levels
 of deprivation. This correlation may be caused by the hefty tobacco
-duties the UK impose on its' residents (\citeproc{ref-GovUK}{GOV.UK
-2014}). Less deprived individuals they can take-up more unnecessary,
-expensive habits, with smoking being one of the main candidates.}
+duties the UK impose on its' residents
+(\protect\hyperlink{ref-GovUK}{GOV.UK 2014}). Less deprived individuals
+they can take-up more unnecessary, expensive habits, with smoking being
+one of the main candidates.}
 
 We reserved 80\% of our data to train the model, and used the remaining
 20\% to test the model, which was made possible due to the large size of
@@ -443,7 +448,7 @@ reduced the risk of overfitting and allowed us to test the predictive
 power of each model we proposed.
 
 \begin{table}
-\centering
+
 \caption{\label{tab:outputtesttraintable}Comparison of the characteristics of the training set compared with the test set.\label{tab:output-testtrain-table}}
 \centering
 \fontsize{10}{12}\selectfont
@@ -517,7 +522,7 @@ include a \(a_i^2\) term in our model. A comparison of these models are
 summarised in Table \ref{tab:output-model-selection-table}.
 
 \begin{table}
-\centering
+
 \caption{\label{tab:outputmodelselectiontable}Comparison of selected model evaluations, wherein $\eta_i = \text{logit}(\mu_i)$, and Acc. refers to the model accuracy on test data.\label{tab:output-model-selection-table}}
 \centering
 \fontsize{9}{11}\selectfont
@@ -568,8 +573,9 @@ indicative of a well-calibrated model.
 \caption{Calibration chart for Binomial model}\label{fig:output-calibration-chart}
 \end{figure}
 
+\hypertarget{which-lifestyle-habits-are-associated-with-systolic-blood-pressure}{%
 \subsubsection{Which lifestyle habits are associated with systolic blood
-pressure?}\label{which-lifestyle-habits-are-associated-with-systolic-blood-pressure}
+pressure?}\label{which-lifestyle-habits-are-associated-with-systolic-blood-pressure}}
 
 We chose to model the systolic blood pressure (BP) using the
 Inverse-Normal distribution with a \(1/\mu_i^2\) link function. As we
@@ -591,10 +597,10 @@ term in our model. To account for possible dependencies between
 variables in the data, we tried fitted models with a combination of
 different interaction terms and found three that were likely
 significant. These were an interaction between BMI \& Age
-(\citeproc{ref-AgeBMI}{Medicine 2017}), BMI \& gender
-(\citeproc{ref-SexBMI}{K. et al. 2019}) and Age \& Sex
-(\citeproc{ref-AgeSex}{M. et al. 2019}), which are all existing areas of
-research.
+(\protect\hyperlink{ref-AgeBMI}{Medicine 2017}), BMI \& gender
+(\protect\hyperlink{ref-SexBMI}{K. et al. 2019}) and Age \& Sex
+(\protect\hyperlink{ref-AgeSex}{M. et al. 2019}), which are all existing
+areas of research.
 
 \begin{figure}[H]
 \includegraphics{Coursework_files/figure-latex/output-relationship-plots-1} \caption{Relationship of BMI and Age with Mean Systolic Blood Pressure}\label{fig:output-relationship-plots}
@@ -647,7 +653,8 @@ extra day of drinking led to an increase of 0.74` mm Hg.
 \includegraphics{Coursework_files/figure-latex/output-effect-plots-alc-1} \caption{Marginal effects of alcohol consumption on Systolic Blood Pressure}\label{fig:output-effect-plots-alc}
 \end{figure}
 
-\subsection{Results/Conclusion}\label{resultsconclusion}
+\hypertarget{resultsconclusion}{%
+\subsection{Results/Conclusion}\label{resultsconclusion}}
 
 Our analysis showed that alcohol consumption is extremely common among
 UK adults, with approximately 80.4\% being consumers, while smoking and
@@ -677,64 +684,65 @@ smoking. For example, if our respondent is any of the following: Asian,
 black, married, or went on to further education, the chances of them
 being a smoker is at-least halved.
 
-\section*{References}\label{references}
+\hypertarget{references}{%
+\section*{References}\label{references}}
 \addcontentsline{toc}{section}{References}
 
-\phantomsection\label{refs}
+\hypertarget{refs}{}
 \begin{CSLReferences}{1}{0}
-\bibitem[\citeproctext]{ref-SexBMI}
+\leavevmode\vadjust pre{\hypertarget{ref-SexBMI}{}}%
 al., Katsuya et. 2019. {``{The Investigation of Sex Differences in the
 Effect of Body Mass Index}.''}
 \url{https://www.hindawi.com/journals/ijhy/2019/1360328/}.
 
-\bibitem[\citeproctext]{ref-AgeSex}
+\leavevmode\vadjust pre{\hypertarget{ref-AgeSex}{}}%
 al., Martins et. 2019. {``{The effect of gender on age-related blood
 pressure changes and the prevalence of isolated systolic hypertension
 among older adults}.''} \url{https://pubmed.ncbi.nlm.nih.gov/11605350/}.
 
-\bibitem[\citeproctext]{ref-SmokeCue}
+\leavevmode\vadjust pre{\hypertarget{ref-SmokeCue}{}}%
 Anastasia Droungas, Anna Rose Childress, Ronald N. Ehrman. 1995.
 {``{Effect of smoking cues and cigarette availability on craving and
 smoking behavior}.''}
 \url{https://www.sciencedirect.com/science/article/pii/030646039500029C}.
 
-\bibitem[\citeproctext]{ref-heart}
+\leavevmode\vadjust pre{\hypertarget{ref-heart}{}}%
 Association, American Heart. 2023. {``{Understanding Blood Pressure
 Readings}.''}
 \url{https://www.heart.org/en/health-topics/high-blood-pressure/understanding-blood-pressure-readings}.
 
-\bibitem[\citeproctext]{ref-GovUK}
+\leavevmode\vadjust pre{\hypertarget{ref-GovUK}{}}%
 GOV.UK. 2014. {``{Tax on shopping and services}.''}
 \url{https://www.gov.uk/tax-on-shopping/alcohol-tobacco}.
 
-\bibitem[\citeproctext]{ref-DrinkCue}
+\leavevmode\vadjust pre{\hypertarget{ref-DrinkCue}{}}%
 Kambouropoulos, Nicolas. 2009. {``{{`Cue reward salience'} predicts
 craving in response to alcohol cues}.''}
 \url{https://www.sciencedirect.com/science/article/abs/pii/S0191886908003127}.
 
-\bibitem[\citeproctext]{ref-AgeBMI}
+\leavevmode\vadjust pre{\hypertarget{ref-AgeBMI}{}}%
 Medicine, National Library of. 2017. {``{Weight and Body Mass Index in
 Old Age: Do They Still Matter?}''}
 \url{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5704942/}.
 
-\bibitem[\citeproctext]{ref-Main}
+\leavevmode\vadjust pre{\hypertarget{ref-Main}{}}%
 NatCen Social Research, Department of Epidemiology, University College
 London, and Public Health. 2019. {``{Health Survey for England}.''}
 \url{http://doi.org/10.5255/UKDA-SN-8860-1}.
 
-\bibitem[\citeproctext]{ref-1ONS}
+\leavevmode\vadjust pre{\hypertarget{ref-1ONS}{}}%
 ONS. 2019a. {``{Adult smoking habits in the UK: 2019}.''}
 \url{https://shorturl.at/qQW27}.
 
-\bibitem[\citeproctext]{ref-AccountPartner}
+\leavevmode\vadjust pre{\hypertarget{ref-AccountPartner}{}}%
 ---------. 2019b. {``{Adult smoking habits in the UK: 2019}.''}
 \url{https://shorturl.at/itPQU}.
 
-\bibitem[\citeproctext]{ref-2ONS}
+\leavevmode\vadjust pre{\hypertarget{ref-2ONS}{}}%
 ---------. 2019c. {``{Alcohol-specific deaths in the UK: registered in
 2019}.''} \url{https://shorturl.at/gqxY1}.
 
-\bibitem[\citeproctext]{ref-Omron}
+\leavevmode\vadjust pre{\hypertarget{ref-Omron}{}}%
 Yechiam Ostchega PhD, Tatiana Nwankwo MS, RN. 2009. {``{Assessing the
 Validity of the Omron HEM-907XL Oscillometric Blood Pressure Measurement
 Device in a National Survey Environment}.''}
