@@ -498,6 +498,48 @@ deprivation_smoking_summary <- sd16plus %>%
   )
 ```
 
+```{r test train split p vals}
+# Rough function to calculate p vals for table comparison test/train split
+calculate_p_val <- function(variable, level) {
+  if(variable == " ") {
+    ' '
+  } else if(variable == "Age(Estimated)") {
+    train <- train16plus %>% 
+      filter(!is.na(age_estim)) %>% 
+      pull(age_estim)
+    
+    test <- test16plus %>% 
+      filter(!is.na(age_estim)) %>% 
+      pull(age_estim)
+    
+    test <- t.test(train, test, alternative = "two.sided", var.equal = TRUE)
+    
+    round(test$p.value, digits = 2)
+  } else {
+    train <- train16plus %>% 
+      filter(if_any(all_of(variable), ~ !is.na(.x))) %>% 
+      select(group = all_of(variable)) %>% 
+      group_by(group) %>% 
+      summarise(size = n()) %>% 
+      mutate(n = glue::glue('{variable}:{group}'), total = sum(size)) %>% 
+      filter(group == level)
+    
+    test <- test16plus %>% 
+      filter(if_any(all_of(variable), ~ !is.na(.x))) %>% 
+      select(group = all_of(variable)) %>% 
+      group_by(group) %>% 
+      summarise(size = n()) %>% 
+      mutate(n = glue::glue('{variable}:{group}'), total = sum(size)) %>% 
+      filter(group == level)
+    
+    test <- prop.test(x = c(train$size, test$size), n = c(train$total, test$total))
+    
+    round(test$p.value, digits = 2)
+  }
+}
+```
+
+
 <!-- Start of write-up -->
 
 \clearpage
@@ -630,14 +672,19 @@ We reserved 80% of our data to train the model, and used the remaining 20% to te
 
 ```{r outputtesttraintable, include = T}
 
-n = c("Sex:Male", "Sex:Female", " ", "topqual2:No qualification", "topqual2:GCSE equiv.", "topqual2:A-Level equiv.", "topqual2:Further Education", "topqual2:Higher Education", "topqual2:Foreign/Other", " ", "marstatD:Married", "marstatD:Not Married", " ", "urban14b:Urban", "urban14b:Not Urban", " ", "origin2:White", "origin2:Black", "origin2:Asian","origin2:Multiple", "origin2:Other"," ", "Age(Estimated)") 
+n = c("Sex:Male", "Sex:Female", " ", "topqual2:No qualification", "topqual2:GCSE equiv.", "topqual2:A-Level equiv.", "topqual2:Further Education", "topqual2:Higher Education", "topqual2:Foreign/other", " ", "marstatD:Married", "marstatD:Not Married", " ", "urban14b:Urban", "urban14b:Rural", " ", "origin2:White", "origin2:Black", "origin2:Asian","origin2:Multiple", "origin2:Other"," ", "Age(Estimated)") 
 s = c("43.5", "56.5", " ", "19.7", "21.2", "14.0", "28.5", "15.9", " 0.7", " ", "55.4", "44.6", " ", "80.3", "19.7", " ", "85.9", " 3.1", " 8.8", " 1.4", " 0.8", "Mean", "51.2")
 b = c("45.1", "54.8", " ", "19.8", "20.9", "13.4", "28.4", "16.1", " 1.3", " ", "51.9", "48.1", " ", "81.4", "18.6", " ", "85.8", " 2.9", " 8.7", " 1.7", " 0.9", "Mean", "51.0")
 df = data.frame(n, s, b)
 
+df <- df %>% 
+  mutate(
+    p_val = stringr::str_sub(purrr::map2_chr(.x = gsub(":.*", "", n), .y = gsub(".*:", "", n), calculate_p_val), 1, 4)
+  )
+
 kbl(
   df, "latex", 
-  col.names = c('Variable:Label', 'Test', 'Train'), 
+  col.names = c('Variable:Label', 'Test', 'Train', 'P Value'), 
   caption = "Comparison of the characteristics of the training set compared with the test set.\\label{tab:output-testtrain-table}",
   longtable=F, escape = F) %>% add_header_above(c(" " = 1, "Proportion (%)" = 2)) %>% row_spec (22, bold = T) %>% row_spec (0, bold = T) %>% kable_styling(font_size = 10)
 ```

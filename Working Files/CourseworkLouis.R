@@ -233,3 +233,48 @@ deprivation_smoking_summary <- sd16plus %>%
 # in the least deprived.
 
 round(100 * filter(deprivation_smoking_summary, qimd19 == 5)$p_hat, digits = 2)
+
+###
+
+calculate_p_val <- function(variable, level) {
+  if(variable == " ") {
+    NA
+  } else if(variable == "Age(Estimated)") {
+    train <- train16plus %>% 
+      filter(!is.na(age_estim)) %>% 
+      pull(age_estim)
+    
+    test <- test16plus %>% 
+      filter(!is.na(age_estim)) %>% 
+      pull(age_estim)
+    
+    test <- t.test(train, test, alternative = "two.sided", var.equal = TRUE)
+    
+    round(test$p.value, digits = 2)
+  } else {
+    train <- train16plus %>% 
+      filter(if_any(all_of(variable), ~ !is.na(.x))) %>% 
+      select(group = all_of(variable)) %>% 
+      group_by(group) %>% 
+      summarise(size = n()) %>% 
+      mutate(n = glue::glue('{variable}:{group}'), total = sum(size)) %>% 
+      filter(group == level)
+    
+    test <- test16plus %>% 
+      filter(if_any(all_of(variable), ~ !is.na(.x))) %>% 
+      select(group = all_of(variable)) %>% 
+      group_by(group) %>% 
+      summarise(size = n()) %>% 
+      mutate(n = glue::glue('{variable}:{group}'), total = sum(size)) %>% 
+      filter(group == level)
+    
+    test <- prop.test(x = c(train$size, test$size), n = c(train$total, test$total))
+    
+    round(test$p.value, digits = 2)
+  }
+}
+
+df %>% 
+  mutate(
+    p_val = purrr::map2_chr(.x = gsub(":.*", "", n), .y = gsub(".*:", "", n), calculate_p_val)
+  )
