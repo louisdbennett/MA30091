@@ -11,6 +11,7 @@ header-includes:
   - \usepackage{caption}
   - \usepackage{graphicx}
   - \usepackage{multirow}
+  - \usepackage{amsmath}
   - \usepackage{hhline}
   - \usepackage{calc}
   - \usepackage{tabularx}
@@ -53,7 +54,7 @@ library(kableExtra)
 
 set.seed(200)
 
-load("~/w_MA30091/Coursework/MA30091/Writeup/hsesub.Rdata")
+load("hsesub.Rdata")
 
 fct_variables <- c(
   'Sex', 'Age35g', 'ag16g10', 'topqual2', 'urban14b', 'origin2', 'marstatD', 'GOR1', 'cigsta3_19', 'NDPNow_19', 'drinkYN_19', 'dnoft_19'
@@ -646,8 +647,20 @@ To develop a predictive model for identifying smokers, we used the binary variab
 Under the assumption that the age of participants were approximately uniformly distributed within their respective age bands, we defined the estimated age of the $i^{th}$ observation as the midpoint of the participant's respective 5-year age group (taking the estimation of the 90+ category as 92.5), denoted $a_i$. We found that age may represent a somewhat quadratic effect on the probability of smoking, leading us to include a $a_i^2$ term in our model. A comparison of these models are summarised in Table \ref{tab:output-model-selection-table}.
 
 We selected the model based on AIC, which enabled us to balance model complexity and model fit (quantified by likelihood), which further reduced the risk of overfitting. This model is:
+
 \begin{align*}
-\text{logit}(\mu_i) \sim \beta_0 + \beta_1a + \beta_2a^2 + \beta_3q + \alpha^{ms}_j + \alpha^{u}_k + \alpha^{o}_l + \alpha^{t}_m + \alpha^{s}_n \\\text{where } j \in \{\text{Married, Not Married}\}, k \in \{\text{Urban, Not Urban}\},\\ l \in \{\text{White,}\ldots\text{,Black}\}, n \in \{\text{Male, Female\} and}\ \\ m \in \{\text{Higher Education,}\ldots\text{, No qualification}\}.
+&\text{S}_{\iota} \overset{\text{ind}}{\sim} \text{Binomial}(\mu_{\iota}) \\
+\logit(\mu_{\iota}) &= \beta_0 + \beta_1a_{\iota} + \beta_2a_{\iota}^2 + \beta_3q_{\iota} + \alpha^{ms}_j + \alpha^{u}_k + \\
+&\quad + \alpha^{o}_l + \alpha^{t}_n + \alpha^{s}_m \\
+\text{where: } & \iota = ijklmn, \\
+&j \in \{\text{Married, Not Married}\}, \\
+&k \in \{\text{Urban, Not Urban}\}, \\
+&l \in \{\text{White,}\ldots\text{,Black}\}, \\
+&n \in \{\text{Male, Female\}}\ \\
+&m \in \{\text{Higher Education,}\ldots\text{, No qualification}\} \\
+\text{wherein:} \ &\alpha^{ms}_{\text{Not Married}}=\alpha^u_{\text{Not Urban}} = 
+\alpha^{o}_{\text{White}}= \alpha^{t}_{\text{Male}}= \\
+&\alpha^{s}_{\text{No qualification}} = 0
 \end{align*}
 
 ```{r outputmodelselectiontable, include = T}
@@ -669,42 +682,8 @@ create_binom_model_calibration_chart(q2_model)
 ```
 
 ```{r output-forest-plot, include = T, fig.height=4, fig.width=8, fig.cap="Forest plot of Odds Ratios for the binomial model"}
-# Create df and set reference levels
-data <- data.frame(
-  Sex = factor(train16plus$Sex),
-  age_estim = train16plus$age_estim,
-  current_smoker = train16plus$current_smoker,
-  marstatD = factor(train16plus$marstatD),
-  qimd19 = train16plus$qimd19,
-  urban14b = factor(train16plus$urban14b),
-  origin2 = factor(train16plus$origin2),
-  topqual2 = factor(train16plus$topqual2)
-)
-
-reference_levels <- list(
-  Sex = "Male",
-  marstatD = "Not Married",
-  urban14b = "Urban",
-  origin2 = "White",
-  topqual2 = "No qualification"
-)
-
-# Set reference levels for factor columns
-for (col in names(reference_levels)) {
-  if (is.factor(data[[col]])) {
-    data[[col]] <- relevel(data[[col]], ref = reference_levels[[col]])
-  } else if (is.character(data[[col]])) {
-    levels(data[[col]]) <- c(reference_levels[[col]], levels(data[[col]])[levels(data[[col]]) != reference_levels[[col]]])
-  }
-}
-
-# Define model
-model <- glm(current_smoker ~ age_estim + I(age_estim ^ 2) + marstatD + qimd19 + urban14b + origin2 + topqual2 + Sex + qimd19:urban14b,
-             data = data,
-             family = "binomial")
-
 # Extract coefficients and CIs
-coef_data <- summary(model)$coefficients
+coef_data <- summary(q2_model)$coefficients
 
 # Create a data frame
 forest_data <- data.frame(
@@ -746,9 +725,17 @@ We studied the relationship between both age and BMI with BP, shown in Figure \r
 
 To determine the predictors in the final model, we used a stepwise approach starting with the full model and eliminating variables based on AIC. The final model selected was
 
-$\eta_{ijklm} \sim cig_{ij} + a_i + ms_{ik} + u_{il} + bmi_i + bmi_i^2 + s_{im} + n_i^{alc} + \gamma_{im}^{bmi:s}bmi_i + \gamma_{im}^{a:s}a_i + \alpha_i^{a:bmi}$$
-
-omsysval ~ cigsta3_19 + age_estim + marstatD + urban14b + BMIVal + I(BMIVal ^ 2) + Sex + d7many3_19 + BMIVal:Sex + age_estim:Sex + BMIVal:age_estim
+\begin{align*}
+&\text{sbp}_{\iota} \overset{\text{ind}}{\sim} \text{IG}(\mu_{\iota}, \lambda) \\
+(\mu_{\iota})^{-2} &= \beta_0 + \beta_1cig_{\iota} + \beta_2a_{\iota} + \beta_3bmi_{\iota} + \beta_4bmi_{\iota}^2+ \beta_5n^{alc}_{\iota} + \\
+&+\beta_6bmi_{\iota}\alpha^{s}_n + \beta_7a_{\iota}\alpha^{s}_n + \beta_8bmi_{\iota}a_{\iota} + \alpha^{ms}_j + \alpha^{u}_k   + \alpha^{t}_n \\
+\text{where: } &\iota=ijkn \\
+&j \in \{\text{Married, Not Married}\}, \\
+&k \in \{\text{Urban, Not Urban}\}, \\
+&n \in \{\text{Male, Female\}}\ \\
+\text{wherein:} \ &\alpha^{ms}_{\text{Not Married}} =
+\alpha^{u}_{\text{Not Urban}} = \alpha^{t}_{\text{Male}}= 0
+\end{align*}
 
 The Q-Q plot in Figure \ref{fig:output-qq-plot} shows a good fit to the distribution and, despite some deviation at both ends of the scale, the model captured the outliers more accurately than other distributions we tried. On our testing dataset we achieved a RMSE of 14.3mmHg, which was relatively small compared to the threshold for hypertensive crisis of 140mmHg+.
 
