@@ -18,7 +18,7 @@ header-includes:
   - \usepackage[para,online,flushleft]{threeparttable} 
   - \DeclareMathOperator{\logit}{logit}
   - \DeclareMathOperator{\var}{var}
-geometry: margin=0.1in
+geometry: margin=0.15in
 pagenumbers: no
 fontsize: 11pt
 endnote: no
@@ -29,12 +29,14 @@ bibliography: bibliography.bib
 abstract: "This report provides an analysis of data related to health, age, socio-economic factors and lifestyle habits in adults (from the age of 16) from the population in England, derived from the Health Survey for England 2019. Please note, no generative AI technology was utilized in the creation of this report or the subsequent data analysis presented herein. All findings and conclusions are derived from human-driven methodologies."
 nocite: '@*'
 link-citations: true
+noextraspace: true
 classoption:
 - twocolumn
 ---
 
 <!-- Remove page numbers -->
 
+\raggedbottom 
 \pagenumbering{gobble}
 
 ```{r setup, include=F}
@@ -157,7 +159,7 @@ create_proportion_bar_plot <- function(group_variable, facet_variable, plotting_
     theme(
       axis.text.x = element_text(angle = 45, hjust = 1),
       legend.position = 'bottom',
-      strip.text = element_text(face = 'bold', size = 12),
+      strip.text = element_text(face = 'bold', size = 10),
       legend.text = element_text(size = 7), 
       legend.key.size = unit(0.4, 'cm')
     )
@@ -186,7 +188,7 @@ create_stacked_bar_plot <- function(group_variable, plotting_variable, labels = 
     labs(x = labels$x, y = labels$y) +
     theme_minimal() +
     theme(
-      axis.text.x = element_text(angle = 45, hjust = 1), 
+      axis.text.x = element_text(angle = 45, hjust = 1, size=10), 
       legend.position = 'bottom', 
       legend.text = element_text(size = 6), 
       legend.key.size = unit(0.4, 'cm')
@@ -274,7 +276,7 @@ create_confidence_int_plot <- function(group_variable, facet_variable, labels = 
     ) +
     theme_minimal() +
     theme(
-      strip.text = element_text(face = 'bold', size = 12), legend.position = 'bottom'
+      strip.text = element_text(face = 'bold', size = 10), legend.position = 'bottom'
     )
 }
 ```
@@ -434,7 +436,7 @@ create_qq_plot <- function(fit) {
     stat_qq() +
     stat_qq_line(linetype = 'dashed', col = 'red') +
     theme_minimal() +
-    labs(x = "Theoretical Quantiles", y = "Std. Pearson Residuals")
+    labs(x = "Theoretical Quantiles", y = "Std. Pearson Res.")
 }
 ```
 
@@ -443,7 +445,7 @@ create_relationship_plots <- function(variable, labels) {
   ggplot(data = train16plus, aes(x = !!sym(variable), y = omsysval)) +
     geom_point() +
     geom_smooth() +
-    labs(y = "Omron Valid Mean Systolic Blood Pressure (mmHg)", x = labels$x) +
+    labs(y = "Valid Mean SBP (mmHg)", x = labels$x) +
     theme_minimal()
 }
 ```
@@ -550,13 +552,13 @@ In England, smoking, "vaping" and alcohol consumption are widespread habits amon
 
 We conducted this analysis on a subset containing 8,204 adults living in England (ages 16+), who were interviewed in their homes about their demographics and their smoking and drinking habits as part of the Health Survey for England (HSE) 2019. 4,947 of these participants who consented to an at-home nurse visit had vitals such as blood pressure, weight and height measured. We investigated which features of a participant are associated with smoking habits, and which habits are associated with high blood pressure.
 
-We found alcohol consumption to be the most prevalent lifestyle habit under investigation. Older males were found to drink the most, especially those aged 65-74. Also, smoking tended to be more prevalent in areas of greater deprivation, whilst alcohol consumption was found to be more prevalent in less deprived areas. Socio-economic factors played an important role in the likelihood of smoking, with females 25% less likely to be smokers than males. Ethnicity also played a great role, as being Black or Asian decreased the likelihood of smoking by more than 70% and 65%, respectively. Females were much less likely to experience hypertension in comparison to males. However, systolic blood pressure levels were positively correlated with age and how often the respondent drinks alcohol, regardless of gender.
+We found alcohol consumption to be the most prevalent lifestyle habit under investigation. Older males were found to drink the most, especially those aged 65-74. Also, smoking tended to be more prevalent in areas of greater deprivation, whilst alcohol consumption was found to be more prevalent in less deprived areas. Socio-economic factors played an important role in the likelihood of smoking, with females 25% less likely to be smokers than males. Ethnicity also played a great role, as being Black or Asian decreased the likelihood of smoking by more than 70% and 65%, respectively. Females were much less likely to experience hypertension in comparison to males. However, systolic BP levels were positively correlated with age and how often the respondent drinks alcohol, regardless of gender.
 
 ## Introduction
 
-The mechanisms which drive lifestyle habits are part of a complex and ever-changing field in behavioural psychology. What is known, however, is that such habits are driven by cues and cravings [@SmokeCue; @DrinkCue]. The HSE 2019 captures demographic and socioeconomic characteristics that have the potential to make such cues more visible and cravings harder to resist. For example, living in a region where smoking is more prevalent or not having a husband/wife for an accountability partner to help you quit or resist these habits [@AccountPartner].
+The mechanisms which drive lifestyle habits are part of a complex and ever-changing field in behavioural psychology. What is known, however, is that such habits are driven by cues and cravings [@SmokeCue; @DrinkCue]. The HSE 2019 captures demographic and socioeconomic characteristics that potentially make such cues more visible and cravings harder to resist. For example, living in a region where smoking is more prevalent or not having a husband/wife for an accountability partner to help you quit or resist these habits [@AccountPartner].
 
-In this report, we will use weighting variables to estimate prevalence of cigarette, e-cig, and alcohol users in our population, and compare it with the larger population of adults in England. We will then attempt to identify associations with a participant's current smoking status, explore whether predictive modelling can be used to identify smokers with a high accuracy, and investigate which lifestyle habits are associated with increased values of systolic blood pressure. Such an understanding would be crucial in enabling healthcare providers to implement preventative care for people at risk of developing hypertension.
+Throughout, we will use weighting variables to estimate prevalence of cigarette, e-cig, and alcohol usage in our sample, and compare it with the population of adults in England. We will then attempt to identify associations with a participant's current smoking status, explore whether predictive modelling can be used to accurately identify smokers, and investigate which lifestyle habits are associated with increased values of systolic blood pressure. Such an understanding would be crucial in enabling healthcare providers to implement preventative care for people at risk of developing hypertension.
 
 # Methodology
 
@@ -575,30 +577,21 @@ kbl(
   df, "latex", 
   col.names = c('Variable', 'Definition', 'Notation'), 
   caption = "Summary of the analysis variables used in our report. (D) indicates that a variable was derived.\\label{tab:output-var-table}",
-  longtable=F, escape = F) %>% column_spec(2, width = "11em") %>% column_spec(1, width = "7em") %>% row_spec (0, bold = T) %>% kable_styling(font_size = 8)
+  longtable=F, escape = F) %>% column_spec(2, width = "16em") %>% column_spec(1, width = "9em") %>% row_spec (0, bold = T) %>% kable_styling(font_size = 7)
 ```
-
-### Duplicates
-
 We found 36 pairs of observations with exactly equal variables (excluding ID variables and lab measurements), but we did not remove these from our analysis because the supporting documentation didn't state a protocol for repeated visits. We assumed these were genuine observations from different participants and thus included them in our dataset. However, there were 3 pairs of observations that had duplicate lab variables also. Due to the high precision of measurements, we believed these to be true duplicates and removed one observation from each of the three pairs, resulting in a dataset of `r NROW(sd16plus)` observations.
 
-### Dichotomy of Factors
-
 All variables were originally coded as numeric in our dataset, so we recoded these to factor variables accordingly. Some of the variables used for analysis were dichotomised by us for easier interpretation. We coded a binary variable indicating current smoking status, which served as a response variable. Also, we dichotomised urbanity into two levels being 'Rural' and 'Urban', and finally marital status into 'Married' and 'Not Married'. We grouped respondent's level of education into 'Higher Education', 'Further Education', 'A-Level equiv.', 'GCSE equiv.', 'No qualification' and 'Foreign/other', and we grouped alcohol frequency into "Frequent", "Occasional" and "Rarely" based on the response to the question "How often did you consume alcohol in the last 12 months?".
-
-### Missingness
 
 ```{r outputnatable, include = T}
 kbl(
   variable_na_table, 
   col.names = c('Variable', 'Missing Values', '% Missing'), 
   caption = "Missing values in the training dataset\\label{tab:output-na-table}",
-  longtable=F) %>% row_spec (0, bold = T) %>% kable_styling(font_size = 9)
+  longtable=F) %>% row_spec (0, bold = T) %>% kable_styling(font_size = 7)
 ```
 
 There is significant missingness in the lab values, as shown in Table \ref{tab:output-na-table}. These can be explained by the fact additional consent was needed from the participant to allow a nurse visit. One variable with a substantial amount of missing data was the frequency of drinking in the last 12 months, which due to the retrospective and sensitive nature of the question could be explained by either recall bias or a participant's refusal to answer. As a result, we decided to remove this variable from analysis in favour of a binary variable which simply states whether the respondent has drunk alcohol in the last 12 months. Education level, marital status and ethnicity are the only socioeconomic variables with any missing entries, with `r filter(variable_na_table, Variable == 'topqual2')$SumNA` observations (`r filter(variable_na_table, Variable == 'topqual2')$PercNA` of the data) missing at least one of the three. These were not necessary for identifiability and as they are sensitive, we did not expect every participant to answer these questions. Therefore, we did not remove these observations.
-
-### Outliers and Data Issues
 
 We attempted to determine whether the two lab measurement variables contained potential outliers, and as can be seen in Figure \ref{fig:output-distribution-plots}, there were many outliers for BMI. We note that calculated BMI used self-estimated weight from the participant if this weight exceeded 130kg. Additionally, weight measurements were taken in inconsistent environments such as on different flooring in the participants' homes which is known to impact measurement accuracy [@Weight]. We believed this could have explained the extremely high BMI values in the range of 54.82 to 73.49. We coded such values as missing in the analysis dataset, but kept the observation.
 
@@ -645,14 +638,14 @@ kbl(
   col.names = c('Habit', 'Estimate', 'C.I.'), 
   caption = "Estimates and 95\\% Confidence Intervals for \\% of Population\\label{tab:output-estimates-table}",
   longtable=F
-) %>% row_spec (0, bold = T) %>% kable_styling(font_size = 9)
+) %>% row_spec (0, bold = T) %>% kable_styling(font_size = 7)
 ```
 
 We found that the e-cigarette usage among adults is relatively low, making it challenging to dissect any significant trends within the data. However, since drinking and smoking were so prevalent among the respondents, we had sufficient data to identify any potential trends even within smaller groups of our sample.
 
-Next, we worked to uncover factors that may have associations with smoking prevalence. We started with the demographic factors of age and gender, plotting the smoking prevalence across combinations of these groups to identify any patterns. Figure \ref{fig:output-prevelance-plot} suggests a negative correlation between age and the proportion of current cigarette smokers, across both genders. Interestingly, the proportion of males who quit smoking in later-life was much greater than that of females (75yrs+; M: 50%, F: 31%).
+Next, we worked to uncover factors that may have associations with smoking prevalence. We started with the demographic factors of age and gender, and plotted the prevalence of these habits across the groups in Figure \ref{fig:output-prevelance-plot}. The plot suggests a negative correlation between age and the prevalence of current cigarette smokers across both genders, with males having higher drinking prevalence across nearly all age groups.  Interestingly, we found in our data that the proportion of males who quit smoking in later-life was much greater than that of females (75yrs+; M: 50%, F: 31%).
 
-```{r output-smoking-drinking-age-plot, include = T, fig.width=12, fig.height=5, fig.cap="Smoking and drinking status proportions by age group and gender"}
+```{r output-smoking-drinking-age-plot, include = F, fig.width=12, fig.height=5, fig.cap="Smoking and drinking status proportions by age group and gender"}
 p1 <- create_proportion_bar_plot('ag16g10', 'Sex', 'cigsta3_19', labels = list(x = 'Age Group', y = 'Proportion', legend.title = 'Smoking Status'))
 p2 <- create_proportion_bar_plot('ag16g10', 'Sex', 'dnoft_19', labels = list(x = 'Age Group', y = 'Proportion', legend.title = 'Drinking Status'))
 
@@ -664,7 +657,7 @@ p2
 create_confidence_int_plot('ag16g10', 'Sex', list(x = 'Age Group', y = '% Prevelance In Population', legend.title = "Habit"))
 ```
 
-Males demonstrated a higher prevalence of drinking across nearly all demographic categories in comparison to females. We observed a positive correlation between smoking and deprivation levels, with `r round(100 * filter(deprivation_smoking_summary, qimd19 == 5)$p_hat, digits = 2)`% of individuals in the most deprived quintile being smokers, a significant increase from `r round(100 * filter(deprivation_smoking_summary, qimd19 == 1)$p_hat, digits = 2)`% in the least deprived.
+During our analysis, we also observed a positive correlation between smoking and deprivation levels, with `r round(100 * filter(deprivation_smoking_summary, qimd19 == 5)$p_hat, digits = 2)`% of individuals in the most deprived quintile being smokers, a significant increase from `r round(100 * filter(deprivation_smoking_summary, qimd19 == 1)$p_hat, digits = 2)`% in the least deprived.
 
 ### How is smoking associated with socioeconomic factors and age?
 
@@ -685,8 +678,8 @@ df <- df %>%
 kbl(
   df, "latex", 
   col.names = c('Variable:Label', 'Test', 'Train', 'P Value'), 
-  caption = "Comparison of the characteristics of the training set compared with the test set.\\label{tab:output-testtrain-table}",
-  longtable=F, escape = F) %>% add_header_above(c(" " = 1, "Proportion (%)" = 2)) %>% row_spec (22, bold = T) %>% row_spec (0, bold = T) %>% kable_styling(font_size = 10)
+  caption = "Comparison of the characteristics of the training set compared with the test set. P-values derived from two-sample t-test for means and proportion test for proportions. \\label{tab:output-testtrain-table}",
+  longtable=F, escape = F) %>% add_header_above(c(" " = 1, "Proportion (%)" = 2)) %>% row_spec (22, bold = T) %>% row_spec (0, bold = T) %>% kable_styling(font_size = 7)
 ```
 
 To develop a predictive model for identifying smokers, we used the binary variable for current smoking status as a response, with various socioeconomic and demographic factors as predictors. These were selected based on the associations suggested by our prior analysis.
@@ -717,20 +710,54 @@ kbl(
   caption = "Comparison of selected model evaluations, wherein $\\eta_i = \\text{logit}(\\mu_i)$, and Acc. refers to the model accuracy on test data.\\label{tab:output-model-selection-table}",
   escape = FALSE,
   longtable=F
-) %>% column_spec(1, width = "9em") %>% add_header_above(c(" " = 3, "RMSE" = 2, " " = 1)) %>% row_spec (0, bold = T) %>% kable_styling(font_size = 8)
+) %>% column_spec(1, width = "9em") %>% add_header_above(c(" " = 3, "RMSE" = 2, " " = 1)) %>% row_spec (0, bold = T) %>% kable_styling(font_size = 7)
 ```
 
-To evaluate the predictive performance of our final model using our test data, Figure 4 demonstrates the predicted probability of each 'probability bin' against the mean actual outcomes. As we can see the calibration curve closely follows the line $y = x$, which is indicative of a well-calibrated model.
+To evaluate the predictive performance of our final model using our test data, Figure \ref{fig:output-calibration-chart} demonstrates the predicted probability of each 'probability bin' against the mean actual outcomes. As we can see the calibration curve closely follows the line $y = x$, which is indicative of a well-calibrated model.
 
 This model doesn't predict high values due to the low prevalence of smoking within the population. The highest likelihood our model predicts is 63.75% All results should be interpreted with the population average in mind, which is \~16.5%. For example, if the model predicts the likelihood of an individual being a smoker at 33%, said individual is twice as more likely to be a smoker than the average. This effect can be seen in the following calibration chart.
 
-```{r output-calibration-chart, include = T, fig.width=4, fig.height=3, fig.align='center', fig.cap="Calibration chart for Binomial model"}
+```{r output-calibration-chart, include = T, fig.width=3, fig.height=2, fig.align='center', fig.cap="Calibration chart for Binomial model"}
 create_binom_model_calibration_chart(q2_model)
 ```
 
 ```{r output-forest-plot, include = T, fig.height=4, fig.width=8, fig.cap="Forest plot of Odds Ratios for the binomial model"}
+# Create df and set reference levels
+data <- data.frame(
+  Sex = factor(train16plus$Sex),
+  age_estim = train16plus$age_estim,
+  current_smoker = train16plus$current_smoker,
+  marstatD = factor(train16plus$marstatD),
+  qimd19 = train16plus$qimd19,
+  urban14b = factor(train16plus$urban14b),
+  origin2 = factor(train16plus$origin2),
+  topqual2 = factor(train16plus$topqual2)
+)
+
+reference_levels <- list(
+  Sex = "Male",
+  marstatD = "Not Married",
+  urban14b = "Urban",
+  origin2 = "White",
+  topqual2 = "No qualification"
+)
+
+# Set reference levels for factor columns
+for (col in names(reference_levels)) {
+  if (is.factor(data[[col]])) {
+    data[[col]] <- relevel(data[[col]], ref = reference_levels[[col]])
+  } else if (is.character(data[[col]])) {
+    levels(data[[col]]) <- c(reference_levels[[col]], levels(data[[col]])[levels(data[[col]]) != reference_levels[[col]]])
+  }
+}
+
+# Define model
+model <- glm(current_smoker ~ age_estim + I(age_estim ^ 2) + marstatD + qimd19 + urban14b + origin2 + topqual2 + Sex + qimd19:urban14b,
+             data = data,
+             family = "binomial")
+
 # Extract coefficients and CIs
-coef_data <- summary(q2_model)$coefficients
+coef_data <- summary(model)$coefficients
 
 # Create a data frame
 forest_data <- data.frame(
@@ -755,13 +782,13 @@ ggplot(forest_data, aes(x = estimate, y = variable, colour = case_when(variable 
   guides(color = FALSE)  + geom_vline(xintercept = 1, colour = "black", size = 0.5)
 ```
 
-For interpretability, we decided to include a forest plot of the odds ratio for each variable in our model, as the log-odds can be difficult to interpret. The intercept 0.257 can be interpreted as the probability of a white, non-married, unqualified male living in urban area being a smoker, using the reference levels of each factor. On average, the blue factors increase the probability and the red factors decrease the probability. Being Black, Asian, Married or a female significantly decreases this probability, so this is evidence of a socioeconomic effect.
+For interpretability, we decided to include a forest plot of the odds ratio for each variable in our model, as the log-odds can be difficult to interpret. The intercept 0.257 can be interpreted as the probability of a white, non-married, unqualified male living in urban area being a smoker, using the reference levels of each factor. On average, the green factors increase the probability and the red factors decrease the probability. Being Black, Asian, Married or a female significantly decreases this probability, so this is evidence of a socioeconomic effect.
 
 ### Which lifestyle habits are associated with systolic blood pressure?
 
 We chose to model the systolic blood pressure (BP) using the Inverse-Normal distribution with a $1/\mu_i^2$ link function. This distribution was a suitable choice because this variable has a lot of outliers, is right-skewed and strictly positive. We also tested a Log-Normal distribution, a Normal distribution with identity link and a Gamma distribution with an inverse link but found that the Inverse-Normal distribution was best able to account for the higher values of BP in the Q-Q plots. The data we used to fit this model was the same training data set as the Binomial model. We filtered out *NA* values of BMI and BP as we only want to consider respondents that had lab measurements taken, leaving us with `r NROW(filter(train16plus , BMIVal <= 54, !is.na(omsysval), !is.na(BMIVal)))` observations.
 
-```{r output-relationship-plots, include = T, fig.height=5, fig.width=12, fig.cap="Relationship of BMI and Age with Mean Systolic Blood Pressure"}
+```{r output-relationship-plots, include = T, fig.height=7, fig.width=12, fig.cap="Relationship of BMI and Age with Mean Systolic Blood Pressure"}
 p1 <- create_relationship_plots('age_estim', labels = list(x = "Estimated Age (yrs)"))
 p2 <- create_relationship_plots('BMIVal', labels = list(x = "Body Mass Index (kg/m^2)"))
 
@@ -786,7 +813,7 @@ To determine the predictors in the final model, we used a stepwise approach star
 
 The Q-Q plot in Figure \ref{fig:output-qq-plot} shows a good fit to the distribution and, despite some deviation at both ends of the scale, the model captured the outliers more accurately than other distributions we tried. On our testing dataset we achieved a RMSE of 14.3mmHg, which was relatively small compared to the threshold for hypertensive crisis of 140mmHg+.
 
-```{r output-qq-plot, include = T, fig.height=2, fig.width=4, fig.align='center', fig.cap="Q-Q plot of Inverse-Normal model residuals"}
+```{r output-qq-plot, include = T, fig.height=2, fig.width=3, fig.align='center', fig.cap="Q-Q plot of Inverse-Normal model residuals"}
 create_qq_plot(q3_model)
 ```
 
@@ -812,10 +839,9 @@ create_effects_plot(q3_model, c('d7many3_19', 'Sex'), labels = list(x = 'Number 
 
 Our analysis showed that alcohol consumption is highly common in our sample, with approximately `r round(100 * overall_drinking$p_hat, digits = 1)`% being consumers, while smoking and vaping rates were lower at `r round(100 * overall_smoking$p_hat, digits = 1)`% and `r round(100 * overall_ecigs$p_hat, digits = 1)`%, respectively. Older males showed the highest tendencies for alcohol consumption, with 'frequent' drinking the most prevalent among males aged 65-74. Unlike 'frequent' alcohol consumption, the prevalence of smoking decreases with age. Individuals aged 16-24 appear to be the most susceptible to smoking cigarettes, indicating a significant issue within youth culture. Moreover, we found interesting, opposing associations between deprivation levels and smoking and drinking behaviours. Smoking prevalence seemed to increase as deprivation levels decreased, whereas alcohol consumption appeared to do the opposite.
 
-To help us uncover the underlying socio-economic factors that may drive the prevalence of smoking, we looked at the most 'comparable' respondent type in our dataset. This 'respondent' is a white, single male who has no qualifications and lives in an urban area. We found that the probability of our hypothetical respondent being a smoker is approximately 25%, which can be seen from Figure \ref{fig:output-forest-plot}. This is notably higher than the population average of `r round(100 * overall_smoking$p_hat, digits = 1)`. The smoking prevalence estimate in our sample is significantly higher than that of the population of interest (16.5% vs. 13.9%, outside of the CI in Table \ref{tab:output-estimates-table}). The only socio-economic variables to certainly increase this probability is the deprivation level our respondent falls under. The rest of the socio-economic variables we have access to, appear to decrease the likelihood of smoking. For example, if our respondent is any of the following: Asian, black, married, or went on to further education, the chances of them being a smoker is at-least halved.
+To help us uncover the underlying socio-economic factors that may drive smoking prevalence, we looked at the most 'comparable' respondent in our dataset. This 'respondent' is a white, single male who has no qualifications and lives in an urban area. We found that the probability of our hypothetical respondent being a smoker is around 25%, which can be seen from Figure \ref{fig:output-forest-plot}. The smoking prevalence estimate in our sample is significantly higher than that of the population of interest (16.5% vs. 13.9%, outside of the CI in Table \ref{tab:output-estimates-table}). The only socio-economic variables to certainly increase this probability is the deprivation level our respondent falls under. The rest of the socio-economic variables we have access to, appear to decrease the likelihood of smoking. For example, if our respondent is any of the following: Asian, black, married, or went on to further education, the chances of them being a smoker is at-least halved.
 
-If we had more observations from current smokers, we may have been able to increase the positive predictive value of our final model for smoking status, and hence obtain increased accuracy. Due to the cross-sectional format of the study, we are
-unable to comment on temporal changes in smoking habits or establish a causal relationship. Furthermore, access to data from the whole of the UK could improve generalisability, but including participants with hypertensive crisis helps to generalise our findings to those who may need the most attention and preventative care from healthcare providers.
+If we had more data from current smokers, we may have been able to increase the accuracy of our final model for smoking status. Due to the cross-sectional format of the study, we are unable to comment on temporal changes in habits or establish a causal relationship. Furthermore, access to data from the whole of the UK could improve generalisability, but including participants with hypertensive crisis helped to generalise our findings to those who may have the most need for preventative care from healthcare providers.
 
 ```{=tex}
 \clearpage
